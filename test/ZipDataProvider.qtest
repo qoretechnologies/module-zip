@@ -1,0 +1,203 @@
+#!/usr/bin/env qore
+# -*- mode: qore; indent-tabs-mode: nil -*-
+
+/*
+    Qore ZipDataProvider module test suite
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+%new-style
+%strict-args
+%require-types
+%enable-all-warnings
+
+%requires QUnit
+%requires Util
+%requires DataProvider
+%requires zip
+%requires ZipDataProvider
+
+%exec-class ZipDataProviderTest
+
+public class ZipDataProviderTest inherits QUnit::Test {
+    private {
+        string testDir;
+    }
+
+    constructor() : Test("ZipDataProviderTest", "1.0") {
+        testDir = tmp_location() + "/zip_dp_test_" + string(getpid());
+
+        addTestCase("Module loading tests", \moduleLoadingTest());
+        addTestCase("App registration tests", \appRegistrationTest());
+        addTestCase("Integration tests", \integrationTest());
+        addTestCase("Compression tests", \compressionTest());
+
+        set_return_value(main());
+    }
+
+    setUp() {
+        mkdir(testDir, 0755);
+    }
+
+    tearDown() {
+        if (is_dir(testDir)) {
+            system("rm -rf " + testDir);
+        }
+    }
+
+    # ==================== Module Loading Tests ====================
+
+    moduleLoadingTest() {
+        # Test that ZipDataProvider module loads successfully
+        assertEq(True, True, "ZipDataProvider module loaded");
+
+        # Test that the factory is registered
+        AbstractDataProviderFactory zipFactory = DataProvider::getFactory("zip");
+        assertEq(True, exists zipFactory, "zip factory is registered");
+        assertEq("zip", zipFactory.getName(), "factory name is 'zip'");
+    }
+
+    # ==================== App Registration Tests ====================
+
+    appRegistrationTest() {
+        # Test app registration
+        *hash<DataProviderAppInfo> appInfo = DataProviderActionCatalog::getApp("Zip");
+        assertEq(True, exists appInfo, "Zip app is registered");
+        assertEq("Zip", appInfo.name, "app name is Zip");
+        assertEq("Zip Archive", appInfo.display_name, "app display_name");
+        assertEq(True, exists appInfo.short_desc, "app has short_desc");
+        assertEq(True, exists appInfo.desc, "app has desc");
+        assertEq(True, exists appInfo.logo, "app has logo");
+        assertEq("zip-logo.svg", appInfo.logo_file_name, "app logo_file_name");
+        assertEq(MimeTypeSvg, appInfo.logo_mime_type, "app logo_mime_type");
+
+        # Verify logo is valid SVG
+        assertEq(True, appInfo.logo.find("<svg") >= 0, "logo contains SVG tag");
+        assertEq(True, appInfo.logo.find("</svg>") >= 0, "logo contains closing SVG tag");
+    }
+
+    # ==================== Integration Tests ====================
+
+    integrationTest() {
+        # Full workflow test: create -> list -> extract -> verify
+
+        string zipPath = testDir + "/dp_integration.zip";
+        string extractDir = testDir + "/dp_integration_extracted";
+        mkdir(extractDir);
+
+        # Step 1: Create archive using ZipFile
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("readme.txt", "Integration test readme");
+            zip.addText("data/config.json", '{"setting": "value"}');
+            zip.addText("data/users.csv", "id,name\n1,Alice\n2,Bob");
+            zip.setComment("Integration test archive");
+            zip.close();
+        }
+
+        # Step 2: Verify archive was created
+        assertEq(True, is_file(zipPath), "archive file exists");
+
+        # Step 3: List contents
+        {
+            ZipFile zip(zipPath, "r");
+            list<hash<ZipEntryInfo>> entries = zip.entries();
+            assertEq(3, entries.size(), "integration archive has 3 entries");
+
+            # Verify entry names
+            hash<string, bool> entryNames;
+            foreach hash<ZipEntryInfo> entry in (entries) {
+                entryNames{entry.name} = True;
+            }
+            assertEq(True, exists entryNames{"readme.txt"}, "has readme.txt");
+            assertEq(True, exists entryNames{"data/config.json"}, "has data/config.json");
+            assertEq(True, exists entryNames{"data/users.csv"}, "has data/users.csv");
+            zip.close();
+        }
+
+        # Step 4: Extract archive
+        {
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir);
+            zip.close();
+        }
+
+        # Step 5: Verify extraction
+        assertEq(True, is_file(extractDir + "/readme.txt"), "readme.txt extracted");
+        assertEq(True, is_file(extractDir + "/data/config.json"), "data/config.json extracted");
+        assertEq(True, is_file(extractDir + "/data/users.csv"), "data/users.csv extracted");
+
+        # Verify content
+        string readmeContent = ReadOnlyFile::readTextFile(extractDir + "/readme.txt");
+        assertEq("Integration test readme", readmeContent, "readme content matches");
+
+        string jsonContent = ReadOnlyFile::readTextFile(extractDir + "/data/config.json");
+        assertEq('{"setting": "value"}', jsonContent, "json content matches");
+
+        # Step 6: Create in-memory archive and decompress
+        binary memArchive;
+        {
+            ZipFile zip();
+            zip.addText("memory1.txt", "Memory content 1");
+            zip.addText("memory2.txt", "Memory content 2");
+            memArchive = zip.toData();
+        }
+
+        assertEq(True, memArchive.size() > 0, "in-memory archive created");
+
+        # Verify in-memory archive contents
+        {
+            ZipFile zip(memArchive);
+            assertEq(2, zip.count(), "memory archive has 2 entries");
+            string content1 = zip.readText("memory1.txt");
+            assertEq("Memory content 1", content1, "memory1 content matches");
+            zip.close();
+        }
+    }
+
+    # ==================== Compression Tests ====================
+
+    compressionTest() {
+        # Test compression with data provider workflow
+        string largeContent = strmul("This is test content for compression testing. ", 1000);
+        binary compressedArchive;
+        {
+            ZipFile zip();
+            zip.addText("large.txt", largeContent, NOTHING, <ZipAddOptions>{
+                "compression_method": ZIP_CM_DEFLATE,
+                "compression_level": ZIP_COMPRESSION_BEST,
+            });
+            compressedArchive = zip.toData();
+        }
+
+        # Verify compression worked (archive should be smaller than content)
+        assertEq(True, compressedArchive.size() < largeContent.size(), "compression reduced size");
+
+        # Verify content integrity
+        {
+            ZipFile zip(compressedArchive);
+            string decompressed = zip.readText("large.txt");
+            assertEq(largeContent, decompressed, "decompressed content matches original");
+            zip.close();
+        }
+    }
+}

@@ -1,0 +1,515 @@
+# -*- mode: qore; indent-tabs-mode: nil -*-
+#! @file ZipDataProvider.qm Qore user module providing a data provider API for ZIP archives
+
+/*  ZipDataProvider.qm Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+%requires qore >= 2.0
+
+%requires DataProvider
+%requires Mime
+%requires zip
+
+%new-style
+%strict-args
+%require-types
+%enable-all-warnings
+
+module ZipDataProvider {
+    version = "1.0";
+    desc = "user module providing a data provider API for ZIP archives";
+    author = "Qore Technologies, s.r.o.";
+    url = "https://github.com/qoretechnologies/module-zip";
+    license = "MIT";
+    init = sub () {
+        # Register the data provider factory
+        DataProvider::registerFactory(new ZipDataProviderFactory());
+
+        # Register the data provider application
+        DataProviderActionCatalog::registerApp(<DataProviderAppInfo>{
+            "name": ZipDataProvider::AppName,
+            "display_name": "Zip Archive",
+            "short_desc": "Zip archive operations",
+            "desc": "Create, extract, and manage Zip archives with compression support",
+            "logo": ZipLogo,
+            "logo_file_name": "zip-logo.svg",
+            "logo_mime_type": MimeTypeSvg,
+        });
+
+        # Register actions
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/create",
+            "action": "create-archive",
+            "display_name": "Create Archive",
+            "short_desc": "Create a new zip archive",
+            "desc": "Create a new zip archive from files, directories, or binary data",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/extract",
+            "action": "extract-archive",
+            "display_name": "Extract Archive",
+            "short_desc": "Extract a zip archive",
+            "desc": "Extract all contents of a zip archive to a destination directory",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/list",
+            "action": "list-archive",
+            "display_name": "List Archive Contents",
+            "short_desc": "List files in a zip archive",
+            "desc": "Get a list of all entries in a zip archive with metadata",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/info",
+            "action": "get-archive-info",
+            "display_name": "Get Archive Info",
+            "short_desc": "Get zip archive metadata",
+            "desc": "Get metadata and statistics about a zip archive",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/add",
+            "action": "add-files",
+            "display_name": "Add Files to Archive",
+            "short_desc": "Add files to an existing archive",
+            "desc": "Add new files or update existing files in a zip archive",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/file/extract",
+            "action": "extract-file",
+            "display_name": "Extract Single File",
+            "short_desc": "Extract one file from archive",
+            "desc": "Extract a single file from a zip archive to memory or disk",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/data/compress",
+            "action": "compress-data",
+            "display_name": "Compress Data",
+            "short_desc": "Compress data to zip format",
+            "desc": "Compress binary data or files into an in-memory zip archive",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/data/decompress",
+            "action": "decompress-data",
+            "display_name": "Decompress Data",
+            "short_desc": "Decompress zip data",
+            "desc": "Decompress an in-memory zip archive and return file contents",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/stream/extract",
+            "action": "stream-extract",
+            "display_name": "Stream Extract",
+            "short_desc": "Stream extract large file from archive",
+            "desc": "Extract a large file from an archive using streaming to avoid loading entire file into memory",
+            "action_code": DPAT_API,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/entry/delete",
+            "action": "delete-entry",
+            "display_name": "Delete Entry",
+            "short_desc": "Delete file from archive",
+            "desc": "Delete a file or directory entry from an existing zip archive",
+            "action_code": DPAT_API,
+        });
+    };
+}
+
+public namespace ZipDataProvider {
+    #! Application name
+    public const AppName = "Zip";
+
+    #! ZIP logo (loaded at initialization)
+    public const ZipLogo = File::readTextFile(get_script_dir() + "/zip-logo.svg");
+
+#! ZipDataProvider factory class
+public class ZipDataProviderFactory inherits AbstractDataProviderFactory {
+    public {
+        #! Factory info
+        const FactoryInfo = <DataProviderFactoryInfo>{
+            "name": "zip",
+            "desc": "ZIP archive data provider factory",
+            "children_can_support_apis": True,
+        };
+    }
+
+    #! Returns the factory name
+    string getName() {
+        return FactoryInfo.name;
+    }
+
+    #! Returns static factory information
+    hash<DataProviderFactoryInfo> getInfoImpl() {
+        return FactoryInfo;
+    }
+
+    #! Returns the data provider info
+    private hash<DataProviderInfo> getProviderInfoImpl() {
+        return ZipDataProvider::ProviderInfo;
+    }
+
+    #! Returns a data provider with the given options
+    private AbstractDataProvider getProviderImpl(hash<auto> opts) {
+        return new ZipDataProvider(opts);
+    }
+
+    #! Returns the class for the data provider
+    private Class getClassImpl() {
+        return Class::forName("ZipDataProvider::ZipDataProvider");
+    }
+}
+
+#! Main ZIP data provider class
+public class ZipDataProvider inherits AbstractDataProvider {
+    public {
+        #! Provider info
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "zip",
+            "desc": "ZIP archive data provider",
+            "type": "ZipDataProvider",
+            "supports_children": True,
+            "children_can_support_apis": True,
+        };
+    }
+
+    private {
+        #! Options passed to constructor
+        hash<auto> opts;
+    }
+
+    #! Constructor
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    #! Returns the data provider name
+    string getName() {
+        return ProviderInfo.name;
+    }
+
+    #! Returns the data provider description
+    *string getDesc() {
+        return ProviderInfo.desc;
+    }
+
+    #! Returns child providers
+    private *list<string> getChildProviderNamesImpl() {
+        return ("archive", "file", "data", "stream", "entry");
+    }
+
+    #! Returns the given child provider or NOTHING if it doesn't exist
+    private *AbstractDataProvider getChildProviderImpl(string name) {
+        switch (name) {
+            case "archive":
+                return new ZipArchiveDataProvider(opts);
+            case "file":
+                return new ZipFileDataProvider(opts);
+            case "data":
+                return new ZipDataDataProvider(opts);
+            case "stream":
+                return new ZipStreamDataProvider(opts);
+            case "entry":
+                return new ZipEntryDataProvider(opts);
+        }
+        return NOTHING;
+    }
+
+    #! Returns data provider static info
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return ProviderInfo;
+    }
+}
+
+#! Archive operations provider
+public class ZipArchiveDataProvider inherits AbstractDataProvider {
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "archive",
+            "desc": "ZIP archive operations",
+            "type": "ZipArchiveDataProvider",
+            "supports_children": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
+    private *list<string> getChildProviderNamesImpl() {
+        return ("create", "extract", "list", "info", "add");
+    }
+
+    private *AbstractDataProvider getChildProviderImpl(string name) {
+        switch (name) {
+            case "create":
+                return new ZipCreateArchiveDataProvider(opts);
+            case "extract":
+                return new ZipExtractArchiveDataProvider(opts);
+            case "list":
+                return new ZipListArchiveDataProvider(opts);
+            case "info":
+                return new ZipArchiveInfoDataProvider(opts);
+            case "add":
+                return new ZipAddFilesDataProvider(opts);
+        }
+        return NOTHING;
+    }
+
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return ProviderInfo;
+    }
+}
+
+#! File operations provider
+public class ZipFileDataProvider inherits AbstractDataProvider {
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "file",
+            "desc": "ZIP file entry operations",
+            "type": "ZipFileDataProvider",
+            "supports_children": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
+    private *list<string> getChildProviderNamesImpl() {
+        return ("extract",);
+    }
+
+    private *AbstractDataProvider getChildProviderImpl(string name) {
+        if (name == "extract") {
+            return new ZipExtractFileDataProvider(opts);
+        }
+        return NOTHING;
+    }
+
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return ProviderInfo;
+    }
+}
+
+#! Data operations provider
+public class ZipDataDataProvider inherits AbstractDataProvider {
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "data",
+            "desc": "ZIP data operations",
+            "type": "ZipDataDataProvider",
+            "supports_children": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
+    private *list<string> getChildProviderNamesImpl() {
+        return ("compress", "decompress");
+    }
+
+    private *AbstractDataProvider getChildProviderImpl(string name) {
+        switch (name) {
+            case "compress":
+                return new ZipCompressDataDataProvider(opts);
+            case "decompress":
+                return new ZipDecompressDataDataProvider(opts);
+        }
+        return NOTHING;
+    }
+
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return ProviderInfo;
+    }
+}
+
+#! Stream operations provider (placeholder)
+public class ZipStreamDataProvider inherits AbstractDataProvider {
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "stream",
+            "desc": "ZIP stream operations",
+            "type": "ZipStreamDataProvider",
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return ProviderInfo;
+    }
+}
+
+#! Entry operations provider (placeholder)
+public class ZipEntryDataProvider inherits AbstractDataProvider {
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "entry",
+            "desc": "ZIP entry operations",
+            "type": "ZipEntryDataProvider",
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return ProviderInfo;
+    }
+}
+
+# Placeholder data provider classes for specific operations
+# These would be fully implemented with proper request/response types
+
+public class ZipCreateArchiveDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "create"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "create", "desc": "Create ZIP archive", "supports_request": True};
+    }
+}
+
+public class ZipExtractArchiveDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "extract"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "extract", "desc": "Extract ZIP archive", "supports_request": True};
+    }
+}
+
+public class ZipListArchiveDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "list"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "list", "desc": "List ZIP archive contents", "supports_request": True};
+    }
+}
+
+public class ZipArchiveInfoDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "info"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "info", "desc": "Get ZIP archive info", "supports_request": True};
+    }
+}
+
+public class ZipAddFilesDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "add"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "add", "desc": "Add files to ZIP archive", "supports_request": True};
+    }
+}
+
+public class ZipExtractFileDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "extract"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "extract", "desc": "Extract single file from ZIP", "supports_request": True};
+    }
+}
+
+public class ZipCompressDataDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "compress"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "compress", "desc": "Compress data to ZIP", "supports_request": True};
+    }
+}
+
+public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
+    constructor(hash<auto> opts = {}) {}
+    string getName() { return "decompress"; }
+    private hash<DataProviderInfo> getStaticInfoImpl() {
+        return <DataProviderInfo>{"name": "decompress", "desc": "Decompress ZIP data", "supports_request": True};
+    }
+}
+
+} # end namespace ZipDataProvider

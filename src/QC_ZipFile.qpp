@@ -1,0 +1,478 @@
+/* -*- mode: c++; indent-tabs-mode: nil -*- */
+/** @file QC_ZipFile.qpp defines the %Qore ZipFile class and related types */
+/*
+    Qore zip module
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+#include "QC_ZipFile.h"
+#include "QoreZipFile.h"
+#include "ZipInputStream.h"
+#include "ZipOutputStream.h"
+#include "QC_ZipInputStream.h"
+#include "QC_ZipOutputStream.h"
+
+/** @defgroup zip_compression_methods Zip Compression Methods
+    These constants define the compression methods available for ZIP archives.
+*/
+///@{
+//! No compression (store only)
+const ZIP_CM_STORE = MZ_COMPRESS_METHOD_STORE;
+
+//! Deflate compression (standard, most compatible)
+const ZIP_CM_DEFLATE = MZ_COMPRESS_METHOD_DEFLATE;
+
+//! BZip2 compression
+const ZIP_CM_BZIP2 = MZ_COMPRESS_METHOD_BZIP2;
+
+//! LZMA compression
+const ZIP_CM_LZMA = MZ_COMPRESS_METHOD_LZMA;
+
+//! Zstandard compression (fast, high ratio)
+const ZIP_CM_ZSTD = MZ_COMPRESS_METHOD_ZSTD;
+
+//! XZ/LZMA2 compression
+const ZIP_CM_XZ = MZ_COMPRESS_METHOD_XZ;
+///@}
+
+/** @defgroup zip_compression_levels Zip Compression Levels
+    These constants define compression levels for ZIP archives.
+*/
+///@{
+//! Default compression level
+const ZIP_COMPRESSION_DEFAULT = -1;
+
+//! No compression (store only)
+const ZIP_COMPRESSION_STORE = 0;
+
+//! Fastest compression
+const ZIP_COMPRESSION_FASTEST = 1;
+
+//! Best (maximum) compression
+const ZIP_COMPRESSION_BEST = 9;
+///@}
+
+/** @defgroup zip_encryption_methods Zip Encryption Methods
+    These constants define encryption methods for ZIP archives.
+*/
+///@{
+//! No encryption
+const ZIP_EM_NONE = 0;
+
+//! Traditional PKWARE encryption (weak, not recommended)
+const ZIP_EM_TRAD_PKWARE = 1;
+
+//! AES-128 encryption
+const ZIP_EM_AES_128 = 0x0101;
+
+//! AES-192 encryption
+const ZIP_EM_AES_192 = 0x0102;
+
+//! AES-256 encryption (recommended)
+const ZIP_EM_AES_256 = 0x0103;
+///@}
+
+//! Information about a ZIP archive entry
+/** @since %zip 1.0
+*/
+hashdecl ZipEntryInfo {
+    //! The name/path of the entry within the archive
+    string name;
+
+    //! The uncompressed size of the entry in bytes
+    int size;
+
+    //! The compressed size of the entry in bytes
+    int compressed_size;
+
+    //! The last modification date and time of the entry
+    date modified;
+
+    //! The CRC-32 checksum of the uncompressed data
+    int crc32;
+
+    //! The compression method used (one of @ref zip_compression_methods)
+    int compression_method;
+
+    //! True if this entry represents a directory
+    bool is_directory;
+
+    //! True if this entry is password-protected
+    bool is_encrypted;
+
+    //! Optional comment associated with this entry
+    *string comment;
+}
+
+//! Options for adding entries to a ZIP archive
+/** @since %zip 1.0
+*/
+hashdecl ZipAddOptions {
+    //! Compression level (0-9, where 0=store, 9=maximum)
+    *int compression_level;
+
+    //! Compression method (one of @ref zip_compression_methods)
+    *int compression_method;
+
+    //! Password for encryption (enables AES-256 by default)
+    *string password;
+
+    //! Optional comment for the entry
+    *string comment;
+
+    //! Last modification time (defaults to current time)
+    *date modified;
+}
+
+//! Options for extracting entries from a ZIP archive
+/** @since %zip 1.0
+*/
+hashdecl ZipExtractOptions {
+    //! Password for decryption (required for encrypted entries)
+    *string password;
+
+    //! If True, overwrite existing files during extraction
+    *bool overwrite;
+
+    //! If True, preserve directory paths during extraction
+    *bool preserve_paths;
+}
+
+//! The ZipFile class provides functionality for creating, reading, and modifying ZIP archives
+/**
+    @par Example: Creating a ZIP archive
+    @code{.py}
+#!/usr/bin/qore
+
+%requires zip
+
+ZipFile zip("archive.zip", "w");
+zip.addText("readme.txt", "Hello, World!");
+zip.addFile("document.pdf", "/path/to/document.pdf");
+zip.addDirectory("images/");
+zip.close();
+    @endcode
+
+    @par Example: Reading a ZIP archive
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+foreach hash<ZipEntryInfo> entry in (zip.entries()) {
+    printf("Entry: %s, Size: %d bytes\n", entry.name, entry.size);
+}
+binary data = zip.read("readme.txt");
+zip.close();
+    @endcode
+
+    @par Example: Extracting a ZIP archive
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+zip.extractAll("/destination/path", {"overwrite": True});
+zip.close();
+    @endcode
+
+    @since %zip 1.0
+*/
+qclass ZipFile [arg=QoreZipFile* zf; ns=Zip];
+
+//! Creates a ZipFile object for reading, writing, or appending to an archive
+/** @param path the path to the ZIP archive file
+    @param mode the open mode: \c "r" for read, \c "w" for write (create/overwrite), \c "a" for append
+
+    @throw ZIP-ERROR error opening the archive
+*/
+ZipFile::constructor(string path, string mode = "r") {
+    ZipMode zm = ZIP_MODE_READ;
+    if (mode->empty() || mode->c_str()[0] == 'r') {
+        zm = ZIP_MODE_READ;
+    } else if (mode->c_str()[0] == 'w') {
+        zm = ZIP_MODE_WRITE;
+    } else if (mode->c_str()[0] == 'a') {
+        zm = ZIP_MODE_APPEND;
+    } else {
+        xsink->raiseException("ZIP-ERROR", "invalid mode '%s'; must be 'r', 'w', or 'a'", mode->c_str());
+        return;
+    }
+
+    ReferenceHolder<QoreZipFile> holder(new QoreZipFile(path->c_str(), zm, xsink), xsink);
+    if (*xsink) {
+        return;
+    }
+    self->setPrivate(CID_ZIPFILE, holder.release());
+}
+
+//! Creates a ZipFile object from binary data (in-memory archive)
+/** @param data binary data containing a ZIP archive
+
+    @throw ZIP-ERROR error parsing the archive data
+*/
+ZipFile::constructor(binary data) {
+    ReferenceHolder<QoreZipFile> holder(new QoreZipFile(data, xsink), xsink);
+    if (*xsink) {
+        return;
+    }
+    self->setPrivate(CID_ZIPFILE, holder.release());
+}
+
+//! Creates a new empty in-memory ZIP archive
+/** Use toData() to get the archive as binary data after adding entries.
+*/
+ZipFile::constructor() {
+    ReferenceHolder<QoreZipFile> holder(new QoreZipFile(xsink), xsink);
+    if (*xsink) {
+        return;
+    }
+    self->setPrivate(CID_ZIPFILE, holder.release());
+}
+
+//! Destroys the object and closes the archive if still open
+/**
+*/
+ZipFile::destructor() {
+    zf->close(xsink);
+    zf->deref(xsink);
+}
+
+//! Closes the archive
+/** @throw ZIP-ERROR error closing the archive
+*/
+nothing ZipFile::close() {
+    zf->close(xsink);
+}
+
+//! Returns the archive as binary data (for in-memory archives)
+/** @return the archive as binary data
+
+    @throw ZIP-ERROR error getting archive data or archive not in memory mode
+*/
+binary ZipFile::toData() {
+    return zf->toData(xsink);
+}
+
+//! Returns a list of all entries in the archive
+/** @return a list of @ref ZipEntryInfo hashes describing each entry
+
+    @throw ZIP-ERROR error reading archive entries
+*/
+list<hash<ZipEntryInfo>> ZipFile::entries() {
+    return zf->entries(xsink);
+}
+
+//! Returns the number of entries in the archive
+/** @return the number of entries
+
+    @throw ZIP-ERROR error reading archive
+*/
+int ZipFile::count() {
+    return zf->count(xsink);
+}
+
+//! Checks if an entry exists in the archive
+/** @param name the name of the entry to check
+
+    @return True if the entry exists, False otherwise
+
+    @throw ZIP-ERROR error reading archive
+*/
+bool ZipFile::hasEntry(string name) {
+    return zf->hasEntry(name->c_str(), xsink);
+}
+
+//! Reads an entry from the archive as binary data
+/** @param name the name of the entry to read
+
+    @return the entry content as binary data
+
+    @throw ZIP-ERROR error reading entry or entry not found
+*/
+binary ZipFile::read(string name) {
+    return zf->read(name->c_str(), xsink);
+}
+
+//! Reads an entry from the archive as text
+/** @param name the name of the entry to read
+    @param encoding the character encoding to use (default: UTF-8)
+
+    @return the entry content as a string
+
+    @throw ZIP-ERROR error reading entry or entry not found
+*/
+string ZipFile::readText(string name, *string encoding) {
+    return zf->readText(name->c_str(), encoding ? encoding->c_str() : nullptr, xsink);
+}
+
+//! Gets information about a specific entry
+/** @param name the name of the entry
+
+    @return a @ref ZipEntryInfo hash describing the entry
+
+    @throw ZIP-ERROR error reading entry or entry not found
+*/
+hash<ZipEntryInfo> ZipFile::getEntry(string name) {
+    return zf->getEntry(name->c_str(), xsink);
+}
+
+//! Adds binary data as an entry to the archive
+/** @param name the name for the entry in the archive
+    @param data the binary data to add
+    @param opts optional @ref ZipAddOptions for compression and encryption settings
+
+    @throw ZIP-ERROR error adding entry or archive not open for writing
+*/
+nothing ZipFile::add(string name, binary data, *hash<ZipAddOptions> opts) {
+    zf->add(name->c_str(), data, opts, xsink);
+}
+
+//! Adds text as an entry to the archive
+/** @param name the name for the entry in the archive
+    @param text the text content to add
+    @param encoding the character encoding to use (default: UTF-8)
+    @param opts optional @ref ZipAddOptions for compression and encryption settings
+
+    @throw ZIP-ERROR error adding entry or archive not open for writing
+*/
+nothing ZipFile::addText(string name, string text, *string encoding, *hash<ZipAddOptions> opts) {
+    zf->addText(name->c_str(), text, encoding ? encoding->c_str() : nullptr, opts, xsink);
+}
+
+//! Adds a file from the filesystem to the archive
+/** @param name the name for the entry in the archive
+    @param filepath the path to the file on the filesystem
+    @param opts optional @ref ZipAddOptions for compression and encryption settings
+
+    @throw ZIP-ERROR error adding file or archive not open for writing
+*/
+nothing ZipFile::addFile(string name, string filepath, *hash<ZipAddOptions> opts) {
+    zf->addFile(name->c_str(), filepath->c_str(), opts, xsink);
+}
+
+//! Adds a directory entry to the archive
+/** @param name the name for the directory entry (should end with /)
+
+    @throw ZIP-ERROR error adding directory or archive not open for writing
+*/
+nothing ZipFile::addDirectory(string name) {
+    zf->addDirectory(name->c_str(), xsink);
+}
+
+//! Extracts all entries to a destination directory
+/** @param destPath the destination directory path
+    @param opts optional @ref ZipExtractOptions for extraction settings
+
+    @throw ZIP-ERROR error extracting archive
+*/
+nothing ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) {
+    zf->extractAll(destPath->c_str(), opts, xsink);
+}
+
+//! Extracts a single entry to a destination path
+/** @param name the name of the entry to extract
+    @param destPath the destination file path
+
+    @throw ZIP-ERROR error extracting entry or entry not found
+*/
+nothing ZipFile::extractEntry(string name, string destPath) {
+    zf->extractEntry(name->c_str(), destPath->c_str(), xsink);
+}
+
+//! Deletes an entry from the archive
+/** @param name the name of the entry to delete
+
+    @throw ZIP-ERROR error deleting entry or archive not open for writing
+
+    @note This operation may require rewriting the archive
+*/
+nothing ZipFile::delete(string name) [dom=FILESYSTEM] {
+    zf->deleteEntry(name->c_str(), xsink);
+}
+
+//! Returns the path of the archive file
+/** @return the file path, or an empty string for in-memory archives
+*/
+*string ZipFile::path() {
+    return zf->getPath();
+}
+
+//! Returns the archive comment
+/** @return the archive comment, or NOTHING if not set
+
+    @throw ZIP-ERROR error reading archive comment
+*/
+*string ZipFile::comment() {
+    return zf->getComment(xsink);
+}
+
+//! Sets the archive comment
+/** @param comment the comment to set
+
+    @throw ZIP-ERROR error setting comment or archive not open for writing
+*/
+nothing ZipFile::setComment(string comment) {
+    zf->setComment(comment->c_str(), xsink);
+}
+
+//! Opens an input stream for reading an entry from the archive
+/** @param name the name of the entry to read
+
+    @return a @ref ZipInputStream object for reading the entry data
+
+    @throw ZIP-ERROR if the archive is not open for reading or the entry is not found
+
+    @par Example:
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+ZipInputStream is = zip.openRead("large_file.bin");
+while (*binary data = is.read(65536)) {
+    # process chunk
+}
+    @endcode
+
+    @see ZipInputStream
+*/
+ZipInputStream ZipFile::openRead(string name) {
+    return zf->openInputStream(name->c_str(), xsink);
+}
+
+//! Opens an output stream for writing a new entry to the archive
+/** @param name the name for the new entry
+    @param opts optional @ref ZipAddOptions for compression and encryption settings
+
+    @return a @ref ZipOutputStream object for writing the entry data
+
+    @throw ZIP-ERROR if the archive is not open for writing
+
+    @par Example:
+    @code{.py}
+ZipFile zip("archive.zip", "w");
+ZipOutputStream os = zip.openWrite("large_file.bin", {"compression_level": 9});
+os.write(chunk1);
+os.write(chunk2);
+os.close();
+zip.close();
+    @endcode
+
+    @note You must call close() on the stream when done writing to finalize the entry.
+
+    @see ZipOutputStream
+*/
+ZipOutputStream ZipFile::openWrite(string name, *hash<ZipAddOptions> opts) {
+    return zf->openOutputStream(name->c_str(), opts, xsink);
+}

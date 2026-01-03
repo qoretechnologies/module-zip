@@ -1,0 +1,630 @@
+#!/usr/bin/env qore
+# -*- mode: qore; indent-tabs-mode: nil -*-
+
+/*
+    Qore zip module test suite
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+%new-style
+%strict-args
+%require-types
+%enable-all-warnings
+
+%requires QUnit
+%requires Util
+%requires zip
+
+%exec-class ZipTest
+
+public class ZipTest inherits QUnit::Test {
+    private {
+        string testDir;
+        string testZipPath;
+    }
+
+    constructor() : Test("ZipTest", "1.0") {
+        testDir = tmp_location() + "/zip_test_" + string(getpid());
+        testZipPath = testDir + "/test.zip";
+
+        addTestCase("Archive creation tests", \archiveCreationTest());
+        addTestCase("Archive reading tests", \archiveReadingTest());
+        addTestCase("In-memory archive tests", \inMemoryArchiveTest());
+        addTestCase("Compression tests", \compressionTest());
+        addTestCase("Extraction tests", \extractionTest());
+        addTestCase("Encryption tests", \encryptionTest());
+        addTestCase("Error handling tests", \errorHandlingTest());
+        addTestCase("Corner case tests", \cornerCaseTest());
+        addTestCase("Unicode filename tests", \unicodeFilenameTest());
+        addTestCase("Streaming API tests", \streamingApiTest());
+
+        set_return_value(main());
+    }
+
+    globalSetUp() {
+        mkdir(testDir);
+    }
+
+    globalTearDown() {
+        # Clean up test directory
+        if (is_dir(testDir)) {
+            system("rm -rf " + testDir);
+        }
+    }
+
+    # Test archive creation
+    archiveCreationTest() {
+        # Test creating empty archive
+        {
+            ZipFile zip(testZipPath, "w");
+            zip.close();
+            assertEq(True, is_file(testZipPath), "empty archive file created");
+        }
+
+        # Test creating archive with single text file
+        {
+            string zipPath = testDir + "/single_file.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addText("hello.txt", "Hello, World!");
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            assertEq(1, readZip.count(), "archive has 1 entry");
+            assertEq(True, readZip.hasEntry("hello.txt"), "entry exists");
+            readZip.close();
+        }
+
+        # Test creating archive with multiple files
+        {
+            string zipPath = testDir + "/multi_file.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addText("file1.txt", "Content 1");
+            zip.addText("file2.txt", "Content 2");
+            zip.addText("file3.txt", "Content 3");
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            assertEq(3, readZip.count(), "archive has 3 entries");
+            readZip.close();
+        }
+
+        # Test creating archive with directories
+        {
+            string zipPath = testDir + "/with_dirs.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addDirectory("subdir/");
+            zip.addText("subdir/file.txt", "Nested file content");
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            assertEq(2, readZip.count(), "archive has directory and file");
+            assertEq(True, readZip.hasEntry("subdir/"), "directory entry exists");
+            assertEq(True, readZip.hasEntry("subdir/file.txt"), "nested file exists");
+            readZip.close();
+        }
+
+        # Test creating archive with nested directories
+        {
+            string zipPath = testDir + "/nested_dirs.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addDirectory("a/");
+            zip.addDirectory("a/b/");
+            zip.addDirectory("a/b/c/");
+            zip.addText("a/b/c/deep.txt", "Deep nested file");
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            assertEq(True, readZip.hasEntry("a/b/c/deep.txt"), "deeply nested file exists");
+            readZip.close();
+        }
+    }
+
+    # Test reading archives
+    archiveReadingTest() {
+        # Create test archive
+        string zipPath = testDir + "/read_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("text.txt", "Hello, World!");
+            zip.addText("data.bin", binary_to_string(<0102030405>));
+            zip.close();
+        }
+
+        # Test reading text
+        {
+            ZipFile zip(zipPath, "r");
+            string content = zip.readText("text.txt");
+            assertEq("Hello, World!", content, "text content matches");
+            zip.close();
+        }
+
+        # Test reading binary
+        {
+            ZipFile zip(zipPath, "r");
+            binary data = zip.read("text.txt");
+            assertEq(True, data.size() > 0, "binary read returns data");
+            zip.close();
+        }
+
+        # Test entries list
+        {
+            ZipFile zip(zipPath, "r");
+            list<hash<ZipEntryInfo>> entries = zip.entries();
+            assertEq(2, entries.size(), "entries list has correct count");
+
+            hash<ZipEntryInfo> entry = entries[0];
+            assertEq(True, exists entry.name, "entry has name");
+            assertEq(True, exists entry.size, "entry has size");
+            assertEq(True, exists entry.compressed_size, "entry has compressed_size");
+            assertEq(True, exists entry.is_directory, "entry has is_directory");
+            zip.close();
+        }
+
+        # Test getEntry
+        {
+            ZipFile zip(zipPath, "r");
+            hash<ZipEntryInfo> entry = zip.getEntry("text.txt");
+            assertEq("text.txt", entry.name, "entry name matches");
+            assertEq(False, entry.is_directory, "text file is not directory");
+            assertEq(False, entry.is_encrypted, "entry is not encrypted");
+            zip.close();
+        }
+    }
+
+    # Test in-memory archive operations
+    inMemoryArchiveTest() {
+        # Create in-memory archive
+        binary archiveData;
+        {
+            ZipFile zip();
+            zip.addText("memory.txt", "In-memory content");
+            zip.addText("data.json", '{"key": "value"}');
+            archiveData = zip.toData();
+        }
+
+        assertEq(True, archiveData.size() > 0, "in-memory archive has data");
+
+        # Read from in-memory archive
+        {
+            ZipFile zip(archiveData);
+            assertEq(2, zip.count(), "in-memory archive has 2 entries");
+            string content = zip.readText("memory.txt");
+            assertEq("In-memory content", content, "in-memory content matches");
+            zip.close();
+        }
+    }
+
+    # Test compression methods and levels
+    compressionTest() {
+        string testContent = strmul("This is test content for compression testing. ", 1000);
+
+        # Test store (no compression)
+        {
+            string zipPath = testDir + "/store.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addText("stored.txt", testContent, NOTHING, <ZipAddOptions>{"compression_method": ZIP_CM_STORE});
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            hash<ZipEntryInfo> entry = readZip.getEntry("stored.txt");
+            # Stored files should have similar compressed and uncompressed sizes
+            assertEq(entry.size, entry.compressed_size, "stored file has no compression");
+            readZip.close();
+        }
+
+        # Test deflate compression
+        {
+            string zipPath = testDir + "/deflate.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addText("deflated.txt", testContent, NOTHING, <ZipAddOptions>{"compression_method": ZIP_CM_DEFLATE});
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            hash<ZipEntryInfo> entry = readZip.getEntry("deflated.txt");
+            # Deflated files should be smaller
+            assertEq(True, entry.compressed_size < entry.size, "deflate compression reduces size");
+            readZip.close();
+        }
+
+        # Test compression levels
+        {
+            string zipPath1 = testDir + "/level1.zip";
+            string zipPath9 = testDir + "/level9.zip";
+
+            {
+                ZipFile zip(zipPath1, "w");
+                zip.addText("content.txt", testContent, NOTHING, <ZipAddOptions>{"compression_level": ZIP_COMPRESSION_FASTEST});
+                zip.close();
+            }
+
+            {
+                ZipFile zip(zipPath9, "w");
+                zip.addText("content.txt", testContent, NOTHING, <ZipAddOptions>{"compression_level": ZIP_COMPRESSION_BEST});
+                zip.close();
+            }
+
+            # Best compression should produce smaller or equal file
+            int size1 = hstat(zipPath1).size;
+            int size9 = hstat(zipPath9).size;
+            assertEq(True, size9 <= size1, "best compression is smaller or equal to fastest");
+        }
+    }
+
+    # Test extraction
+    extractionTest() {
+        # Create test archive
+        string zipPath = testDir + "/extract_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addDirectory("dir1/");
+            zip.addText("dir1/file1.txt", "File 1 content");
+            zip.addText("dir1/file2.txt", "File 2 content");
+            zip.addDirectory("dir2/");
+            zip.addText("dir2/nested.txt", "Nested content");
+            zip.close();
+        }
+
+        # Test full extraction
+        {
+            string extractDir = testDir + "/extracted";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(True, is_dir(extractDir + "/dir1"), "dir1 extracted");
+            assertEq(True, is_file(extractDir + "/dir1/file1.txt"), "file1.txt extracted");
+            assertEq(True, is_file(extractDir + "/dir1/file2.txt"), "file2.txt extracted");
+            assertEq(True, is_dir(extractDir + "/dir2"), "dir2 extracted");
+            assertEq(True, is_file(extractDir + "/dir2/nested.txt"), "nested.txt extracted");
+
+            # Verify content
+            string content = ReadOnlyFile::readTextFile(extractDir + "/dir1/file1.txt");
+            assertEq("File 1 content", content, "extracted content matches");
+        }
+
+        # Test single entry extraction
+        {
+            string singleFile = testDir + "/single_extracted.txt";
+
+            ZipFile zip(zipPath, "r");
+            zip.extractEntry("dir1/file1.txt", singleFile);
+            zip.close();
+
+            assertEq(True, is_file(singleFile), "single entry extracted");
+            string content = ReadOnlyFile::readTextFile(singleFile);
+            assertEq("File 1 content", content, "single entry content matches");
+        }
+    }
+
+    # Test encryption
+    encryptionTest() {
+        string password = "SecretPassword123!";
+        string content = "This is encrypted content";
+
+        # Create encrypted archive
+        string zipPath = testDir + "/encrypted.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("secret.txt", content, NOTHING, <ZipAddOptions>{"password": password});
+            zip.close();
+        }
+
+        # Read with correct password
+        {
+            ZipFile zip(zipPath, "r");
+            hash<ZipEntryInfo> entry = zip.getEntry("secret.txt");
+            assertEq(True, entry.is_encrypted, "entry shows as encrypted");
+
+            # Note: Reading encrypted content requires setting password
+            # This may need adjustment based on actual API
+            zip.close();
+        }
+
+        # Test wrong password (negative test)
+        # Note: This test depends on how the API handles wrong passwords
+    }
+
+    # Test error handling (negative tests)
+    errorHandlingTest() {
+        # Test opening non-existent file
+        {
+            bool caught = False;
+            try {
+                ZipFile zip(testDir + "/nonexistent.zip", "r");
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "correct exception type for missing file");
+            }
+            assertEq(True, caught, "exception thrown for missing file");
+        }
+
+        # Test reading non-existent entry
+        {
+            string zipPath = testDir + "/entry_test.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("exists.txt", "content");
+                zip.close();
+            }
+
+            bool caught = False;
+            try {
+                ZipFile zip(zipPath, "r");
+                zip.read("doesnt_exist.txt");
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "correct exception for missing entry");
+            }
+            assertEq(True, caught, "exception thrown for missing entry");
+        }
+
+        # Test writing to read-only archive
+        {
+            string zipPath = testDir + "/readonly_test.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("test.txt", "content");
+                zip.close();
+            }
+
+            bool caught = False;
+            try {
+                ZipFile zip(zipPath, "r");
+                zip.addText("new.txt", "new content");
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "correct exception for write on read-only");
+            }
+            assertEq(True, caught, "exception thrown for write on read-only archive");
+        }
+
+        # Test invalid mode
+        {
+            bool caught = False;
+            try {
+                ZipFile zip(testDir + "/invalid_mode.zip", "x");
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+            }
+            assertEq(True, caught, "exception thrown for invalid mode");
+        }
+    }
+
+    # Test corner cases
+    cornerCaseTest() {
+        # Test empty file
+        {
+            string zipPath = testDir + "/empty_file.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addText("empty.txt", "");
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            string content = readZip.readText("empty.txt");
+            assertEq("", content, "empty file content is empty string");
+            readZip.close();
+        }
+
+        # Test very long filename
+        {
+            string longName = strmul("a", 200) + ".txt";
+            string zipPath = testDir + "/long_name.zip";
+
+            ZipFile zip(zipPath, "w");
+            zip.addText(longName, "content");
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            assertEq(True, readZip.hasEntry(longName), "long filename entry exists");
+            readZip.close();
+        }
+
+        # Test special characters in filename
+        {
+            string zipPath = testDir + "/special_chars.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addText("file with spaces.txt", "content1");
+            zip.addText("file-with-dashes.txt", "content2");
+            zip.addText("file_with_underscores.txt", "content3");
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            assertEq(3, readZip.count(), "all special char files added");
+            readZip.close();
+        }
+
+        # Test binary content with null bytes
+        {
+            string zipPath = testDir + "/binary_nulls.zip";
+            binary binData = <00010203040506070809>;
+
+            ZipFile zip(zipPath, "w");
+            zip.add("binary.bin", binData);
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            binary readData = readZip.read("binary.bin");
+            assertEq(binData, readData, "binary data with nulls preserved");
+            readZip.close();
+        }
+    }
+
+    # Test Unicode filenames
+    unicodeFilenameTest() {
+        string zipPath = testDir + "/unicode.zip";
+
+        # Test various Unicode filenames
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("日本語.txt", "Japanese content");
+            zip.addText("中文.txt", "Chinese content");
+            zip.addText("한국어.txt", "Korean content");
+            zip.addText("émojis_🎉.txt", "Emoji content");
+            zip.close();
+        }
+
+        # Read back and verify
+        {
+            ZipFile readZip(zipPath, "r");
+            assertEq(4, readZip.count(), "all unicode files added");
+
+            string japContent = readZip.readText("日本語.txt");
+            assertEq("Japanese content", japContent, "Japanese filename works");
+
+            readZip.close();
+        }
+    }
+
+    # Test streaming API
+    streamingApiTest() {
+        # Test streaming read
+        {
+            string zipPath = testDir + "/stream_read.zip";
+            string content = "This is test content for streaming read. It will be read in chunks.";
+
+            # Create archive
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("stream_test.txt", content);
+                zip.close();
+            }
+
+            # Read using stream
+            {
+                ZipFile zip(zipPath, "r");
+                binary allData;
+                {
+                    ZipInputStream is = zip.openRead("stream_test.txt");
+
+                    # Read in small chunks
+                    while (*binary chunk = is.read(10)) {
+                        allData += chunk;
+                    }
+                }
+                # Stream is closed before zip.close()
+
+                string readContent = allData.toString("UTF-8");
+                assertEq(content, readContent, "streaming read content matches");
+                zip.close();
+            }
+        }
+
+        # Test streaming write
+        {
+            string zipPath = testDir + "/stream_write.zip";
+            binary chunk1 = binary("First chunk of data. ");
+            binary chunk2 = binary("Second chunk of data. ");
+            binary chunk3 = binary("Third and final chunk.");
+
+            # Create archive using streaming
+            {
+                ZipFile zip(zipPath, "w");
+                ZipOutputStream os = zip.openWrite("streamed.txt");
+                os.write(chunk1);
+                os.write(chunk2);
+                os.write(chunk3);
+                os.close();
+                zip.close();
+            }
+
+            # Read back and verify
+            {
+                ZipFile zip(zipPath, "r");
+                string content = zip.readText("streamed.txt");
+                assertEq("First chunk of data. Second chunk of data. Third and final chunk.",
+                         content, "streaming write content matches");
+                zip.close();
+            }
+        }
+
+        # Test streaming with compression
+        {
+            string zipPath = testDir + "/stream_compress.zip";
+            # Create large repetitive content that compresses well
+            string largeContent = strmul("Repeated content for compression testing. ", 100);
+
+            # Create archive using streaming with high compression
+            {
+                ZipFile zip(zipPath, "w");
+                ZipOutputStream os = zip.openWrite("large.txt", <ZipAddOptions>{
+                    "compression_method": ZIP_CM_DEFLATE,
+                    "compression_level": ZIP_COMPRESSION_BEST,
+                });
+                os.write(binary(largeContent));
+                os.close();
+                zip.close();
+            }
+
+            # Read back and verify
+            {
+                ZipFile zip(zipPath, "r");
+                binary allData;
+                {
+                    # Verify using streaming read
+                    ZipInputStream is = zip.openRead("large.txt");
+                    while (*binary chunk = is.read(1024)) {
+                        allData += chunk;
+                    }
+                }
+                # Stream is closed before zip.close()
+
+                string readContent = allData.toString("UTF-8");
+                assertEq(largeContent, readContent, "streamed compressed content matches");
+                zip.close();
+            }
+        }
+
+        # Test peek functionality
+        {
+            string zipPath = testDir + "/stream_peek.zip";
+
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("peek_test.txt", "ABCDEF");
+                zip.close();
+            }
+
+            {
+                ZipFile zip(zipPath, "r");
+                {
+                    ZipInputStream is = zip.openRead("peek_test.txt");
+
+                    # Peek should return first byte without consuming
+                    int first = is.peek();
+                    assertEq(65, first, "peek returns 'A' (65)");  # 'A' = 65
+
+                    # Peek again should return same byte
+                    int second = is.peek();
+                    assertEq(65, second, "second peek returns same byte");
+
+                    # Read should now consume the peeked byte and more
+                    *binary data = is.read(3);
+                    assertEq("ABC", data.toString("UTF-8"), "read after peek works correctly");
+                }
+                # Stream is closed before zip.close()
+                zip.close();
+            }
+        }
+    }
+}

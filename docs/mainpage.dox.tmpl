@@ -1,0 +1,159 @@
+/** @mainpage Qore zip Module
+
+    @tableofcontents
+
+    @section zipintro Introduction
+
+    The \c zip module provides comprehensive ZIP archive functionality for Qore, including:
+
+    - Creating, reading, and modifying ZIP archives
+    - Multiple compression methods: deflate, bzip2, lzma, zstd, xz
+    - ZIP64 support for large files (>4GB) and many entries (>65,535)
+    - AES encryption (128/192/256-bit)
+    - Streaming API for large file operations
+    - Data provider module for integration with Qore's data provider framework
+
+    To use this module, use \c "%requires zip" in your code.
+
+    @section zipquickstart Quick Start
+
+    @subsection zipcreate Creating a ZIP Archive
+
+    @code{.py}
+#!/usr/bin/qore
+
+%requires zip
+
+# Create a new archive
+ZipFile zip("archive.zip", "w");
+zip.addText("readme.txt", "Hello, World!");
+zip.addFile("document.pdf", "/path/to/document.pdf");
+zip.addDirectory("images/");
+zip.addFile("images/logo.png", "/path/to/logo.png", {"compression_level": ZIP_COMPRESSION_BEST});
+zip.close();
+    @endcode
+
+    @subsection zipread Reading a ZIP Archive
+
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+foreach hash<ZipEntryInfo> entry in (zip.entries()) {
+    printf("Entry: %s, Size: %d bytes\n", entry.name, entry.size);
+}
+binary data = zip.read("readme.txt");
+zip.close();
+    @endcode
+
+    @subsection zipextract Extracting a ZIP Archive
+
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+zip.extractAll("/destination/path", {"overwrite": True});
+zip.close();
+    @endcode
+
+    @subsection zipmemory In-Memory Archives
+
+    @code{.py}
+# Create an in-memory archive
+ZipFile zip();
+zip.addText("data.json", make_json({"key": "value"}));
+binary archive_data = zip.toData();
+# archive_data can be sent over network, stored in DB, etc.
+
+# Read from binary data
+ZipFile readZip(archive_data);
+string content = readZip.readText("data.json");
+    @endcode
+
+    @subsection zipencrypt Password-Protected Archives
+
+    @code{.py}
+# Create encrypted archive
+ZipFile zip("secure.zip", "w");
+zip.addText("secret.txt", "Confidential data", NOTHING, {"password": "secret123"});
+zip.close();
+    @endcode
+
+    @section zipcompression Compression Methods
+
+    The module supports multiple compression methods:
+
+    |Constant|Description|
+    |--------|-----------|
+    |@ref Zip::ZIP_CM_STORE|No compression (store only)|
+    |@ref Zip::ZIP_CM_DEFLATE|Standard deflate compression (most compatible)|
+    |@ref Zip::ZIP_CM_BZIP2|BZip2 compression|
+    |@ref Zip::ZIP_CM_LZMA|LZMA compression|
+    |@ref Zip::ZIP_CM_ZSTD|Zstandard compression (fast, high ratio)|
+    |@ref Zip::ZIP_CM_XZ|XZ/LZMA2 compression|
+
+    Compression levels range from 0 (store) to 9 (maximum):
+
+    |Constant|Description|
+    |--------|-----------|
+    |@ref Zip::ZIP_COMPRESSION_DEFAULT|Default compression level|
+    |@ref Zip::ZIP_COMPRESSION_STORE|No compression (level 0)|
+    |@ref Zip::ZIP_COMPRESSION_FASTEST|Fastest compression (level 1)|
+    |@ref Zip::ZIP_COMPRESSION_BEST|Best compression (level 9)|
+
+    @section zipencryption Encryption
+
+    The module supports multiple encryption methods:
+
+    |Constant|Description|
+    |--------|-----------|
+    |@ref Zip::ZIP_EM_NONE|No encryption|
+    |@ref Zip::ZIP_EM_TRAD_PKWARE|Traditional PKWARE encryption (weak, not recommended)|
+    |@ref Zip::ZIP_EM_AES_128|AES-128 encryption|
+    |@ref Zip::ZIP_EM_AES_192|AES-192 encryption|
+    |@ref Zip::ZIP_EM_AES_256|AES-256 encryption (recommended)|
+
+    When a password is provided in @ref ZipAddOptions, AES-256 encryption is used by default.
+
+    @section zipdataprovider Data Provider API
+
+    The \c ZipDataProvider module provides integration with Qore's data provider framework:
+
+    @code{.py}
+%requires ZipDataProvider
+
+# Use data provider actions
+auto result = UserApi::callRestApi("zip", "create-archive", {
+    "path": "output.zip",
+    "files": (
+        {"name": "file.txt", "data": "Hello, World!"},
+    ),
+});
+    @endcode
+
+    @section ziperrors Error Handling
+
+    All ZIP operations throw exceptions of type \c "ZIP-ERROR" when errors occur:
+
+    @code{.py}
+try {
+    ZipFile zip("nonexistent.zip", "r");
+} catch (hash<ExceptionInfo> ex) {
+    if (ex.err == "ZIP-ERROR") {
+        printf("ZIP error: %s\n", ex.desc);
+    }
+}
+    @endcode
+
+    @section zipreleasenotes Release Notes
+
+    @subsection zip_1_0 zip Module Version 1.0
+    - Initial release
+    - Full ZIP64 support
+    - Multiple compression methods (deflate, bzip2, lzma, zstd, xz)
+    - AES encryption support
+    - In-memory archive operations
+    - Data provider module
+
+    @section ziplicense License
+
+    The zip module is released under the MIT license.
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+*/

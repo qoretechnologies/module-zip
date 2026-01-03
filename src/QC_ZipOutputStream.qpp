@@ -1,0 +1,88 @@
+/* -*- mode: c++; indent-tabs-mode: nil -*- */
+/** @file QC_ZipOutputStream.qpp defines the %Qore ZipOutputStream class */
+/*
+    Qore zip module
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+#include "ZipOutputStream.h"
+
+//! The ZipOutputStream class provides streaming write access to a single entry in a ZIP archive
+/**
+    This class implements the @ref OutputStream interface for writing data to a ZIP archive entry.
+    It allows writing large files without loading the entire content into memory.
+
+    @par Example: Writing an entry with streaming
+    @code{.py}
+ZipFile zip("archive.zip", "w");
+ZipOutputStream os = zip.openWrite("large_file.bin");
+os.write(<binary_data_chunk_1>);
+os.write(<binary_data_chunk_2>);
+os.close();
+zip.close();
+    @endcode
+
+    @note This class is not thread-safe. Concurrent access from multiple threads requires external synchronization.
+    @note You must call close() when done writing to finalize the entry in the archive.
+
+    @since %zip 1.0
+
+    @see ZipFile::openWrite()
+*/
+qclass ZipOutputStream [arg=ZipOutputStream* zos; ns=Zip; vparent=OutputStream];
+
+//! Private constructor - ZipOutputStream objects are created via ZipFile::openWrite()
+/** @throw ZIP-ERROR this constructor should not be called directly
+*/
+ZipOutputStream::constructor() {
+    xsink->raiseException("ZIP-ERROR", "ZipOutputStream objects must be created via ZipFile::openWrite()");
+}
+
+//! Destroys the stream and releases resources
+/**
+*/
+ZipOutputStream::destructor() {
+    zos->deref(xsink);
+}
+
+//! Writes binary data to the stream
+/** @param data the data to write
+
+    @throw ZIP-STREAM-ERROR if an error occurs while writing
+    @throw OUTPUT-STREAM-CLOSED-ERROR if the stream has already been closed
+
+    @see close()
+*/
+nothing ZipOutputStream::write(binary data) {
+    zos->writeHelper(data, xsink);
+}
+
+//! Closes the stream and finalizes the entry
+/** This method must be called when done writing to finalize the entry in the archive.
+
+    @throw ZIP-STREAM-ERROR if an error occurs while closing
+
+    @note Calling close() multiple times is safe; subsequent calls have no effect.
+*/
+nothing ZipOutputStream::close() {
+    zos->closeHelper(xsink);
+}

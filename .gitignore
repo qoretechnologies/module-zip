@@ -1,0 +1,8 @@
+.vscode
+build*
+*.o
+*.so
+*.qmod
+*.pyc
+__pycache__
+.DS_Store

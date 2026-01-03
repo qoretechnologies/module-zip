@@ -1,0 +1,102 @@
+/* -*- mode: c++; indent-tabs-mode: nil -*- */
+/** @file QC_ZipEntry.qpp defines the %Qore ZipEntry class */
+/*
+    Qore zip module
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+#include "QC_ZipFile.h"
+#include "QoreZipFile.h"
+
+//! The ZipEntry class provides read-only access to ZIP archive entry metadata
+/**
+    This class represents a single entry in a ZIP archive and provides access to
+    its metadata such as name, size, compression method, and modification time.
+
+    ZipEntry objects are returned by ZipFile methods and should not be created directly.
+
+    @since %zip 1.0
+*/
+qclass ZipEntry [arg=QoreZipEntry* ze; ns=Zip];
+
+//! Returns the name/path of the entry within the archive
+/** @return the entry name
+*/
+string ZipEntry::name() {
+    return ze->getName();
+}
+
+//! Returns the uncompressed size of the entry in bytes
+/** @return the uncompressed size
+*/
+int ZipEntry::size() {
+    return ze->getSize();
+}
+
+//! Returns the compressed size of the entry in bytes
+/** @return the compressed size
+*/
+int ZipEntry::compressedSize() {
+    return ze->getCompressedSize();
+}
+
+//! Returns the last modification date and time of the entry
+/** @return the modification timestamp
+*/
+date ZipEntry::modified() {
+    return ze->getModified();
+}
+
+//! Returns the CRC-32 checksum of the uncompressed data
+/** @return the CRC-32 value
+*/
+int ZipEntry::crc32() {
+    return ze->getCrc32();
+}
+
+//! Returns the compression method used for this entry
+/** @return one of the @ref zip_compression_methods constants
+*/
+int ZipEntry::compressionMethod() {
+    return ze->getCompressionMethod();
+}
+
+//! Returns True if this entry represents a directory
+/** @return True for directories, False for files
+*/
+bool ZipEntry::isDirectory() {
+    return ze->isDirectory();
+}
+
+//! Returns True if this entry is encrypted
+/** @return True if password-protected
+*/
+bool ZipEntry::isEncrypted() {
+    return ze->isEncrypted();
+}
+
+//! Returns the comment associated with this entry
+/** @return the entry comment, or NOTHING if not set
+*/
+*string ZipEntry::comment() {
+    return ze->getComment();
+}
