@@ -72,8 +72,11 @@ The module includes `ZipDataProvider` for use with Qore's data provider framewor
 ```qore
 %requires ZipDataProvider
 
-# Use data provider actions
-auto result = UserApi::callRestApi("zip", "create-archive", {
+# Get the data provider factory and navigate to the action
+AbstractDataProvider dp = DataProvider::getFactoryObjectFromStringEx("zip{}/archive/create");
+
+# Execute the action
+hash<auto> result = dp.doRequest({
     "path": "output.zip",
     "files": (
         {"name": "file.txt", "data": "Hello, World!"},

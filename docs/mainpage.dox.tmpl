@@ -118,8 +118,24 @@ zip.close();
     @code{.py}
 %requires ZipDataProvider
 
-# Use data provider actions
-auto result = UserApi::callRestApi("zip", "create-archive", {
+# Get the data provider factory
+AbstractDataProviderFactory factory = DataProvider::getFactoryEx("zip");
+AbstractDataProvider provider = factory.create();
+
+# Navigate to the create-archive action
+AbstractDataProvider createAction = provider.getChildProviderEx("archive").getChildProviderEx("create");
+
+# Execute the action
+hash<auto> result = createAction.doRequest({
+    "path": "output.zip",
+    "files": (
+        {"name": "file.txt", "data": "Hello, World!"},
+    ),
+});
+
+# Or use the shorthand path navigation
+AbstractDataProvider dp = DataProvider::getFactoryObjectFromStringEx("zip{}/archive/create");
+result = dp.doRequest({
     "path": "output.zip",
     "files": (
         {"name": "file.txt", "data": "Hello, World!"},
