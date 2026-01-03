@@ -790,7 +790,7 @@ QoreStringNode* QoreZipEntry::getComment() const {
 }
 
 QoreObject* QoreZipFile::openInputStream(const char* name, ExceptionSink* xsink) {
-    QoreAutoRWWriteLocker lock(rwlock);
+    QoreAutoRWReadLocker lock(rwlock);
 
     if (!checkOpenUnlocked(xsink, false)) {
         return nullptr;

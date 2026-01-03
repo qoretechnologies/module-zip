@@ -69,9 +69,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
         OUTPUT_QUIET
         ERROR_QUIET
     )
-    # Result 0 = success, 1 = already applied (which is fine)
+    # Result 0 = success, 1 = already applied (treated as success), >1 = error (e.g., 2 for patch failure)
     if(PATCH_RESULT GREATER 1)
-        message(WARNING "Failed to apply OpenSSL 3.2 compatibility patch")
+        message(WARNING "Failed to apply OpenSSL 3.2 compatibility patch (patch exit code: ${PATCH_RESULT})")
     endif()
 endif()
 
