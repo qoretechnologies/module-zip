@@ -32,17 +32,24 @@
 
 #include <string>
 
+// Forward declaration
+class QoreZipFile;
+
 //! ZipOutputStream - OutputStream for writing a single entry to a ZIP archive
+/** @note This class is not thread-safe. Only one thread should access
+    an instance at a time.
+*/
 class ZipOutputStream : public OutputStream {
 public:
     //! Constructor - opens entry for writing
-    /** @param writer the minizip writer handle
+    /** @param parent the parent ZipFile object
+        @param writer the minizip writer handle
         @param entry_name the name of the entry being written
         @param compression_method compression method to use
         @param compression_level compression level (0-9)
         @param xsink exception sink
     */
-    DLLLOCAL ZipOutputStream(void* writer, const std::string& entry_name,
+    DLLLOCAL ZipOutputStream(QoreZipFile* parent, void* writer, const std::string& entry_name,
                               int16_t compression_method, int16_t compression_level,
                               ExceptionSink* xsink);
 
@@ -72,6 +79,7 @@ public:
     DLLLOCAL virtual void write(const void* ptr, int64 count, ExceptionSink* xsink) override;
 
 private:
+    QoreZipFile* parent;    //!< parent ZipFile object (not owned, for reference counting)
     void* writer;           //!< minizip writer handle (not owned)
     std::string entry_name; //!< name of the entry being written
     bool entry_open;        //!< true if entry is currently open

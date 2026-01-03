@@ -25,14 +25,15 @@
 */
 
 #include "ZipOutputStream.h"
+#include "QoreZipFile.h"
 
 #include <ctime>
 #include <cstring>
 
-ZipOutputStream::ZipOutputStream(void* w, const std::string& name,
+ZipOutputStream::ZipOutputStream(QoreZipFile* p, void* w, const std::string& name,
                                   int16_t compression_method, int16_t compression_level,
                                   ExceptionSink* xsink)
-    : writer(w), entry_name(name), entry_open(false), closed(false) {
+    : parent(p), writer(w), entry_name(name), entry_open(false), closed(false) {
     // Set compression options
     mz_zip_writer_set_compress_method(writer, compression_method);
     mz_zip_writer_set_compress_level(writer, compression_level);
@@ -59,6 +60,10 @@ ZipOutputStream::~ZipOutputStream() {
         // Close the entry if not already closed
         mz_zip_writer_entry_close(writer);
         entry_open = false;
+    }
+    // Decrement the parent's active stream count
+    if (parent) {
+        parent->derefStream();
     }
 }
 

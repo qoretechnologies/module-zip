@@ -41,7 +41,7 @@ DLLLOCAL extern QoreClass* QC_ZIPOUTPUTSTREAM;
 // Constructor for file-based archive
 QoreZipFile::QoreZipFile(const char* path, ZipMode m, ExceptionSink* xsink)
     : filepath(path), mode(m), reader(nullptr), writer(nullptr), mem_stream(nullptr),
-      in_memory(false), closed(false) {
+      in_memory(false), closed(false), active_streams(0), max_alloc_size(ZIP_DEFAULT_MAX_ALLOC_SIZE) {
     if (mode == ZIP_MODE_READ) {
         openRead(xsink);
     } else {
@@ -52,7 +52,7 @@ QoreZipFile::QoreZipFile(const char* path, ZipMode m, ExceptionSink* xsink)
 // Constructor for in-memory archive (from binary data)
 QoreZipFile::QoreZipFile(const BinaryNode* data, ExceptionSink* xsink)
     : mode(ZIP_MODE_READ), reader(nullptr), writer(nullptr), mem_stream(nullptr),
-      in_memory(true), closed(false) {
+      in_memory(true), closed(false), active_streams(0), max_alloc_size(ZIP_DEFAULT_MAX_ALLOC_SIZE) {
     // Create memory stream from binary data
     mem_stream = mz_stream_mem_create();
     if (!mem_stream) {
@@ -82,7 +82,7 @@ QoreZipFile::QoreZipFile(const BinaryNode* data, ExceptionSink* xsink)
 // Constructor for new in-memory archive
 QoreZipFile::QoreZipFile(ExceptionSink* xsink)
     : mode(ZIP_MODE_WRITE), reader(nullptr), writer(nullptr), mem_stream(nullptr),
-      in_memory(true), closed(false) {
+      in_memory(true), closed(false), active_streams(0), max_alloc_size(ZIP_DEFAULT_MAX_ALLOC_SIZE) {
     // Create memory stream for writing
     mem_stream = mz_stream_mem_create();
     if (!mem_stream) {
@@ -90,7 +90,7 @@ QoreZipFile::QoreZipFile(ExceptionSink* xsink)
         return;
     }
 
-    mz_stream_mem_set_grow_size(mem_stream, 128 * 1024);  // 128KB grow size
+    mz_stream_mem_set_grow_size(mem_stream, ZIP_MEM_STREAM_GROW_SIZE);
     int32_t err = mz_stream_open(mem_stream, nullptr, MZ_OPEN_MODE_CREATE);
     if (err != MZ_OK) {
         mz_stream_mem_delete(&mem_stream);
@@ -159,7 +159,15 @@ void QoreZipFile::openWrite(ExceptionSink* xsink) {
 }
 
 void QoreZipFile::close(ExceptionSink* xsink) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
     if (closed) {
+        return;
+    }
+
+    // Check for active streams
+    if (active_streams > 0) {
+        xsink->raiseException("ZIP-ERROR", "cannot close archive with %d active stream(s)", (int)active_streams);
         return;
     }
 
@@ -185,8 +193,21 @@ void QoreZipFile::close(ExceptionSink* xsink) {
 }
 
 BinaryNode* QoreZipFile::toData(ExceptionSink* xsink) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
     if (!in_memory) {
         xsink->raiseException("ZIP-ERROR", "toData() can only be called on in-memory archives");
+        return nullptr;
+    }
+
+    if (closed) {
+        xsink->raiseException("ZIP-ERROR", "archive is already closed");
+        return nullptr;
+    }
+
+    // Check for active streams
+    if (active_streams > 0) {
+        xsink->raiseException("ZIP-ERROR", "cannot finalize archive with %d active stream(s)", (int)active_streams);
         return nullptr;
     }
 
@@ -208,6 +229,13 @@ BinaryNode* QoreZipFile::toData(ExceptionSink* xsink) {
         return nullptr;
     }
 
+    // Check allocation size limit
+    if (buf_size > max_alloc_size) {
+        xsink->raiseException("ZIP-ERROR", "archive size %d exceeds maximum allocation size %lld",
+                              buf_size, (long long)max_alloc_size);
+        return nullptr;
+    }
+
     // Make a copy of the data
     void* copy = malloc(buf_size);
     if (!copy) {
@@ -216,10 +244,20 @@ BinaryNode* QoreZipFile::toData(ExceptionSink* xsink) {
     }
     memcpy(copy, buf, buf_size);
 
+    // Clean up memory stream since we're done with it
+    if (mem_stream) {
+        mz_stream_close(mem_stream);
+        mz_stream_mem_delete(&mem_stream);
+        mem_stream = nullptr;
+    }
+
+    // Mark as closed since we've finalized the archive
+    closed = true;
+
     return new BinaryNode(copy, buf_size);
 }
 
-bool QoreZipFile::checkOpen(ExceptionSink* xsink, bool forWrite) {
+bool QoreZipFile::checkOpenUnlocked(ExceptionSink* xsink, bool forWrite) {
     if (closed) {
         xsink->raiseException("ZIP-ERROR", "archive is closed");
         return false;
@@ -233,6 +271,43 @@ bool QoreZipFile::checkOpen(ExceptionSink* xsink, bool forWrite) {
     if (!forWrite && !reader) {
         xsink->raiseException("ZIP-ERROR", "archive is not open for reading");
         return false;
+    }
+
+    return true;
+}
+
+bool QoreZipFile::validateExtractPath(const char* entry_name, const char* dest_path, ExceptionSink* xsink) {
+    // Check for path traversal attempts
+    if (!entry_name) {
+        return true;
+    }
+
+    // Check for absolute paths
+    if (entry_name[0] == '/') {
+        xsink->raiseException("ZIP-SECURITY-ERROR", "absolute path in archive entry: '%s'", entry_name);
+        return false;
+    }
+
+    // Check for path traversal sequences
+    const char* p = entry_name;
+    while (*p) {
+        // Check for ".." component
+        if (p[0] == '.' && p[1] == '.') {
+            // Check if it's at the start or after a path separator
+            if (p == entry_name || p[-1] == '/') {
+                // Check if it's followed by end, slash, or backslash
+                if (p[2] == '\0' || p[2] == '/' || p[2] == '\\') {
+                    xsink->raiseException("ZIP-SECURITY-ERROR", "path traversal detected in archive entry: '%s'", entry_name);
+                    return false;
+                }
+            }
+        }
+        // Also check for backslashes (Windows-style paths)
+        if (*p == '\\') {
+            xsink->raiseException("ZIP-SECURITY-ERROR", "backslash in archive entry path: '%s'", entry_name);
+            return false;
+        }
+        ++p;
     }
 
     return true;
@@ -270,7 +345,9 @@ QoreHashNode* QoreZipFile::createEntryInfo(mz_zip_file* file_info, ExceptionSink
 }
 
 QoreListNode* QoreZipFile::entries(ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return nullptr;
     }
 
@@ -297,7 +374,9 @@ QoreListNode* QoreZipFile::entries(ExceptionSink* xsink) {
 }
 
 int64 QoreZipFile::count(ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return -1;
     }
 
@@ -312,7 +391,9 @@ int64 QoreZipFile::count(ExceptionSink* xsink) {
 }
 
 bool QoreZipFile::hasEntry(const char* name, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return false;
     }
 
@@ -321,7 +402,9 @@ bool QoreZipFile::hasEntry(const char* name, ExceptionSink* xsink) {
 }
 
 BinaryNode* QoreZipFile::read(const char* name, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return nullptr;
     }
 
@@ -343,13 +426,25 @@ BinaryNode* QoreZipFile::read(const char* name, ExceptionSink* xsink) {
         return new BinaryNode();
     }
 
+    // Check allocation size limit
+    if ((int64)file_info->uncompressed_size > max_alloc_size) {
+        xsink->raiseException("ZIP-ERROR", "entry '%s' size %lld exceeds maximum allocation size %lld",
+                              name, (long long)file_info->uncompressed_size, (long long)max_alloc_size);
+        return nullptr;
+    }
+
     if (!password.empty()) {
         mz_zip_reader_set_password(reader, password.c_str());
     }
 
     err = mz_zip_reader_entry_open(reader);
     if (err != MZ_OK) {
-        xsink->raiseException("ZIP-ERROR", "failed to open entry '%s' for reading: error %d", name, err);
+        // Provide more specific error for wrong password
+        if (file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) {
+            xsink->raiseException("ZIP-ERROR", "failed to open encrypted entry '%s' for reading: error %d (wrong password?)", name, err);
+        } else {
+            xsink->raiseException("ZIP-ERROR", "failed to open entry '%s' for reading: error %d", name, err);
+        }
         return nullptr;
     }
 
@@ -384,7 +479,9 @@ QoreStringNode* QoreZipFile::readText(const char* name, const char* encoding, Ex
 }
 
 QoreHashNode* QoreZipFile::getEntry(const char* name, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return nullptr;
     }
 
@@ -442,10 +539,16 @@ void QoreZipFile::parseAddOptions(const QoreHashNode* opts, int16_t& compression
 }
 
 void QoreZipFile::add(const char* name, const BinaryNode* data, const QoreHashNode* opts, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, true)) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, true)) {
         return;
     }
 
+    addUnlocked(name, data, opts, xsink);
+}
+
+void QoreZipFile::addUnlocked(const char* name, const BinaryNode* data, const QoreHashNode* opts, ExceptionSink* xsink) {
     int16_t compression_method, compression_level;
     std::string entry_password, comment;
     int64 modified_time;
@@ -479,7 +582,7 @@ void QoreZipFile::add(const char* name, const BinaryNode* data, const QoreHashNo
 
 void QoreZipFile::addText(const char* name, const QoreStringNode* text, const char* encoding,
                            const QoreHashNode* opts, ExceptionSink* xsink) {
-    // Convert to specified encoding if necessary
+    // Convert to specified encoding if necessary (can be done without lock)
     TempEncodingHelper teh(text, encoding ? QEM.findCreate(encoding) : QCS_UTF8, xsink);
     if (*xsink) {
         return;
@@ -487,11 +590,20 @@ void QoreZipFile::addText(const char* name, const QoreStringNode* text, const ch
 
     SimpleRefHolder<BinaryNode> bin(new BinaryNode());
     bin->append(teh->c_str(), teh->size());
-    add(name, *bin, opts, xsink);
+
+    QoreAutoRWWriteLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, true)) {
+        return;
+    }
+
+    addUnlocked(name, *bin, opts, xsink);
 }
 
 void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHashNode* opts, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, true)) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, true)) {
         return;
     }
 
@@ -516,7 +628,9 @@ void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHash
 }
 
 void QoreZipFile::addDirectory(const char* name, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, true)) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, true)) {
         return;
     }
 
@@ -549,8 +663,23 @@ void QoreZipFile::addDirectory(const char* name, ExceptionSink* xsink) {
 }
 
 void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return;
+    }
+
+    // First, validate all entry paths for security
+    int32_t err = mz_zip_reader_goto_first_entry(reader);
+    while (err == MZ_OK) {
+        mz_zip_file* file_info = nullptr;
+        err = mz_zip_reader_entry_get_info(reader, &file_info);
+        if (err == MZ_OK && file_info) {
+            if (!validateExtractPath(file_info->filename, destPath, xsink)) {
+                return;
+            }
+        }
+        err = mz_zip_reader_goto_next_entry(reader);
     }
 
     if (opts) {
@@ -560,14 +689,21 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
         }
     }
 
-    int32_t err = mz_zip_reader_save_all(reader, destPath);
+    err = mz_zip_reader_save_all(reader, destPath);
     if (err != MZ_OK) {
         xsink->raiseException("ZIP-ERROR", "failed to extract archive to '%s': error %d", destPath, err);
     }
 }
 
 void QoreZipFile::extractEntry(const char* name, const char* destPath, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
+        return;
+    }
+
+    // Validate path for security
+    if (!validateExtractPath(name, destPath, xsink)) {
         return;
     }
 
@@ -590,7 +726,8 @@ void QoreZipFile::extractEntry(const char* name, const char* destPath, Exception
 void QoreZipFile::deleteEntry(const char* name, ExceptionSink* xsink) {
     // Note: minizip-ng doesn't support in-place deletion
     // This would require rewriting the archive without the entry
-    xsink->raiseException("ZIP-ERROR", "delete operation not yet implemented");
+    xsink->raiseException("ZIP-NOT-SUPPORTED", "delete operation is not supported by this implementation; "
+                          "to remove entries, create a new archive without the unwanted entries");
 }
 
 QoreStringNode* QoreZipFile::getPath() const {
@@ -601,7 +738,9 @@ QoreStringNode* QoreZipFile::getPath() const {
 }
 
 QoreStringNode* QoreZipFile::getComment(ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWReadLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return nullptr;
     }
 
@@ -615,7 +754,9 @@ QoreStringNode* QoreZipFile::getComment(ExceptionSink* xsink) {
 }
 
 void QoreZipFile::setComment(const char* comment, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, true)) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, true)) {
         return;
     }
 
@@ -649,7 +790,9 @@ QoreStringNode* QoreZipEntry::getComment() const {
 }
 
 QoreObject* QoreZipFile::openInputStream(const char* name, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, false)) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, false)) {
         return nullptr;
     }
 
@@ -664,9 +807,13 @@ QoreObject* QoreZipFile::openInputStream(const char* name, ExceptionSink* xsink)
         mz_zip_reader_set_password(reader, password.c_str());
     }
 
+    // Increment active stream count
+    ++active_streams;
+
     // Create the stream - it will open the entry
-    ReferenceHolder<ZipInputStream> stream(new ZipInputStream(reader, name, xsink), xsink);
+    ReferenceHolder<ZipInputStream> stream(new ZipInputStream(this, reader, name, xsink), xsink);
     if (*xsink) {
+        --active_streams;
         return nullptr;
     }
 
@@ -674,7 +821,9 @@ QoreObject* QoreZipFile::openInputStream(const char* name, ExceptionSink* xsink)
 }
 
 QoreObject* QoreZipFile::openOutputStream(const char* name, const QoreHashNode* opts, ExceptionSink* xsink) {
-    if (!checkOpen(xsink, true)) {
+    QoreAutoRWWriteLocker lock(rwlock);
+
+    if (!checkOpenUnlocked(xsink, true)) {
         return nullptr;
     }
 
@@ -688,10 +837,14 @@ QoreObject* QoreZipFile::openOutputStream(const char* name, const QoreHashNode* 
         mz_zip_writer_set_aes(writer, 1);
     }
 
+    // Increment active stream count
+    ++active_streams;
+
     // Create the stream - it will open the entry
     ReferenceHolder<ZipOutputStream> stream(
-        new ZipOutputStream(writer, name, compression_method, compression_level, xsink), xsink);
+        new ZipOutputStream(this, writer, name, compression_method, compression_level, xsink), xsink);
     if (*xsink) {
+        --active_streams;
         return nullptr;
     }
 

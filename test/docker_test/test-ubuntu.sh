@@ -10,7 +10,7 @@ ENV_FILE=/tmp/env.sh
 # setup MODULE_SRC_DIR env var
 cwd=`pwd`
 if [ -z "${MODULE_SRC_DIR}" ]; then
-    if [ -e "$cwd/src/zip-module.cpp" ]; then
+    if [ -e "$cwd/src/QoreZipFile.cpp" ]; then
         MODULE_SRC_DIR=$cwd
     else
         MODULE_SRC_DIR=$WORKDIR/module-zip

@@ -1,0 +1,28 @@
+--- a/mz_crypt_openssl.c
++++ b/mz_crypt_openssl.c
+@@ -12,7 +12,10 @@
+ #include "mz_crypt.h"
+
+ #include <openssl/err.h>
+-#include <openssl/engine.h>
++/* ENGINE API deprecated in OpenSSL 3.0, removed in OpenSSL 3.2 */
++#if OPENSSL_VERSION_NUMBER < 0x30000000L
++#  include <openssl/engine.h>
++#endif
+ #include <openssl/rand.h>
+ #include <openssl/sha.h>
+ #include <openssl/aes.h>
+@@ -37,8 +40,12 @@ static void mz_crypt_init(void) {
+
+         ENGINE_load_builtin_engines();
+         ENGINE_register_all_complete();
+-#else
++#elif OPENSSL_VERSION_NUMBER < 0x30000000L
++        /* ENGINE API deprecated in OpenSSL 3.0, removed in OpenSSL 3.2 */
+         OPENSSL_init_crypto(OPENSSL_INIT_ENGINE_ALL_BUILTIN, NULL);
++#else
++        /* OpenSSL 3.0+: ENGINE API deprecated, use provider-based init */
++        OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CONFIG, NULL);
+ #endif
+
+         openssl_initialized = 1;

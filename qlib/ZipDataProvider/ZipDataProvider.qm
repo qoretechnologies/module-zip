@@ -134,26 +134,6 @@ module ZipDataProvider {
             "desc": "Decompress an in-memory zip archive and return file contents",
             "action_code": DPAT_API,
         });
-
-        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
-            "app": ZipDataProvider::AppName,
-            "path": "/stream/extract",
-            "action": "stream-extract",
-            "display_name": "Stream Extract",
-            "short_desc": "Stream extract large file from archive",
-            "desc": "Extract a large file from an archive using streaming to avoid loading entire file into memory",
-            "action_code": DPAT_API,
-        });
-
-        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
-            "app": ZipDataProvider::AppName,
-            "path": "/entry/delete",
-            "action": "delete-entry",
-            "display_name": "Delete Entry",
-            "short_desc": "Delete file from archive",
-            "desc": "Delete a file or directory entry from an existing zip archive",
-            "action_code": DPAT_API,
-        });
     };
 }
 
@@ -163,6 +143,219 @@ public namespace ZipDataProvider {
 
     #! ZIP logo (loaded at initialization)
     public const ZipLogo = File::readTextFile(get_script_dir() + "/zip-logo.svg");
+
+#! Request type for creating a ZIP archive
+public hashdecl ZipCreateArchiveRequest {
+    #! Output file path (optional if returning binary data)
+    *string output_path;
+
+    #! Entries to add: list of hashes with "name", "data" or "path", and optional "compression_method"
+    list<hash<auto>> entries;
+
+    #! Archive comment
+    *string comment;
+
+    #! Default compression method (0=store, 8=deflate)
+    *int compression_method;
+
+    #! Password for encryption (optional)
+    *string password;
+}
+
+#! Response type for creating a ZIP archive
+public hashdecl ZipCreateArchiveResponse {
+    #! True if successful
+    bool success;
+
+    #! Output file path if written to disk
+    *string output_path;
+
+    #! Binary data if in-memory archive
+    *binary data;
+
+    #! Number of entries added
+    int entry_count;
+
+    #! Archive size in bytes
+    int size;
+}
+
+#! Request type for extracting a ZIP archive
+public hashdecl ZipExtractArchiveRequest {
+    #! Input file path
+    *string input_path;
+
+    #! Binary data of the archive (alternative to input_path)
+    *binary data;
+
+    #! Destination directory
+    string destination;
+
+    #! Password for decryption (optional)
+    *string password;
+}
+
+#! Response type for extracting a ZIP archive
+public hashdecl ZipExtractArchiveResponse {
+    #! True if successful
+    bool success;
+
+    #! Number of entries extracted
+    int entry_count;
+
+    #! Destination directory
+    string destination;
+
+    #! List of extracted file paths
+    list<string> extracted_files;
+}
+
+#! Request type for listing archive contents
+public hashdecl ZipListArchiveRequest {
+    #! Input file path
+    *string input_path;
+
+    #! Binary data of the archive (alternative to input_path)
+    *binary data;
+}
+
+#! Response type for listing archive contents
+public hashdecl ZipListArchiveResponse {
+    #! List of entries with their metadata
+    list<hash<ZipEntryInfo>> entries;
+
+    #! Total number of entries
+    int count;
+}
+
+#! Request type for getting archive info
+public hashdecl ZipArchiveInfoRequest {
+    #! Input file path
+    *string input_path;
+
+    #! Binary data of the archive (alternative to input_path)
+    *binary data;
+}
+
+#! Response type for getting archive info
+public hashdecl ZipArchiveInfoResponse {
+    #! Archive file path (if from file)
+    *string path;
+
+    #! Total number of entries
+    int entry_count;
+
+    #! Total uncompressed size
+    int total_size;
+
+    #! Total compressed size
+    int compressed_size;
+
+    #! Archive comment
+    *string comment;
+}
+
+#! Request type for adding files to archive
+public hashdecl ZipAddFilesRequest {
+    #! Archive file path
+    string archive_path;
+
+    #! Entries to add: list of hashes with "name", "data" or "path"
+    list<hash<auto>> entries;
+
+    #! Password for new entries (optional)
+    *string password;
+}
+
+#! Response type for adding files to archive
+public hashdecl ZipAddFilesResponse {
+    #! True if successful
+    bool success;
+
+    #! Number of entries added
+    int entries_added;
+}
+
+#! Request type for extracting a single file
+public hashdecl ZipExtractFileRequest {
+    #! Archive file path
+    *string archive_path;
+
+    #! Binary data of the archive (alternative to archive_path)
+    *binary archive_data;
+
+    #! Name of the entry to extract
+    string entry_name;
+
+    #! Password for decryption (optional)
+    *string password;
+
+    #! Output file path (optional, if not specified returns data)
+    *string output_path;
+}
+
+#! Response type for extracting a single file
+public hashdecl ZipExtractFileResponse {
+    #! True if successful
+    bool success;
+
+    #! Entry name
+    string entry_name;
+
+    #! Binary data (if not written to file)
+    *binary data;
+
+    #! Output file path (if written to file)
+    *string output_path;
+
+    #! Size of extracted data
+    int size;
+}
+
+#! Request type for compressing data
+public hashdecl ZipCompressDataRequest {
+    #! Entries to compress: list of hashes with "name" and "data"
+    list<hash<auto>> entries;
+
+    #! Compression method (0=store, 8=deflate)
+    *int compression_method;
+
+    #! Password for encryption (optional)
+    *string password;
+}
+
+#! Response type for compressing data
+public hashdecl ZipCompressDataResponse {
+    #! Compressed archive data
+    binary data;
+
+    #! Number of entries
+    int entry_count;
+
+    #! Compressed size
+    int size;
+}
+
+#! Request type for decompressing data
+public hashdecl ZipDecompressDataRequest {
+    #! Compressed archive data
+    binary data;
+
+    #! Password for decryption (optional)
+    *string password;
+
+    #! Specific entry names to extract (optional, extracts all if not specified)
+    *list<string> entry_names;
+}
+
+#! Response type for decompressing data
+public hashdecl ZipDecompressDataResponse {
+    #! Hash of entry name -> binary data
+    hash<string, binary> entries;
+
+    #! Number of entries extracted
+    int entry_count;
+}
 
 #! ZipDataProvider factory class
 public class ZipDataProviderFactory inherits AbstractDataProviderFactory {
@@ -236,7 +429,7 @@ public class ZipDataProvider inherits AbstractDataProvider {
 
     #! Returns child providers
     private *list<string> getChildProviderNamesImpl() {
-        return ("archive", "file", "data", "stream", "entry");
+        return ("archive", "file", "data");
     }
 
     #! Returns the given child provider or NOTHING if it doesn't exist
@@ -248,10 +441,6 @@ public class ZipDataProvider inherits AbstractDataProvider {
                 return new ZipFileDataProvider(opts);
             case "data":
                 return new ZipDataDataProvider(opts);
-            case "stream":
-                return new ZipStreamDataProvider(opts);
-            case "entry":
-                return new ZipEntryDataProvider(opts);
         }
         return NOTHING;
     }
@@ -391,124 +580,548 @@ public class ZipDataDataProvider inherits AbstractDataProvider {
     }
 }
 
-#! Stream operations provider (placeholder)
-public class ZipStreamDataProvider inherits AbstractDataProvider {
-    public {
-        const ProviderInfo = <DataProviderInfo>{
-            "name": "stream",
-            "desc": "ZIP stream operations",
-            "type": "ZipStreamDataProvider",
-        };
-    }
-
-    private {
-        hash<auto> opts;
-    }
-
-    constructor(hash<auto> opts = {}) {
-        self.opts = opts;
-    }
-
-    string getName() {
-        return ProviderInfo.name;
-    }
-
-    private hash<DataProviderInfo> getStaticInfoImpl() {
-        return ProviderInfo;
-    }
-}
-
-#! Entry operations provider (placeholder)
-public class ZipEntryDataProvider inherits AbstractDataProvider {
-    public {
-        const ProviderInfo = <DataProviderInfo>{
-            "name": "entry",
-            "desc": "ZIP entry operations",
-            "type": "ZipEntryDataProvider",
-        };
-    }
-
-    private {
-        hash<auto> opts;
-    }
-
-    constructor(hash<auto> opts = {}) {
-        self.opts = opts;
-    }
-
-    string getName() {
-        return ProviderInfo.name;
-    }
-
-    private hash<DataProviderInfo> getStaticInfoImpl() {
-        return ProviderInfo;
-    }
-}
-
-# Placeholder data provider classes for specific operations
-# These would be fully implemented with proper request/response types
-
+#! Create archive data provider
 public class ZipCreateArchiveDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "create"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "create",
+            "desc": "Create a new ZIP archive",
+            "type": "ZipCreateArchiveDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "create", "desc": "Create ZIP archive", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipCreateArchiveRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipCreateArchiveResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipCreateArchiveRequest> request = req;
+
+        ZipFile zip;
+        if (request.output_path) {
+            zip = new ZipFile(request.output_path, "w");
+        } else {
+            zip = new ZipFile();
+        }
+
+        if (request.comment) {
+            zip.setComment(request.comment);
+        }
+
+        int entry_count = 0;
+        foreach hash<auto> entry in (request.entries) {
+            hash<ZipAddOptions> add_opts();
+            if (request.compression_method) {
+                add_opts.compression_method = request.compression_method;
+            }
+            if (request.password) {
+                add_opts.password = request.password;
+            }
+
+            if (entry.data) {
+                zip.add(entry.name, entry.data, add_opts);
+            } else if (entry.path) {
+                zip.addFile(entry.name ?? basename(entry.path), entry.path, add_opts);
+            }
+            ++entry_count;
+        }
+
+        hash<ZipCreateArchiveResponse> response();
+        response.success = True;
+        response.entry_count = entry_count;
+
+        if (request.output_path) {
+            zip.close();
+            response.output_path = request.output_path;
+            response.size = hstat(request.output_path).size;
+        } else {
+            response.data = zip.toData();
+            response.size = response.data.size();
+        }
+
+        return response;
     }
 }
 
+#! Extract archive data provider
 public class ZipExtractArchiveDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "extract"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "extract",
+            "desc": "Extract a ZIP archive to a directory",
+            "type": "ZipExtractArchiveDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "extract", "desc": "Extract ZIP archive", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipExtractArchiveRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipExtractArchiveResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipExtractArchiveRequest> request = req;
+
+        ZipFile zip;
+        if (request.input_path) {
+            zip = new ZipFile(request.input_path, "r");
+        } else if (request.data) {
+            zip = new ZipFile(request.data);
+        } else {
+            throw "ZIP-ERROR", "Either input_path or data must be provided";
+        }
+
+        hash<ZipExtractOptions> extract_opts();
+        if (request.password) {
+            extract_opts.password = request.password;
+        }
+
+        # Get list of entries before extraction
+        list<hash<ZipEntryInfo>> entries = zip.entries();
+        list<string> extracted_files = ();
+        foreach hash<ZipEntryInfo> entry in (entries) {
+            if (!entry.is_directory) {
+                extracted_files += request.destination + "/" + entry.name;
+            }
+        }
+
+        zip.extractAll(request.destination, extract_opts);
+        zip.close();
+
+        return <ZipExtractArchiveResponse>{
+            "success": True,
+            "entry_count": entries.size(),
+            "destination": request.destination,
+            "extracted_files": extracted_files,
+        };
     }
 }
 
+#! List archive data provider
 public class ZipListArchiveDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "list"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "list",
+            "desc": "List contents of a ZIP archive",
+            "type": "ZipListArchiveDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "list", "desc": "List ZIP archive contents", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipListArchiveRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipListArchiveResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipListArchiveRequest> request = req;
+
+        ZipFile zip;
+        if (request.input_path) {
+            zip = new ZipFile(request.input_path, "r");
+        } else if (request.data) {
+            zip = new ZipFile(request.data);
+        } else {
+            throw "ZIP-ERROR", "Either input_path or data must be provided";
+        }
+
+        list<hash<ZipEntryInfo>> entries = zip.entries();
+        zip.close();
+
+        return <ZipListArchiveResponse>{
+            "entries": entries,
+            "count": entries.size(),
+        };
     }
 }
 
+#! Archive info data provider
 public class ZipArchiveInfoDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "info"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "info",
+            "desc": "Get ZIP archive metadata",
+            "type": "ZipArchiveInfoDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "info", "desc": "Get ZIP archive info", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipArchiveInfoRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipArchiveInfoResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipArchiveInfoRequest> request = req;
+
+        ZipFile zip;
+        if (request.input_path) {
+            zip = new ZipFile(request.input_path, "r");
+        } else if (request.data) {
+            zip = new ZipFile(request.data);
+        } else {
+            throw "ZIP-ERROR", "Either input_path or data must be provided";
+        }
+
+        list<hash<ZipEntryInfo>> entries = zip.entries();
+        int total_size = 0;
+        int compressed_size = 0;
+        foreach hash<ZipEntryInfo> entry in (entries) {
+            total_size += entry.size;
+            compressed_size += entry.compressed_size;
+        }
+
+        hash<ZipArchiveInfoResponse> response = <ZipArchiveInfoResponse>{
+            "path": request.input_path,
+            "entry_count": entries.size(),
+            "total_size": total_size,
+            "compressed_size": compressed_size,
+            "comment": zip.comment(),
+        };
+
+        zip.close();
+        return response;
     }
 }
 
+#! Add files data provider
 public class ZipAddFilesDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "add"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "add",
+            "desc": "Add files to an existing ZIP archive",
+            "type": "ZipAddFilesDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "add", "desc": "Add files to ZIP archive", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipAddFilesRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipAddFilesResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipAddFilesRequest> request = req;
+
+        ZipFile zip(request.archive_path, "a");
+
+        int entries_added = 0;
+        foreach hash<auto> entry in (request.entries) {
+            hash<ZipAddOptions> add_opts();
+            if (request.password) {
+                add_opts.password = request.password;
+            }
+
+            if (entry.data) {
+                zip.add(entry.name, entry.data, add_opts);
+            } else if (entry.path) {
+                zip.addFile(entry.name ?? basename(entry.path), entry.path, add_opts);
+            }
+            ++entries_added;
+        }
+
+        zip.close();
+
+        return <ZipAddFilesResponse>{
+            "success": True,
+            "entries_added": entries_added,
+        };
     }
 }
 
+#! Extract file data provider
 public class ZipExtractFileDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "extract"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "extract",
+            "desc": "Extract a single file from a ZIP archive",
+            "type": "ZipExtractFileDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "extract", "desc": "Extract single file from ZIP", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipExtractFileRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipExtractFileResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipExtractFileRequest> request = req;
+
+        ZipFile zip;
+        if (request.archive_path) {
+            zip = new ZipFile(request.archive_path, "r");
+        } else if (request.archive_data) {
+            zip = new ZipFile(request.archive_data);
+        } else {
+            throw "ZIP-ERROR", "Either archive_path or archive_data must be provided";
+        }
+
+        binary data = zip.read(request.entry_name);
+        zip.close();
+
+        hash<ZipExtractFileResponse> response = <ZipExtractFileResponse>{
+            "success": True,
+            "entry_name": request.entry_name,
+            "size": data.size(),
+        };
+
+        if (request.output_path) {
+            File f();
+            f.open2(request.output_path, O_CREAT | O_WRONLY | O_TRUNC);
+            f.write(data);
+            f.close();
+            response.output_path = request.output_path;
+        } else {
+            response.data = data;
+        }
+
+        return response;
     }
 }
 
+#! Compress data data provider
 public class ZipCompressDataDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "compress"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "compress",
+            "desc": "Compress data into a ZIP archive",
+            "type": "ZipCompressDataDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "compress", "desc": "Compress data to ZIP", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipCompressDataRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipCompressDataResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipCompressDataRequest> request = req;
+
+        ZipFile zip();
+
+        foreach hash<auto> entry in (request.entries) {
+            hash<ZipAddOptions> add_opts();
+            if (request.compression_method) {
+                add_opts.compression_method = request.compression_method;
+            }
+            if (request.password) {
+                add_opts.password = request.password;
+            }
+
+            zip.add(entry.name, entry.data, add_opts);
+        }
+
+        binary data = zip.toData();
+
+        return <ZipCompressDataResponse>{
+            "data": data,
+            "entry_count": request.entries.size(),
+            "size": data.size(),
+        };
     }
 }
 
+#! Decompress data data provider
 public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
-    constructor(hash<auto> opts = {}) {}
-    string getName() { return "decompress"; }
+    public {
+        const ProviderInfo = <DataProviderInfo>{
+            "name": "decompress",
+            "desc": "Decompress a ZIP archive from binary data",
+            "type": "ZipDecompressDataDataProvider",
+            "supports_request": True,
+        };
+    }
+
+    private {
+        hash<auto> opts;
+    }
+
+    constructor(hash<auto> opts = {}) {
+        self.opts = opts;
+    }
+
+    string getName() {
+        return ProviderInfo.name;
+    }
+
     private hash<DataProviderInfo> getStaticInfoImpl() {
-        return <DataProviderInfo>{"name": "decompress", "desc": "Decompress ZIP data", "supports_request": True};
+        return ProviderInfo;
+    }
+
+    private *AbstractDataProviderType getRequestTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipDecompressDataRequest>"));
+    }
+
+    private *AbstractDataProviderType getResponseTypeImpl() {
+        return AbstractDataProviderType::get(new Type("hash<ZipDecompressDataResponse>"));
+    }
+
+    private auto doRequestImpl(auto req, *hash<auto> request_options) {
+        hash<ZipDecompressDataRequest> request = req;
+
+        ZipFile zip(request.data);
+
+        hash<string, binary> entries();
+        list<hash<ZipEntryInfo>> entry_list = zip.entries();
+
+        foreach hash<ZipEntryInfo> entry in (entry_list) {
+            if (entry.is_directory) {
+                continue;
+            }
+
+            # If specific entry names are requested, only extract those
+            if (request.entry_names && request.entry_names.size() > 0) {
+                if (!inlist(entry.name, request.entry_names)) {
+                    continue;
+                }
+            }
+
+            entries{entry.name} = zip.read(entry.name);
+        }
+
+        zip.close();
+
+        return <ZipDecompressDataResponse>{
+            "entries": entries,
+            "entry_count": entries.size(),
+        };
     }
 }
 

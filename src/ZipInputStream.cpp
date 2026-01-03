@@ -25,9 +25,10 @@
 */
 
 #include "ZipInputStream.h"
+#include "QoreZipFile.h"
 
-ZipInputStream::ZipInputStream(void* r, const std::string& name, ExceptionSink* xsink)
-    : reader(r), entry_name(name), entry_open(false), eof(false), peek_byte(-2) {
+ZipInputStream::ZipInputStream(QoreZipFile* p, void* r, const std::string& name, ExceptionSink* xsink)
+    : parent(p), reader(r), entry_name(name), entry_open(false), eof(false), peek_byte(-2) {
     // Open the entry for reading
     int32_t err = mz_zip_reader_entry_open(reader);
     if (err != MZ_OK) {
@@ -42,6 +43,10 @@ ZipInputStream::~ZipInputStream() {
     if (entry_open) {
         mz_zip_reader_entry_close(reader);
         entry_open = false;
+    }
+    // Decrement the parent's active stream count
+    if (parent) {
+        parent->derefStream();
     }
 }
 

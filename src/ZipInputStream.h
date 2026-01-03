@@ -32,15 +32,22 @@
 
 #include <string>
 
+// Forward declaration
+class QoreZipFile;
+
 //! ZipInputStream - InputStream for reading a single entry from a ZIP archive
+/** @note This class is not thread-safe. Only one thread should access
+    an instance at a time.
+*/
 class ZipInputStream : public InputStream {
 public:
     //! Constructor - opens entry for reading
-    /** @param reader the minizip reader handle (must have entry located)
+    /** @param parent the parent ZipFile object
+        @param reader the minizip reader handle (must have entry located)
         @param entry_name the name of the entry being read
         @param xsink exception sink
     */
-    DLLLOCAL ZipInputStream(void* reader, const std::string& entry_name, ExceptionSink* xsink);
+    DLLLOCAL ZipInputStream(QoreZipFile* parent, void* reader, const std::string& entry_name, ExceptionSink* xsink);
 
     //! Destructor
     DLLLOCAL virtual ~ZipInputStream();
@@ -65,6 +72,7 @@ public:
     DLLLOCAL virtual int64 peek(ExceptionSink* xsink) override;
 
 private:
+    QoreZipFile* parent;    //!< parent ZipFile object (not owned, for reference counting)
     void* reader;           //!< minizip reader handle (not owned)
     std::string entry_name; //!< name of the entry being read
     bool entry_open;        //!< true if entry is currently open
