@@ -14,6 +14,7 @@ default:
 
 variables:
   REPO_NAME: module-zip
+  GIT_SUBMODULE_STRATEGY: recursive
 
 test-ubuntu:
   stage: test
