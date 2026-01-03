@@ -59,6 +59,22 @@ set(MZ_BUILD_TESTS OFF CACHE BOOL "Disable minizip-ng tests" FORCE)
 set(MZ_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable minizip-ng unit tests" FORCE)
 set(MZ_BUILD_FUZZ_TESTS OFF CACHE BOOL "Disable minizip-ng fuzz tests" FORCE)
 
+# Apply patches to minizip-ng before building
+# OpenSSL 3.2+ removed ENGINE API - apply compatibility patch
+if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
+    execute_process(
+        COMMAND patch -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/src/minizip-ng"
+        RESULT_VARIABLE PATCH_RESULT
+        OUTPUT_QUIET
+        ERROR_QUIET
+    )
+    # Result 0 = success, 1 = already applied (treated as success), >1 = error (e.g., 2 for patch failure)
+    if(PATCH_RESULT GREATER 1)
+        message(WARNING "Failed to apply OpenSSL 3.2 compatibility patch (patch exit code: ${PATCH_RESULT})")
+    endif()
+endif()
+
 # Add minizip-ng subdirectory
 add_subdirectory(src/minizip-ng)
 

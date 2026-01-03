@@ -50,6 +50,14 @@ public class ZipDataProviderTest inherits QUnit::Test {
         addTestCase("App registration tests", \appRegistrationTest());
         addTestCase("Integration tests", \integrationTest());
         addTestCase("Compression tests", \compressionTest());
+        addTestCase("Create archive action tests", \createArchiveActionTest());
+        addTestCase("Extract archive action tests", \extractArchiveActionTest());
+        addTestCase("List archive action tests", \listArchiveActionTest());
+        addTestCase("Archive info action tests", \archiveInfoActionTest());
+        addTestCase("Add files action tests", \addFilesActionTest());
+        addTestCase("Extract file action tests", \extractFileActionTest());
+        addTestCase("Compress data action tests", \compressDataActionTest());
+        addTestCase("Decompress data action tests", \decompressDataActionTest());
 
         set_return_value(main());
     }
@@ -198,6 +206,402 @@ public class ZipDataProviderTest inherits QUnit::Test {
             string decompressed = zip.readText("large.txt");
             assertEq(largeContent, decompressed, "decompressed content matches original");
             zip.close();
+        }
+    }
+
+    # ==================== Create Archive Action Tests ====================
+
+    createArchiveActionTest() {
+        # Get the create archive data provider using factory path
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("create");
+        assertEq(True, exists dp, "create archive provider exists");
+        assertEq("create", dp.getName(), "provider name is 'create'");
+
+        # Test creating archive to file
+        {
+            string zipPath = testDir + "/dp_create_file.zip";
+            hash<auto> request = {
+                "output_path": zipPath,
+                "entries": (
+                    {"name": "file1.txt", "data": binary("Content 1")},
+                    {"name": "file2.txt", "data": binary("Content 2")},
+                ),
+                "comment": "Test archive",
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "create file archive succeeded");
+            assertEq(2, response.entry_count, "entry count is 2");
+            assertEq(zipPath, response.output_path, "output path matches");
+            assertEq(True, response.size > 0, "archive has size");
+            assertEq(True, is_file(zipPath), "archive file exists");
+
+            # Verify contents
+            ZipFile zip(zipPath, "r");
+            assertEq(2, zip.count(), "archive has 2 entries");
+            assertEq("Content 1", zip.readText("file1.txt"), "file1 content matches");
+            zip.close();
+        }
+
+        # Test creating in-memory archive
+        {
+            hash<auto> request = {
+                "entries": (
+                    {"name": "mem1.txt", "data": binary("Memory content")},
+                ),
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "create memory archive succeeded");
+            assertEq(1, response.entry_count, "entry count is 1");
+            assertEq(True, exists response.data, "response has data");
+            assertEq(True, response.data.size() > 0, "data has content");
+
+            # Verify contents
+            ZipFile zip(response.data);
+            assertEq("Memory content", zip.readText("mem1.txt"), "memory content matches");
+            zip.close();
+        }
+    }
+
+    # ==================== Extract Archive Action Tests ====================
+
+    extractArchiveActionTest() {
+        # Create test archive first
+        string zipPath = testDir + "/dp_extract_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("extract1.txt", "Extract content 1");
+            zip.addText("subdir/extract2.txt", "Extract content 2");
+            zip.close();
+        }
+
+        # Get the extract archive data provider
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+        assertEq(True, exists dp, "extract archive provider exists");
+
+        # Test extracting from file
+        {
+            string extractDir = testDir + "/dp_extracted";
+            mkdir(extractDir);
+
+            hash<auto> request = {
+                "input_path": zipPath,
+                "destination": extractDir,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "extract succeeded");
+            assertEq(2, response.entry_count, "entry count is 2");
+            assertEq(extractDir, response.destination, "destination matches");
+            assertEq(True, response.extracted_files.size() > 0, "has extracted files list");
+
+            # Verify extraction
+            assertEq(True, is_file(extractDir + "/extract1.txt"), "extract1.txt exists");
+            assertEq(True, is_file(extractDir + "/subdir/extract2.txt"), "subdir/extract2.txt exists");
+            assertEq("Extract content 1", ReadOnlyFile::readTextFile(extractDir + "/extract1.txt"), "content matches");
+        }
+
+        # Test extracting from binary data
+        {
+            binary archiveData = File::readBinaryFile(zipPath);
+            string extractDir2 = testDir + "/dp_extracted2";
+            mkdir(extractDir2);
+
+            hash<auto> request = {
+                "data": archiveData,
+                "destination": extractDir2,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "extract from binary succeeded");
+            assertEq(True, is_file(extractDir2 + "/extract1.txt"), "file extracted from binary");
+        }
+    }
+
+    # ==================== List Archive Action Tests ====================
+
+    listArchiveActionTest() {
+        # Create test archive
+        string zipPath = testDir + "/dp_list_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("list1.txt", "List content 1");
+            zip.addText("list2.txt", "List content 2");
+            zip.addDirectory("emptydir/");
+            zip.close();
+        }
+
+        # Get the list archive data provider
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("list");
+        assertEq(True, exists dp, "list archive provider exists");
+
+        # Test listing from file
+        {
+            hash<auto> request = {
+                "input_path": zipPath,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(3, response.count, "count is 3");
+            assertEq(3, response.entries.size(), "entries list has 3 items");
+
+            # Check entry details
+            hash<string, hash<ZipEntryInfo>> entriesByName;
+            foreach hash<ZipEntryInfo> entry in (response.entries) {
+                entriesByName{entry.name} = entry;
+            }
+            assertEq(True, exists entriesByName{"list1.txt"}, "has list1.txt");
+            assertEq(True, exists entriesByName{"list2.txt"}, "has list2.txt");
+            assertEq(True, exists entriesByName{"emptydir/"}, "has emptydir/");
+            assertEq(True, entriesByName{"emptydir/"}.is_directory, "emptydir is directory");
+        }
+
+        # Test listing from binary data
+        {
+            binary archiveData = File::readBinaryFile(zipPath);
+            hash<auto> request = {
+                "data": archiveData,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(3, response.count, "count from binary is 3");
+        }
+    }
+
+    # ==================== Archive Info Action Tests ====================
+
+    archiveInfoActionTest() {
+        # Create test archive with comment
+        string zipPath = testDir + "/dp_info_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("info1.txt", "Info content 1");
+            zip.addText("info2.txt", strmul("Large content ", 100));
+            zip.setComment("Test archive comment");
+            zip.close();
+        }
+
+        # Get the archive info data provider
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("info");
+        assertEq(True, exists dp, "archive info provider exists");
+
+        # Test getting info
+        {
+            hash<auto> request = {
+                "input_path": zipPath,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(zipPath, response.path, "path matches");
+            assertEq(2, response.entry_count, "entry count is 2");
+            assertEq(True, response.total_size > 0, "has total size");
+            assertEq(True, response.compressed_size > 0, "has compressed size");
+            assertEq("Test archive comment", response.comment, "comment matches");
+        }
+    }
+
+    # ==================== Add Files Action Tests ====================
+
+    addFilesActionTest() {
+        # Create initial archive
+        string zipPath = testDir + "/dp_add_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("original.txt", "Original content");
+            zip.close();
+        }
+
+        # Get the add files data provider
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("add");
+        assertEq(True, exists dp, "add files provider exists");
+
+        # Test adding files
+        {
+            hash<auto> request = {
+                "archive_path": zipPath,
+                "entries": (
+                    {"name": "added1.txt", "data": binary("Added content 1")},
+                    {"name": "added2.txt", "data": binary("Added content 2")},
+                ),
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "add files succeeded");
+            assertEq(2, response.entries_added, "2 entries added");
+
+            # Verify archive now has all files
+            ZipFile zip(zipPath, "r");
+            assertEq(3, zip.count(), "archive now has 3 entries");
+            assertEq(True, zip.hasEntry("original.txt"), "original still exists");
+            assertEq(True, zip.hasEntry("added1.txt"), "added1 exists");
+            assertEq(True, zip.hasEntry("added2.txt"), "added2 exists");
+            zip.close();
+        }
+    }
+
+    # ==================== Extract File Action Tests ====================
+
+    extractFileActionTest() {
+        # Create test archive
+        string zipPath = testDir + "/dp_extract_file_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("single.txt", "Single file content");
+            zip.addText("other.txt", "Other content");
+            zip.close();
+        }
+
+        # Get the extract file data provider
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("file").getChildProviderEx("extract");
+        assertEq(True, exists dp, "extract file provider exists");
+
+        # Test extracting to memory
+        {
+            hash<auto> request = {
+                "archive_path": zipPath,
+                "entry_name": "single.txt",
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "extract to memory succeeded");
+            assertEq("single.txt", response.entry_name, "entry name matches");
+            assertEq(True, exists response.data, "response has data");
+            assertEq("Single file content", response.data.toString("UTF-8"), "content matches");
+            assertEq(True, response.size > 0, "has size");
+        }
+
+        # Test extracting to file
+        {
+            string outputPath = testDir + "/dp_single_extracted.txt";
+            hash<auto> request = {
+                "archive_path": zipPath,
+                "entry_name": "single.txt",
+                "output_path": outputPath,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "extract to file succeeded");
+            assertEq(outputPath, response.output_path, "output path matches");
+            assertEq(True, is_file(outputPath), "output file exists");
+            assertEq("Single file content", ReadOnlyFile::readTextFile(outputPath), "file content matches");
+        }
+
+        # Test extracting from binary archive
+        {
+            binary archiveData = File::readBinaryFile(zipPath);
+            hash<auto> request = {
+                "archive_data": archiveData,
+                "entry_name": "other.txt",
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, response.success, "extract from binary succeeded");
+            assertEq("Other content", response.data.toString("UTF-8"), "content from binary matches");
+        }
+    }
+
+    # ==================== Compress Data Action Tests ====================
+
+    compressDataActionTest() {
+        # Get the compress data provider
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("compress");
+        assertEq(True, exists dp, "compress data provider exists");
+
+        # Test compressing data
+        {
+            hash<auto> request = {
+                "entries": (
+                    {"name": "compress1.txt", "data": binary("Compress content 1")},
+                    {"name": "compress2.txt", "data": binary("Compress content 2")},
+                ),
+                "compression_method": ZIP_CM_DEFLATE,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, exists response.data, "response has data");
+            assertEq(2, response.entry_count, "entry count is 2");
+            assertEq(True, response.size > 0, "has size");
+
+            # Verify the compressed data is valid
+            ZipFile zip(response.data);
+            assertEq(2, zip.count(), "compressed archive has 2 entries");
+            assertEq("Compress content 1", zip.readText("compress1.txt"), "content 1 matches");
+            assertEq("Compress content 2", zip.readText("compress2.txt"), "content 2 matches");
+            zip.close();
+        }
+
+        # Test with password
+        {
+            hash<auto> request = {
+                "entries": (
+                    {"name": "secret.txt", "data": binary("Secret content")},
+                ),
+                "password": "TestPassword123",
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(True, exists response.data, "encrypted response has data");
+
+            # Verify it's encrypted
+            ZipFile zip(response.data);
+            hash<ZipEntryInfo> entry = zip.getEntry("secret.txt");
+            assertEq(True, entry.is_encrypted, "entry is encrypted");
+            zip.close();
+        }
+    }
+
+    # ==================== Decompress Data Action Tests ====================
+
+    decompressDataActionTest() {
+        # Create test archive data
+        binary archiveData;
+        {
+            ZipFile zip();
+            zip.addText("decomp1.txt", "Decompress content 1");
+            zip.addText("decomp2.txt", "Decompress content 2");
+            zip.addText("decomp3.txt", "Decompress content 3");
+            archiveData = zip.toData();
+        }
+
+        # Get the decompress data provider
+        ZipDataProvider factory();
+        AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("decompress");
+        assertEq(True, exists dp, "decompress data provider exists");
+
+        # Test decompressing all entries
+        {
+            hash<auto> request = {
+                "data": archiveData,
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(3, response.entry_count, "entry count is 3");
+            assertEq(3, response.entries.size(), "entries hash has 3 items");
+            assertEq("Decompress content 1", response.entries{"decomp1.txt"}.toString("UTF-8"), "content 1 matches");
+            assertEq("Decompress content 2", response.entries{"decomp2.txt"}.toString("UTF-8"), "content 2 matches");
+            assertEq("Decompress content 3", response.entries{"decomp3.txt"}.toString("UTF-8"), "content 3 matches");
+        }
+
+        # Test decompressing specific entries
+        {
+            hash<auto> request = {
+                "data": archiveData,
+                "entry_names": ("decomp1.txt", "decomp3.txt"),
+            };
+
+            hash<auto> response = dp.doRequest(request);
+            assertEq(2, response.entry_count, "filtered entry count is 2");
+            assertEq(True, exists response.entries{"decomp1.txt"}, "has decomp1.txt");
+            assertEq(True, exists response.entries{"decomp3.txt"}, "has decomp3.txt");
+            assertEq(False, exists response.entries{"decomp2.txt"}, "does not have decomp2.txt");
         }
     }
 }

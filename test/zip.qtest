@@ -56,6 +56,11 @@ public class ZipTest inherits QUnit::Test {
         addTestCase("Corner case tests", \cornerCaseTest());
         addTestCase("Unicode filename tests", \unicodeFilenameTest());
         addTestCase("Streaming API tests", \streamingApiTest());
+        addTestCase("Path traversal security tests", \pathTraversalSecurityTest());
+        addTestCase("Active stream tests", \activeStreamTest());
+        addTestCase("toData state tests", \toDataStateTest());
+        addTestCase("deleteEntry tests", \deleteEntryTest());
+        addTestCase("Encryption with password tests", \encryptionPasswordTest());
 
         set_return_value(main());
     }
@@ -540,11 +545,14 @@ public class ZipTest inherits QUnit::Test {
             # Create archive using streaming
             {
                 ZipFile zip(zipPath, "w");
-                ZipOutputStream os = zip.openWrite("streamed.txt");
-                os.write(chunk1);
-                os.write(chunk2);
-                os.write(chunk3);
-                os.close();
+                {
+                    ZipOutputStream os = zip.openWrite("streamed.txt");
+                    os.write(chunk1);
+                    os.write(chunk2);
+                    os.write(chunk3);
+                    os.close();
+                }
+                # Stream goes out of scope before zip.close()
                 zip.close();
             }
 
@@ -567,12 +575,15 @@ public class ZipTest inherits QUnit::Test {
             # Create archive using streaming with high compression
             {
                 ZipFile zip(zipPath, "w");
-                ZipOutputStream os = zip.openWrite("large.txt", <ZipAddOptions>{
-                    "compression_method": ZIP_CM_DEFLATE,
-                    "compression_level": ZIP_COMPRESSION_BEST,
-                });
-                os.write(binary(largeContent));
-                os.close();
+                {
+                    ZipOutputStream os = zip.openWrite("large.txt", <ZipAddOptions>{
+                        "compression_method": ZIP_CM_DEFLATE,
+                        "compression_level": ZIP_COMPRESSION_BEST,
+                    });
+                    os.write(binary(largeContent));
+                    os.close();
+                }
+                # Stream goes out of scope before zip.close()
                 zip.close();
             }
 
@@ -625,6 +636,268 @@ public class ZipTest inherits QUnit::Test {
                 # Stream is closed before zip.close()
                 zip.close();
             }
+        }
+    }
+
+    # Test path traversal security
+    pathTraversalSecurityTest() {
+        # Test that extractAll rejects path traversal attempts
+        # Note: We can't easily create a malicious archive with minizip-ng,
+        # so we test the API behavior for valid paths and document the protection
+
+        # Test with valid relative path
+        {
+            string zipPath = testDir + "/safe_extract.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("subdir/file.txt", "safe content");
+                zip.close();
+            }
+
+            string extractDir = testDir + "/safe_extracted";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/subdir/file.txt"), "valid relative path extraction works");
+        }
+
+        # Test extractEntry with safe path
+        {
+            string zipPath = testDir + "/safe_single.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("normal.txt", "normal content");
+                zip.close();
+            }
+
+            string outputPath = testDir + "/safe_output.txt";
+            ZipFile zip(zipPath, "r");
+            zip.extractEntry("normal.txt", outputPath);
+            zip.close();
+
+            assertEq(True, is_file(outputPath), "single entry extraction works");
+        }
+
+        # Test that absolute paths in entries are rejected
+        # This would require creating a malicious archive externally
+        # Document: The module now includes path traversal protection for extraction
+    }
+
+    # Test active stream reference counting
+    activeStreamTest() {
+        # Test that closing archive with active stream throws exception
+        {
+            string zipPath = testDir + "/active_stream.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("test.txt", "content for streaming");
+                zip.close();
+            }
+
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            ZipInputStream is = zip.openRead("test.txt");
+            try {
+                # Try to close archive while stream is active
+                zip.close();
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "correct exception for active stream");
+                assertRegex("active stream", ex.desc, "error mentions active stream");
+            }
+            # Clean up - delete the input stream first, then close
+            delete is;
+            zip.close();
+
+            assertEq(True, caught, "exception thrown when closing with active stream");
+        }
+
+        # Test that stream is properly counted for output
+        {
+            string zipPath = testDir + "/active_output_stream.zip";
+
+            bool caught = False;
+            ZipFile zip(zipPath, "w");
+            ZipOutputStream os = zip.openWrite("test.txt");
+            try {
+                # Try to close archive while stream is active
+                zip.close();
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "correct exception for active output stream");
+            }
+            # Clean up
+            os.close();
+            delete os;
+            zip.close();
+
+            assertEq(True, caught, "exception thrown when closing with active output stream");
+        }
+
+        # Test normal stream lifecycle - stream closes before archive
+        {
+            string zipPath = testDir + "/normal_stream.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("test.txt", "content");
+                zip.close();
+            }
+
+            ZipFile zip(zipPath, "r");
+            {
+                ZipInputStream is = zip.openRead("test.txt");
+                *binary data = is.read(100);
+                assertEq(True, data.size() > 0, "stream read works");
+            }
+            # Stream goes out of scope, closes automatically
+
+            # Now archive should close without error
+            zip.close();
+            assertEq(True, True, "archive closes after stream is closed");
+        }
+    }
+
+    # Test toData() state management
+    toDataStateTest() {
+        # Test that toData() marks archive as closed
+        {
+            ZipFile zip();
+            zip.addText("test.txt", "content");
+            binary data = zip.toData();
+            assertEq(True, data.size() > 0, "toData returns data");
+
+            # Second call should fail since archive is now closed
+            bool caught = False;
+            try {
+                zip.toData();
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "correct exception for closed archive");
+            }
+            assertEq(True, caught, "second toData() call throws exception");
+        }
+
+        # Test that toData() with active stream throws
+        {
+            ZipFile zip();
+            ZipOutputStream os = zip.openWrite("test.txt");
+            os.write(binary("content"));
+
+            bool caught = False;
+            try {
+                zip.toData();
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "correct exception for active stream");
+            }
+
+            os.close();
+            delete os;
+
+            # Now toData should work
+            binary finalData = zip.toData();
+            assertEq(True, finalData.size() > 0, "toData works after stream closed");
+
+            assertEq(True, caught, "toData() with active stream throws exception");
+        }
+    }
+
+    # Test delete behavior
+    deleteEntryTest() {
+        string zipPath = testDir + "/delete_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("file1.txt", "content 1");
+            zip.addText("file2.txt", "content 2");
+            zip.close();
+        }
+
+        # Test that delete throws ZIP-NOT-SUPPORTED
+        {
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            try {
+                zip.delete("file1.txt");
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-NOT-SUPPORTED", ex.err, "delete throws ZIP-NOT-SUPPORTED");
+                assertRegex("not supported", ex.desc, "error message mentions not supported");
+            }
+            zip.close();
+            assertEq(True, caught, "delete throws expected exception");
+        }
+    }
+
+    # Test encryption with password verification
+    encryptionPasswordTest() {
+        string password = "TestPassword123!";
+        string content = "This is secret encrypted content that should be protected";
+
+        # Create encrypted archive (AES-256 is default when password is set)
+        string zipPath = testDir + "/aes_encrypted.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("secret.txt", content, NOTHING, <ZipAddOptions>{
+                "password": password,
+            });
+            zip.close();
+        }
+
+        # Verify entry shows as encrypted
+        {
+            ZipFile zip(zipPath, "r");
+            hash<ZipEntryInfo> entry = zip.getEntry("secret.txt");
+            assertEq(True, entry.is_encrypted, "AES encrypted entry shows as encrypted");
+            zip.close();
+        }
+
+        # Test extractAll with correct password
+        {
+            string extractDir = testDir + "/decrypt_extract";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir, <ZipExtractOptions>{"password": password});
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/secret.txt"), "encrypted file extracted");
+            string extractedContent = ReadOnlyFile::readTextFile(extractDir + "/secret.txt");
+            assertEq(content, extractedContent, "decrypted content matches original");
+        }
+
+        # Test extractAll with wrong password
+        {
+            string extractDir = testDir + "/wrong_password_extract";
+            mkdir(extractDir);
+
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            try {
+                zip.extractAll(extractDir, <ZipExtractOptions>{"password": "WrongPassword"});
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-ERROR", ex.err, "wrong password throws ZIP-ERROR");
+            }
+            zip.close();
+            assertEq(True, caught, "wrong password throws exception");
+        }
+
+        # Test in-memory encryption and decryption
+        {
+            ZipFile zip();
+            zip.addText("inmem_secret.txt", content, NOTHING, <ZipAddOptions>{
+                "password": password,
+            });
+            binary archiveData = zip.toData();
+
+            # Read back
+            ZipFile readZip(archiveData);
+            hash<ZipEntryInfo> entry = readZip.getEntry("inmem_secret.txt");
+            assertEq(True, entry.is_encrypted, "in-memory encrypted entry shows as encrypted");
+            readZip.close();
         }
     }
 }

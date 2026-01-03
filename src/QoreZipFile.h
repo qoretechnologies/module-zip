@@ -30,6 +30,13 @@
 #include "zip-module.h"
 
 #include <string>
+#include <atomic>
+
+//! Default maximum size for memory allocations (1GB)
+#define ZIP_DEFAULT_MAX_ALLOC_SIZE (1024LL * 1024 * 1024)
+
+//! Default memory stream grow size (128KB)
+#define ZIP_MEM_STREAM_GROW_SIZE (128 * 1024)
 
 // Open modes
 enum ZipMode {
@@ -40,6 +47,10 @@ enum ZipMode {
 };
 
 //! QoreZipFile - private data class for ZipFile Qore class
+/** This class is thread-safe. All public methods acquire appropriate locks.
+    However, stream objects (ZipInputStream, ZipOutputStream) are not thread-safe
+    and should only be used from a single thread.
+*/
 class QoreZipFile : public AbstractPrivateData {
 public:
     //! Constructor for file-based archive
@@ -50,6 +61,21 @@ public:
 
     //! Constructor for new in-memory archive
     DLLLOCAL QoreZipFile(ExceptionSink* xsink);
+
+    //! Increment the active stream count
+    DLLLOCAL void refStream() { ++active_streams; }
+
+    //! Decrement the active stream count
+    DLLLOCAL void derefStream() { --active_streams; }
+
+    //! Check if there are active streams
+    DLLLOCAL bool hasActiveStreams() const { return active_streams > 0; }
+
+    //! Get the maximum allocation size
+    DLLLOCAL int64 getMaxAllocSize() const { return max_alloc_size; }
+
+    //! Set the maximum allocation size for memory allocations
+    DLLLOCAL void setMaxAllocSize(int64 size) { max_alloc_size = size; }
 
     //! Destructor
     DLLLOCAL virtual ~QoreZipFile();
@@ -122,14 +148,17 @@ public:
     DLLLOCAL void* getWriter() const { return writer; }
 
 private:
+    mutable QoreRWLock rwlock;          //!< Read-write lock for thread safety
     std::string filepath;
     ZipMode mode;
-    void* reader;           // mz_zip_reader handle
-    void* writer;           // mz_zip_writer handle
-    void* mem_stream;       // memory stream for in-memory archives
+    void* reader;                        //!< mz_zip_reader handle
+    void* writer;                        //!< mz_zip_writer handle
+    void* mem_stream;                    //!< memory stream for in-memory archives
     std::string password;
     bool in_memory;
     bool closed;
+    std::atomic<int> active_streams;     //!< Count of active stream objects
+    int64 max_alloc_size;                //!< Maximum size for memory allocations
 
     //! Create ZipEntryInfo hash from minizip file info
     DLLLOCAL QoreHashNode* createEntryInfo(mz_zip_file* file_info, ExceptionSink* xsink);
@@ -139,14 +168,20 @@ private:
                                   std::string& entry_password, std::string& comment, int64& modified_time,
                                   ExceptionSink* xsink);
 
-    //! Check archive is open and in correct mode
-    DLLLOCAL bool checkOpen(ExceptionSink* xsink, bool forWrite = false);
+    //! Check archive is open and in correct mode (must be called with lock held)
+    DLLLOCAL bool checkOpenUnlocked(ExceptionSink* xsink, bool forWrite = false);
 
     //! Open for reading
     DLLLOCAL void openRead(ExceptionSink* xsink);
 
     //! Open for writing
     DLLLOCAL void openWrite(ExceptionSink* xsink);
+
+    //! Validate path for extraction (check for path traversal)
+    DLLLOCAL static bool validateExtractPath(const char* entry_name, const char* dest_path, ExceptionSink* xsink);
+
+    //! Add binary data as entry (must be called with write lock held)
+    DLLLOCAL void addUnlocked(const char* name, const BinaryNode* data, const QoreHashNode* opts, ExceptionSink* xsink);
 };
 
 //! QoreZipEntry - private data class for ZipEntry Qore class
