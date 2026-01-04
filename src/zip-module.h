@@ -28,6 +28,7 @@
 #define _QORE_ZIP_MODULE_H
 
 #include <qore/Qore.h>
+#include <qore/QoreSandboxManager.h>
 #include <mz.h>
 #include <mz_zip.h>
 #include <mz_strm.h>

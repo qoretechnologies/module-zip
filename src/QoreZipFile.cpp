@@ -126,6 +126,12 @@ QoreZipFile::~QoreZipFile() {
 }
 
 void QoreZipFile::openRead(ExceptionSink* xsink) {
+    // Check filesystem sandbox access
+    QoreSandboxManager* sm = runtime_get_sandbox_manager();
+    if (sm && !sm->checkFilesystemAccess(filepath.c_str(), QSEC_READ, xsink)) {
+        return;
+    }
+
     reader = mz_zip_reader_create();
     if (!reader) {
         xsink->raiseException("ZIP-ERROR", "failed to create zip reader");
@@ -142,6 +148,12 @@ void QoreZipFile::openRead(ExceptionSink* xsink) {
 }
 
 void QoreZipFile::openWrite(ExceptionSink* xsink) {
+    // Check filesystem sandbox access (need write and create for new files)
+    QoreSandboxManager* sm = runtime_get_sandbox_manager();
+    if (sm && !sm->checkFilesystemAccess(filepath.c_str(), QSEC_WRITE | QSEC_CREATE, xsink)) {
+        return;
+    }
+
     writer = mz_zip_writer_create();
     if (!writer) {
         xsink->raiseException("ZIP-ERROR", "failed to create zip writer");
@@ -607,6 +619,12 @@ void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHash
         return;
     }
 
+    // Check filesystem sandbox access before reading source file
+    QoreSandboxManager* sm = runtime_get_sandbox_manager();
+    if (sm && !sm->checkFilesystemAccess(filepath, QSEC_READ, xsink)) {
+        return;
+    }
+
     int16_t compression_method, compression_level;
     std::string entry_password, comment;
     int64 modified_time;
@@ -669,6 +687,12 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
         return;
     }
 
+    // Check filesystem sandbox access before writing to destination
+    QoreSandboxManager* sm = runtime_get_sandbox_manager();
+    if (sm && !sm->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
+        return;
+    }
+
     // First, validate all entry paths for security
     int32_t err = mz_zip_reader_goto_first_entry(reader);
     while (err == MZ_OK) {
@@ -699,6 +723,12 @@ void QoreZipFile::extractEntry(const char* name, const char* destPath, Exception
     QoreAutoRWReadLocker lock(rwlock);
 
     if (!checkOpenUnlocked(xsink, false)) {
+        return;
+    }
+
+    // Check filesystem sandbox access before writing to destination
+    QoreSandboxManager* sm = runtime_get_sandbox_manager();
+    if (sm && !sm->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
         return;
     }
 

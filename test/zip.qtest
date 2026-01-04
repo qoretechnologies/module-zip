@@ -61,6 +61,7 @@ public class ZipTest inherits QUnit::Test {
         addTestCase("toData state tests", \toDataStateTest());
         addTestCase("deleteEntry tests", \deleteEntryTest());
         addTestCase("Encryption with password tests", \encryptionPasswordTest());
+        addTestCase("Sandbox filesystem tests", \sandboxFilesystemTest());
 
         set_return_value(main());
     }
@@ -899,5 +900,97 @@ public class ZipTest inherits QUnit::Test {
             assertEq(True, entry.is_encrypted, "in-memory encrypted entry shows as encrypted");
             readZip.close();
         }
+    }
+
+    sandboxFilesystemTest() {
+        # Test that filesystem sandbox blocks ZIP file access outside allowed paths
+
+        string testZipOutside = "/tmp/zip_sandbox_test_" + getpid() + ".zip";
+        on_exit {
+            try { unlink(testZipOutside); } catch () {}
+        }
+
+        # Create a test ZIP file
+        {
+            ZipFile zip(testZipOutside, "w");
+            zip.addText("test.txt", "Hello, World!");
+            zip.close();
+        }
+
+        # Create a sandboxed program with /var as root (so /tmp is outside)
+        Program p(PO_NEW_STYLE | PO_STRICT_ARGS | PO_REQUIRE_TYPES);
+        p.loadModule("zip");
+
+        p.parse(sprintf("
+            sub test_open_zip_read() {
+                ZipFile zip('%s', 'r');
+            }
+            sub test_open_zip_write() {
+                ZipFile zip('%s_new', 'w');
+            }
+        ", testZipOutside, testZipOutside), "sandbox_zip_test");
+
+        SandboxManager sm();
+        sm.setFilesystemSandboxRoot("/var");
+        p.setSandboxManager(sm);
+
+        # Test that reading ZIP outside sandbox is blocked
+        bool caught = False;
+        try {
+            p.callFunction("test_open_zip_read");
+        } catch (hash<ExceptionInfo> ex) {
+            caught = True;
+            assertEq("FILESYSTEM-ACCESS-DENIED", ex.err, "ZIP read access blocked with correct error");
+        }
+        assertTrue(caught, "ZIP read access outside sandbox was blocked");
+
+        # Test that writing ZIP outside sandbox is blocked
+        caught = False;
+        try {
+            p.callFunction("test_open_zip_write");
+        } catch (hash<ExceptionInfo> ex) {
+            caught = True;
+            assertEq("FILESYSTEM-ACCESS-DENIED", ex.err, "ZIP write access blocked with correct error");
+        }
+        assertTrue(caught, "ZIP write access outside sandbox was blocked");
+
+        # Test that in-memory archives work with any sandbox
+        Program p2(PO_NEW_STYLE | PO_STRICT_ARGS | PO_REQUIRE_TYPES);
+        p2.loadModule("zip");
+
+        p2.parse("
+            string sub test_memory_zip() {
+                ZipFile zip();
+                zip.addText('test.txt', 'Memory test');
+                binary data = zip.toData();
+                ZipFile readZip(data);
+                string content = readZip.readText('test.txt');
+                readZip.close();
+                return content;
+            }
+        ", "sandbox_memory_zip_test");
+        p2.setSandboxManager(sm);
+
+        string result = p2.callFunction("test_memory_zip");
+        assertEq("Memory test", result, "In-memory ZIP works with filesystem sandbox");
+
+        # Test that ZIP access works when file is in allowed path
+        SandboxManager sm3();
+        sm3.setFilesystemSandboxRoot("/tmp");
+        Program p3(PO_NEW_STYLE | PO_STRICT_ARGS | PO_REQUIRE_TYPES);
+        p3.loadModule("zip");
+
+        p3.parse(sprintf("
+            string sub test_allowed_zip() {
+                ZipFile zip('%s', 'r');
+                string content = zip.readText('test.txt');
+                zip.close();
+                return content;
+            }
+        ", testZipOutside), "sandbox_allowed_zip_test");
+        p3.setSandboxManager(sm3);
+
+        result = p3.callFunction("test_allowed_zip");
+        assertEq("Hello, World!", result, "ZIP access inside sandbox works");
     }
 }
