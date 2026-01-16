@@ -1,5 +1,5 @@
 /* -*- mode: c++; indent-tabs-mode: nil -*- */
-/** @file QC_ZipFile.qpp defines the %Qore ZipFile class and related types */
+/** @file QC_ZipFile.cpp defines the %Qore ZipFile class and related types */
 /*
     Qore zip module
 
@@ -94,7 +94,7 @@ const ZIP_EM_AES_256 = 0x0103;
 //! Information about a ZIP archive entry
 /** @since %zip 1.0
 */
-hashdecl ZipEntryInfo {
+hashdecl Qore::Zip::ZipEntryInfo {
     //! The name/path of the entry within the archive
     string name;
 
@@ -126,7 +126,7 @@ hashdecl ZipEntryInfo {
 //! Options for adding entries to a ZIP archive
 /** @since %zip 1.0
 */
-hashdecl ZipAddOptions {
+hashdecl Qore::Zip::ZipAddOptions {
     //! Compression level (0-9, where 0=store, 9=maximum)
     *int compression_level;
 
@@ -146,7 +146,7 @@ hashdecl ZipAddOptions {
 //! Options for extracting entries from a ZIP archive
 /** @since %zip 1.0
 */
-hashdecl ZipExtractOptions {
+hashdecl Qore::Zip::ZipExtractOptions {
     //! Password for decryption (required for encrypted entries)
     *string password;
 
@@ -175,7 +175,7 @@ zip.close();
     @par Example: Reading a ZIP archive
     @code{.py}
 ZipFile zip("archive.zip", "r");
-foreach hash<ZipEntryInfo> entry in (zip.entries()) {
+foreach hash<Qore::Zip::ZipEntryInfo> entry in (zip.entries()) {
     printf("Entry: %s, Size: %d bytes\n", entry.name, entry.size);
 }
 binary data = zip.read("readme.txt");
@@ -191,7 +191,7 @@ zip.close();
 
     @since %zip 1.0
 */
-qclass ZipFile [arg=QoreZipFile* zf; ns=Zip];
+qclass ZipFile [arg=QoreZipFile* zf; ns=Qore::Zip];
 
 //! Creates a ZipFile object for reading, writing, or appending to an archive
 /** @param path the path to the ZIP archive file
@@ -199,7 +199,7 @@ qclass ZipFile [arg=QoreZipFile* zf; ns=Zip];
 
     @throw ZIP-ERROR error opening the archive
 */
-ZipFile::constructor(string path, string mode = "r") {
+ZipFile::constructor(string path, string mode = "r") [dom=FILESYSTEM] {
     ZipMode zm = ZIP_MODE_READ;
     if (mode->empty() || mode->c_str()[0] == 'r') {
         zm = ZIP_MODE_READ;
@@ -268,7 +268,7 @@ binary ZipFile::toData() {
 }
 
 //! Returns a list of all entries in the archive
-/** @return a list of @ref ZipEntryInfo hashes describing each entry
+/** @return a list of @ref Qore::Zip::ZipEntryInfo hashes describing each entry
 
     @throw ZIP-ERROR error reading archive entries
 */
@@ -322,7 +322,7 @@ string ZipFile::readText(string name, *string encoding) {
 //! Gets information about a specific entry
 /** @param name the name of the entry
 
-    @return a @ref ZipEntryInfo hash describing the entry
+    @return a @ref Qore::Zip::ZipEntryInfo hash describing the entry
 
     @throw ZIP-ERROR error reading entry or entry not found
 */
@@ -333,7 +333,7 @@ hash<ZipEntryInfo> ZipFile::getEntry(string name) {
 //! Adds binary data as an entry to the archive
 /** @param name the name for the entry in the archive
     @param data the binary data to add
-    @param opts optional @ref ZipAddOptions for compression and encryption settings
+    @param opts optional @ref Qore::Zip::ZipAddOptions for compression and encryption settings
 
     @throw ZIP-ERROR error adding entry or archive not open for writing
 */
@@ -345,7 +345,7 @@ nothing ZipFile::add(string name, binary data, *hash<ZipAddOptions> opts) {
 /** @param name the name for the entry in the archive
     @param text the text content to add
     @param encoding the character encoding to use (default: UTF-8)
-    @param opts optional @ref ZipAddOptions for compression and encryption settings
+    @param opts optional @ref Qore::Zip::ZipAddOptions for compression and encryption settings
 
     @throw ZIP-ERROR error adding entry or archive not open for writing
 */
@@ -356,11 +356,11 @@ nothing ZipFile::addText(string name, string text, *string encoding, *hash<ZipAd
 //! Adds a file from the filesystem to the archive
 /** @param name the name for the entry in the archive
     @param filepath the path to the file on the filesystem
-    @param opts optional @ref ZipAddOptions for compression and encryption settings
+    @param opts optional @ref Qore::Zip::ZipAddOptions for compression and encryption settings
 
     @throw ZIP-ERROR error adding file or archive not open for writing
 */
-nothing ZipFile::addFile(string name, string filepath, *hash<ZipAddOptions> opts) {
+nothing ZipFile::addFile(string name, string filepath, *hash<ZipAddOptions> opts) [dom=FILESYSTEM] {
     zf->addFile(name->c_str(), filepath->c_str(), opts, xsink);
 }
 
@@ -375,11 +375,11 @@ nothing ZipFile::addDirectory(string name) {
 
 //! Extracts all entries to a destination directory
 /** @param destPath the destination directory path
-    @param opts optional @ref ZipExtractOptions for extraction settings
+    @param opts optional @ref Qore::Zip::ZipExtractOptions for extraction settings
 
     @throw ZIP-ERROR error extracting archive
 */
-nothing ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) {
+nothing ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) [dom=FILESYSTEM] {
     zf->extractAll(destPath->c_str(), opts, xsink);
 }
 
@@ -389,7 +389,7 @@ nothing ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) {
 
     @throw ZIP-ERROR error extracting entry or entry not found
 */
-nothing ZipFile::extractEntry(string name, string destPath) {
+nothing ZipFile::extractEntry(string name, string destPath) [dom=FILESYSTEM] {
     zf->extractEntry(name->c_str(), destPath->c_str(), xsink);
 }
 
@@ -453,7 +453,7 @@ ZipInputStream ZipFile::openRead(string name) {
 
 //! Opens an output stream for writing a new entry to the archive
 /** @param name the name for the new entry
-    @param opts optional @ref ZipAddOptions for compression and encryption settings
+    @param opts optional @ref Qore::Zip::ZipAddOptions for compression and encryption settings
 
     @return a @ref ZipOutputStream object for writing the entry data
 

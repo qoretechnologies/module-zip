@@ -1,5 +1,5 @@
 /* -*- mode: c++; indent-tabs-mode: nil -*- */
-/** @file QC_ZipEntry.qpp defines the %Qore ZipEntry class */
+/** @file QC_ZipEntry.cpp defines the %Qore ZipEntry class */
 /*
     Qore zip module
 
@@ -36,7 +36,7 @@
 
     @since %zip 1.0
 */
-qclass ZipEntry [arg=QoreZipEntry* ze; ns=Zip];
+qclass ZipEntry [arg=QoreZipEntry* ze; ns=Qore::Zip];
 
 //! Returns the name/path of the entry within the archive
 /** @return the entry name

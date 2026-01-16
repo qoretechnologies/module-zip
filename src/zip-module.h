@@ -71,6 +71,6 @@ extern const TypedHashDecl* hashdeclZipAddOptions;
 extern const TypedHashDecl* hashdeclZipExtractOptions;
 
 // Namespace
-extern QoreNamespace ZipNS;
+extern QoreNamespace ZipNs;
 
 #endif // _QORE_ZIP_MODULE_H

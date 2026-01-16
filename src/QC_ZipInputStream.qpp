@@ -1,5 +1,5 @@
 /* -*- mode: c++; indent-tabs-mode: nil -*- */
-/** @file QC_ZipInputStream.qpp defines the %Qore ZipInputStream class */
+/** @file QC_ZipInputStream.cpp defines the %Qore ZipInputStream class */
 /*
     Qore zip module
 
@@ -46,7 +46,7 @@ while (*binary data = is.read(65536)) {
 
     @see ZipFile::openRead()
 */
-qclass ZipInputStream [arg=ZipInputStream* zis; ns=Zip; vparent=InputStream];
+qclass ZipInputStream [arg=ZipInputStream* zis; ns=Qore::Zip; vparent=InputStream];
 
 //! Private constructor - ZipInputStream objects are created via ZipFile::openRead()
 /** @throw ZIP-ERROR this constructor should not be called directly

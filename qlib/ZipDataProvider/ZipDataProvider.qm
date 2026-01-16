@@ -137,6 +137,44 @@ module ZipDataProvider {
     };
 }
 
+/** @mainpage ZipDataProvider Module
+
+    @tableofcontents
+
+    @section zipdpintro Zip DataProvider Introduction
+
+    The ZipDataProvider module exposes ZIP archive operations through the Qore DataProvider API,
+    providing a provider tree for archive, file, and data actions along with the corresponding
+    request and response types.
+
+    Key classes:
+    - @ref ZipDataProvider::ZipDataProviderFactory "ZipDataProviderFactory"
+    - @ref ZipDataProvider::ZipDataProvider "ZipDataProvider"
+    - @ref ZipDataProvider::ZipArchiveDataProvider "ZipArchiveDataProvider"
+    - @ref ZipDataProvider::ZipFileDataProvider "ZipFileDataProvider"
+    - @ref ZipDataProvider::ZipDataDataProvider "ZipDataDataProvider"
+
+    @section zipdp_factory Factory Name
+
+    Factory string for DataProvider::getFactoryEx(): "zip"
+
+    @section zipdp_qdp ZipDataProvider Examples
+
+    These examples are with \c qdp, the command-line interface to the Data Provider API.
+
+    @par API Example: Create an Archive
+    @verbatim qdp 'zip{}/archive/create' path=archive.zip,files='({name=readme.txt,data="Hello, World!"})'
+    @endverbatim
+
+    @par API Example: List Archive Contents
+    @verbatim qdp 'zip{}/archive/list' path=archive.zip
+    @endverbatim
+
+    @par API Example: Extract an Archive
+    @verbatim qdp 'zip{}/archive/extract' path=archive.zip,destination=/tmp/extract,overwrite=true
+    @endverbatim
+*/
+
 public namespace ZipDataProvider {
     #! Application name
     public const AppName = "Zip";

@@ -37,7 +37,7 @@ zip.close();
 
     @code{.py}
 ZipFile zip("archive.zip", "r");
-foreach hash<ZipEntryInfo> entry in (zip.entries()) {
+foreach hash<Qore::Zip::ZipEntryInfo> entry in (zip.entries()) {
     printf("Entry: %s, Size: %d bytes\n", entry.name, entry.size);
 }
 binary data = zip.read("readme.txt");
@@ -79,41 +79,39 @@ zip.close();
 
     The module supports multiple compression methods:
 
-    |Constant|Description|
-    |--------|-----------|
-    |@ref Zip::ZIP_CM_STORE|No compression (store only)|
-    |@ref Zip::ZIP_CM_DEFLATE|Standard deflate compression (most compatible)|
-    |@ref Zip::ZIP_CM_BZIP2|BZip2 compression|
-    |@ref Zip::ZIP_CM_LZMA|LZMA compression|
-    |@ref Zip::ZIP_CM_ZSTD|Zstandard compression (fast, high ratio)|
-    |@ref Zip::ZIP_CM_XZ|XZ/LZMA2 compression|
+    |!Constant|!Description
+    |@ref Qore::Zip::ZIP_CM_STORE|No compression (store only)
+    |@ref Qore::Zip::ZIP_CM_DEFLATE|Standard deflate compression (most compatible)
+    |@ref Qore::Zip::ZIP_CM_BZIP2|BZip2 compression
+    |@ref Qore::Zip::ZIP_CM_LZMA|LZMA compression
+    |@ref Qore::Zip::ZIP_CM_ZSTD|Zstandard compression (fast, high ratio)
+    |@ref Qore::Zip::ZIP_CM_XZ|XZ/LZMA2 compression
 
     Compression levels range from 0 (store) to 9 (maximum):
 
-    |Constant|Description|
-    |--------|-----------|
-    |@ref Zip::ZIP_COMPRESSION_DEFAULT|Default compression level|
-    |@ref Zip::ZIP_COMPRESSION_STORE|No compression (level 0)|
-    |@ref Zip::ZIP_COMPRESSION_FASTEST|Fastest compression (level 1)|
-    |@ref Zip::ZIP_COMPRESSION_BEST|Best compression (level 9)|
+    |!Constant|!Description
+    |@ref Qore::Zip::ZIP_COMPRESSION_DEFAULT|Default compression level
+    |@ref Qore::Zip::ZIP_COMPRESSION_STORE|No compression (level 0)
+    |@ref Qore::Zip::ZIP_COMPRESSION_FASTEST|Fastest compression (level 1)
+    |@ref Qore::Zip::ZIP_COMPRESSION_BEST|Best compression (level 9)
 
     @section zipencryption Encryption
 
     The module supports multiple encryption methods:
 
-    |Constant|Description|
-    |--------|-----------|
-    |@ref Zip::ZIP_EM_NONE|No encryption|
-    |@ref Zip::ZIP_EM_TRAD_PKWARE|Traditional PKWARE encryption (weak, not recommended)|
-    |@ref Zip::ZIP_EM_AES_128|AES-128 encryption|
-    |@ref Zip::ZIP_EM_AES_192|AES-192 encryption|
-    |@ref Zip::ZIP_EM_AES_256|AES-256 encryption (recommended)|
+    |!Constant|!Description
+    |@ref Qore::Zip::ZIP_EM_NONE|No encryption
+    |@ref Qore::Zip::ZIP_EM_TRAD_PKWARE|Traditional PKWARE encryption (weak, not recommended)
+    |@ref Qore::Zip::ZIP_EM_AES_128|AES-128 encryption
+    |@ref Qore::Zip::ZIP_EM_AES_192|AES-192 encryption
+    |@ref Qore::Zip::ZIP_EM_AES_256|AES-256 encryption (recommended)
 
-    When a password is provided in @ref ZipAddOptions, AES-256 encryption is used by default.
+    When a password is provided in @ref Qore::Zip::ZipAddOptions, AES-256 encryption is used by default.
 
     @section zipdataprovider Data Provider API
 
     The \c ZipDataProvider module provides integration with Qore's data provider framework:
+    @htmlonly <a href="../../ZipDataProvider/html/index.html">ZipDataProvider module documentation</a> @endhtmlonly
 
     @code{.py}
 %requires ZipDataProvider

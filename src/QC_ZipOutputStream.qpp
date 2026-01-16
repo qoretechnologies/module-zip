@@ -1,5 +1,5 @@
 /* -*- mode: c++; indent-tabs-mode: nil -*- */
-/** @file QC_ZipOutputStream.qpp defines the %Qore ZipOutputStream class */
+/** @file QC_ZipOutputStream.cpp defines the %Qore ZipOutputStream class */
 /*
     Qore zip module
 
@@ -48,7 +48,7 @@ zip.close();
 
     @see ZipFile::openWrite()
 */
-qclass ZipOutputStream [arg=ZipOutputStream* zos; ns=Zip; vparent=OutputStream];
+qclass ZipOutputStream [arg=ZipOutputStream* zos; ns=Qore::Zip; vparent=OutputStream];
 
 //! Private constructor - ZipOutputStream objects are created via ZipFile::openWrite()
 /** @throw ZIP-ERROR this constructor should not be called directly

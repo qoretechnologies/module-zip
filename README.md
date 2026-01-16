@@ -51,7 +51,7 @@ make install
 # Read archive contents
 {
     ZipFile zip("archive.zip", "r");
-    foreach hash<ZipEntryInfo> entry in (zip.entries()) {
+    foreach hash<Qore::Zip::ZipEntryInfo> entry in (zip.entries()) {
         printf("Entry: %s, Size: %d bytes\n", entry.name, entry.size);
     }
     zip.close();

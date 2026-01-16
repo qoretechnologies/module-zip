@@ -51,26 +51,26 @@ const TypedHashDecl* hashdeclZipEntryInfo = nullptr;
 const TypedHashDecl* hashdeclZipAddOptions = nullptr;
 const TypedHashDecl* hashdeclZipExtractOptions = nullptr;
 
-QoreNamespace ZipNS("Zip");
+QoreNamespace ZipNs("Qore::Zip");
 
 static QoreStringNode* zip_module_init() {
     // Initialize hashdecls (defined in QPP files for documentation)
-    hashdeclZipEntryInfo = init_hashdecl_ZipEntryInfo(ZipNS);
-    hashdeclZipAddOptions = init_hashdecl_ZipAddOptions(ZipNS);
-    hashdeclZipExtractOptions = init_hashdecl_ZipExtractOptions(ZipNS);
+    hashdeclZipEntryInfo = init_hashdecl_ZipEntryInfo(ZipNs);
+    hashdeclZipAddOptions = init_hashdecl_ZipAddOptions(ZipNs);
+    hashdeclZipExtractOptions = init_hashdecl_ZipExtractOptions(ZipNs);
 
     // Initialize classes - stream classes must be initialized before ZipFile
     // because ZipFile references them as return types
-    ZipNS.addSystemClass(initZipInputStreamClass(ZipNS));
-    ZipNS.addSystemClass(initZipOutputStreamClass(ZipNS));
-    ZipNS.addSystemClass(initZipFileClass(ZipNS));
-    ZipNS.addSystemClass(initZipEntryClass(ZipNS));
+    ZipNs.addSystemClass(initZipInputStreamClass(ZipNs));
+    ZipNs.addSystemClass(initZipOutputStreamClass(ZipNs));
+    ZipNs.addSystemClass(initZipFileClass(ZipNs));
+    ZipNs.addSystemClass(initZipEntryClass(ZipNs));
 
     return nullptr;
 }
 
 static void zip_module_ns_init(QoreNamespace* rns, QoreNamespace* qns) {
-    qns->addNamespace(ZipNS.copy());
+    qns->addNamespace(ZipNs.copy());
 }
 
 static void zip_module_delete() {

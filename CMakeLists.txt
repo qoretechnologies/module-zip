@@ -128,6 +128,13 @@ if (DEFINED ENV{DOXYGEN_EXECUTABLE})
     set(DOXYGEN_EXECUTABLE $ENV{DOXYGEN_EXECUTABLE})
 endif()
 
+set(DOXYGEN_IMAGE_PATH "${CMAKE_SOURCE_DIR}/docs/images" CACHE STRING "Doxygen image path" FORCE)
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/images")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/doxygen/qlib/ZipDataProvider")
+file(WRITE
+    "${CMAKE_BINARY_DIR}/doxygen/qlib/ZipDataProvider/zip-logo.svg.dox.h"
+    "/** @file zip-logo.svg.dox.h\n    @brief ZIP DataProvider logo file.\n*/\n"
+)
 set(MODULE_DOX_INPUT ${CMAKE_BINARY_DIR})
 qore_external_binary_module(${module_name} ${PROJECT_VERSION})
 
