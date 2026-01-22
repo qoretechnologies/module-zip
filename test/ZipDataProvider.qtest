@@ -46,6 +46,11 @@ public class ZipDataProviderTest inherits QUnit::Test {
     constructor() : Test("ZipDataProviderTest", "1.0") {
         testDir = tmp_location() + "/zip_dp_test_" + string(getpid());
 
+        addTestCase("Enum tests", \enumTest());
+        addTestCase("Type metadata tests", \typeMetadataTest());
+        addTestCase("Field descriptions tests", \fieldDescriptionsTest());
+        addTestCase("Required groups validation tests", \requiredGroupsValidationTest());
+        addTestCase("Backward compatibility tests", \backwardCompatibilityTest());
         addTestCase("Module loading tests", \moduleLoadingTest());
         addTestCase("App registration tests", \appRegistrationTest());
         addTestCase("Integration tests", \integrationTest());
@@ -70,6 +75,223 @@ public class ZipDataProviderTest inherits QUnit::Test {
         if (is_dir(testDir)) {
             system("rm -rf " + testDir);
         }
+    }
+
+    # ==================== Enum Tests ====================
+
+    enumTest() {
+        # Test CompressionMethod enum values
+        assertEq(0, CompressionMethod::Store, "CompressionMethod::Store");
+        assertEq(8, CompressionMethod::Deflate, "CompressionMethod::Deflate");
+        assertEq(12, CompressionMethod::BZip2, "CompressionMethod::BZip2");
+        assertEq(14, CompressionMethod::Lzma, "CompressionMethod::Lzma");
+        assertEq(93, CompressionMethod::Zstd, "CompressionMethod::Zstd");
+        assertEq(95, CompressionMethod::Xz, "CompressionMethod::Xz");
+
+        # Test CompressionLevel enum values
+        assertEq(-1, CompressionLevel::Default, "CompressionLevel::Default");
+        assertEq(0, CompressionLevel::Store, "CompressionLevel::Store");
+        assertEq(1, CompressionLevel::Fastest, "CompressionLevel::Fastest");
+        assertEq(9, CompressionLevel::Best, "CompressionLevel::Best");
+
+        # Test EncryptionMethod enum values
+        assertEq(0, EncryptionMethod::None, "EncryptionMethod::None");
+        assertEq(1, EncryptionMethod::TradPkware, "EncryptionMethod::TradPkware");
+        assertEq(0x0101, EncryptionMethod::Aes128, "EncryptionMethod::Aes128");
+        assertEq(0x0102, EncryptionMethod::Aes192, "EncryptionMethod::Aes192");
+        assertEq(0x0103, EncryptionMethod::Aes256, "EncryptionMethod::Aes256");
+
+        # Test that enums match C++ constants
+        assertEq(ZIP_CM_STORE, CompressionMethod::Store, "enum matches ZIP_CM_STORE");
+        assertEq(ZIP_CM_DEFLATE, CompressionMethod::Deflate, "enum matches ZIP_CM_DEFLATE");
+        assertEq(ZIP_EM_NONE, EncryptionMethod::None, "enum matches ZIP_EM_NONE");
+        assertEq(ZIP_EM_AES_256, EncryptionMethod::Aes256, "enum matches ZIP_EM_AES_256");
+    }
+
+    # ==================== Type Metadata Tests ====================
+
+    typeMetadataTest() {
+        # Test that request types have allowed_values for compression_method
+        ZipCreateArchiveRequestDataType requestType();
+        *AbstractDataField cmField = requestType.getField("compression_method");
+        assertEq(True, exists cmField, "compression_method field exists");
+
+        *list<auto> allowedValues = cmField.getAllowedValues();
+        assertEq(True, allowedValues.val(), "compression_method has allowed values");
+        assertEq(6, allowedValues.size(), "compression_method has 6 allowed values");
+
+        # Verify one of the allowed values
+        bool foundDeflate = False;
+        foreach auto av in (allowedValues) {
+            if (av.value == CompressionMethod::Deflate) {
+                assertEq("Deflate", av.display_name, "Deflate display_name");
+                foundDeflate = True;
+                break;
+            }
+        }
+        assertEq(True, foundDeflate, "Deflate is in allowed values");
+
+        # Test ZipCompressDataRequestDataType also has compression_method with allowed_values
+        ZipCompressDataRequestDataType compressType();
+        *AbstractDataField cmField2 = compressType.getField("compression_method");
+        assertEq(True, exists cmField2, "compress data has compression_method");
+        assertEq(True, cmField2.getAllowedValues().val(), "compress data has allowed values");
+    }
+
+    # ==================== Field Descriptions Tests ====================
+
+    fieldDescriptionsTest() {
+        # Test that fields have display_name and desc
+        ZipCreateArchiveRequestDataType requestType();
+
+        # Check compression_method field metadata
+        *AbstractDataField cmField = requestType.getField("compression_method");
+        hash<DataFieldInfo> cmInfo = cmField.getInfo();
+        assertEq("Compression Method", cmInfo.display_name, "compression_method display_name");
+        assertEq(True, cmInfo.desc.val(), "compression_method has description");
+        assertEq(True, cmInfo.short_desc.val(), "compression_method has short_desc");
+
+        # Check output_path field metadata
+        *AbstractDataField opField = requestType.getField("output_path");
+        hash<DataFieldInfo> opInfo = opField.getInfo();
+        assertEq("Output Path", opInfo.display_name, "output_path display_name");
+        assertEq(True, opInfo.desc.val(), "output_path has description");
+
+        # Check entries field metadata
+        *AbstractDataField entriesField = requestType.getField("entries");
+        hash<DataFieldInfo> entriesInfo = entriesField.getInfo();
+        assertEq("Entries", entriesInfo.display_name, "entries display_name");
+
+        # Test response type fields
+        ZipCreateArchiveResponseDataType responseType();
+        *AbstractDataField successField = responseType.getField("success");
+        hash<DataFieldInfo> successInfo = successField.getInfo();
+        assertEq("Success", successInfo.display_name, "success display_name");
+    }
+
+    # ==================== Required Groups Validation Tests ====================
+
+    requiredGroupsValidationTest() {
+        # Test that required groups are properly defined and enforced
+        ZipDataProvider factory();
+
+        # Test ZipExtractArchiveRequestDataType required groups
+        {
+            ZipExtractArchiveRequestDataType extractType();
+            assertTrue(extractType.hasRequiredGroups(), "extract archive type has required groups");
+            list<list<string>> groups = extractType.getRequiredGroups();
+            assertEq(1, groups.size(), "extract archive has one required group");
+            assertTrue(inlist("input_path", groups[0]), "group contains input_path");
+            assertTrue(inlist("data", groups[0]), "group contains data");
+
+            # Test validation via data provider
+            AbstractDataProvider extractDp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            assertThrows("REQUIRED-FIELD-GROUP-ERROR", sub() {
+                extractDp.doRequest({"destination": "/tmp/test"});
+            }, NOTHING, "extract without input source throws REQUIRED-FIELD-GROUP-ERROR");
+        }
+
+        # Test ZipListArchiveRequestDataType required groups
+        {
+            ZipListArchiveRequestDataType listType();
+            assertTrue(listType.hasRequiredGroups(), "list archive type has required groups");
+
+            AbstractDataProvider listDp = factory.getChildProviderEx("archive").getChildProviderEx("list");
+            assertThrows("REQUIRED-FIELD-GROUP-ERROR", sub() {
+                listDp.doRequest({});
+            }, NOTHING, "list without input source throws REQUIRED-FIELD-GROUP-ERROR");
+        }
+
+        # Test ZipArchiveInfoRequestDataType required groups
+        {
+            ZipArchiveInfoRequestDataType infoType();
+            assertTrue(infoType.hasRequiredGroups(), "archive info type has required groups");
+
+            AbstractDataProvider infoDp = factory.getChildProviderEx("archive").getChildProviderEx("info");
+            assertThrows("REQUIRED-FIELD-GROUP-ERROR", sub() {
+                infoDp.doRequest({});
+            }, NOTHING, "info without input source throws REQUIRED-FIELD-GROUP-ERROR");
+        }
+
+        # Test ZipExtractFileRequestDataType required groups
+        {
+            ZipExtractFileRequestDataType extractFileType();
+            assertTrue(extractFileType.hasRequiredGroups(), "extract file type has required groups");
+            list<list<string>> groups = extractFileType.getRequiredGroups();
+            assertEq(1, groups.size(), "extract file has one required group");
+            assertTrue(inlist("archive_path", groups[0]), "group contains archive_path");
+            assertTrue(inlist("archive_data", groups[0]), "group contains archive_data");
+
+            AbstractDataProvider extractFileDp = factory.getChildProviderEx("file").getChildProviderEx("extract");
+            assertThrows("REQUIRED-FIELD-GROUP-ERROR", sub() {
+                extractFileDp.doRequest({"entry_name": "test.txt"});
+            }, NOTHING, "extract file without archive source throws REQUIRED-FIELD-GROUP-ERROR");
+        }
+
+        # Test that required_groups appears in type info metadata
+        {
+            ZipExtractArchiveRequestDataType extractType();
+            hash<DataTypeInfo> info = extractType.getInfo();
+            assertTrue(exists info.required_groups, "type info includes required_groups");
+            assertEq(1, info.required_groups.size(), "info has one required group");
+        }
+
+        # Verify error message is user-friendly
+        {
+            AbstractDataProvider listDp = factory.getChildProviderEx("archive").getChildProviderEx("list");
+            try {
+                listDp.doRequest({});
+                fail("Should have thrown REQUIRED-FIELD-GROUP-ERROR");
+            } catch (hash<ExceptionInfo> ex) {
+                assertTrue(ex.desc.find("input_path") >= 0 || ex.desc.find("data") >= 0,
+                    "error message mentions the required fields");
+                assertTrue(ex.desc.find("at least one") >= 0,
+                    "error message explains the constraint");
+            }
+        }
+    }
+
+    # ==================== Backward Compatibility Tests ====================
+
+    backwardCompatibilityTest() {
+        # Test that existing hashdecls still work
+        list<hash<auto>> createEntries = ({"name": "test.txt", "data": binary("test")},);
+        hash<ZipCreateArchiveRequest> createReq = <ZipCreateArchiveRequest>{
+            "entries": createEntries,
+            "compression_method": ZIP_CM_DEFLATE,
+        };
+        assertEq(True, exists createReq.entries, "hashdecl entries field works");
+        assertEq(ZIP_CM_DEFLATE, createReq.compression_method, "hashdecl compression_method works");
+
+        hash<ZipExtractArchiveRequest> extractReq = <ZipExtractArchiveRequest>{
+            "input_path": "/path/to/archive.zip",
+            "destination": "/path/to/dest",
+        };
+        assertEq("/path/to/archive.zip", extractReq.input_path, "hashdecl input_path works");
+
+        hash<ZipListArchiveRequest> listReq = <ZipListArchiveRequest>{
+            "input_path": "/path/to/archive.zip",
+        };
+        assertEq(True, exists listReq.input_path, "hashdecl list request works");
+
+        list<hash<auto>> compressEntries = ({"name": "test.txt", "data": binary("test")},);
+        hash<ZipCompressDataRequest> compressReq = <ZipCompressDataRequest>{
+            "entries": compressEntries,
+        };
+        assertEq(True, exists compressReq.entries, "hashdecl compress request works");
+
+        hash<ZipDecompressDataRequest> decompressReq = <ZipDecompressDataRequest>{
+            "data": binary("test"),
+        };
+        assertEq(True, exists decompressReq.data, "hashdecl decompress request works");
+
+        # Test response hashdecls
+        hash<ZipCreateArchiveResponse> createResp = <ZipCreateArchiveResponse>{
+            "success": True,
+            "entry_count": 1,
+            "size": 100,
+        };
+        assertEq(True, createResp.success, "hashdecl response works");
     }
 
     # ==================== Module Loading Tests ====================

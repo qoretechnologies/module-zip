@@ -27,12 +27,19 @@ public namespace ZipDataProvider {
 #! Decompress data data provider
 public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
     public {
+        #! Provider info
         const ProviderInfo = <DataProviderInfo>{
             "name": "decompress",
             "desc": "Decompress a ZIP archive from binary data",
             "type": "ZipDecompressDataDataProvider",
             "supports_request": True,
         };
+
+        #! Request type
+        static ZipDecompressDataRequestDataType RequestType();
+
+        #! Response type
+        static ZipDecompressDataResponseDataType ResponseType();
     }
 
     private {
@@ -52,15 +59,17 @@ public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
     }
 
     private *AbstractDataProviderType getRequestTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipDecompressDataRequest>"));
+        return RequestType;
     }
 
     private *AbstractDataProviderType getResponseTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipDecompressDataResponse>"));
+        return ResponseType;
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipDecompressDataRequest> request = req;
+        hash<ZipDecompressDataRequest> request = cast<hash<ZipDecompressDataRequest>>(req);
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: decompressing archive data (%d bytes)",
+            request.data.size()));
 
         ZipFile zip(request.data);
 

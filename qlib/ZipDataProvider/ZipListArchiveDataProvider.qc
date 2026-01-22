@@ -27,12 +27,19 @@ public namespace ZipDataProvider {
 #! List archive data provider
 public class ZipListArchiveDataProvider inherits AbstractDataProvider {
     public {
+        #! Provider info
         const ProviderInfo = <DataProviderInfo>{
             "name": "list",
             "desc": "List contents of a ZIP archive",
             "type": "ZipListArchiveDataProvider",
             "supports_request": True,
         };
+
+        #! Request type
+        static ZipListArchiveRequestDataType RequestType();
+
+        #! Response type
+        static ZipListArchiveResponseDataType ResponseType();
     }
 
     private {
@@ -52,15 +59,16 @@ public class ZipListArchiveDataProvider inherits AbstractDataProvider {
     }
 
     private *AbstractDataProviderType getRequestTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipListArchiveRequest>"));
+        return RequestType;
     }
 
     private *AbstractDataProviderType getResponseTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipListArchiveResponse>"));
+        return ResponseType;
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipListArchiveRequest> request = req;
+        hash<ZipListArchiveRequest> request = cast<hash<ZipListArchiveRequest>>(req);
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: listing archive contents"));
 
         ZipFile zip;
         if (request.input_path) {

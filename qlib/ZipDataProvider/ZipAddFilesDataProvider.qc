@@ -27,12 +27,19 @@ public namespace ZipDataProvider {
 #! Add files data provider
 public class ZipAddFilesDataProvider inherits AbstractDataProvider {
     public {
+        #! Provider info
         const ProviderInfo = <DataProviderInfo>{
             "name": "add",
             "desc": "Add files to an existing ZIP archive",
             "type": "ZipAddFilesDataProvider",
             "supports_request": True,
         };
+
+        #! Request type
+        static ZipAddFilesRequestDataType RequestType();
+
+        #! Response type
+        static ZipAddFilesResponseDataType ResponseType();
     }
 
     private {
@@ -52,15 +59,17 @@ public class ZipAddFilesDataProvider inherits AbstractDataProvider {
     }
 
     private *AbstractDataProviderType getRequestTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipAddFilesRequest>"));
+        return RequestType;
     }
 
     private *AbstractDataProviderType getResponseTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipAddFilesResponse>"));
+        return ResponseType;
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipAddFilesRequest> request = req;
+        hash<ZipAddFilesRequest> request = cast<hash<ZipAddFilesRequest>>(req);
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: adding %d entries to %y", request.entries.size(),
+            request.archive_path));
 
         ZipFile zip(request.archive_path, "a");
 

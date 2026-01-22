@@ -27,12 +27,19 @@ public namespace ZipDataProvider {
 #! Create archive data provider
 public class ZipCreateArchiveDataProvider inherits AbstractDataProvider {
     public {
+        #! Provider info
         const ProviderInfo = <DataProviderInfo>{
             "name": "create",
             "desc": "Create a new ZIP archive",
             "type": "ZipCreateArchiveDataProvider",
             "supports_request": True,
         };
+
+        #! Request type
+        static ZipCreateArchiveRequestDataType RequestType();
+
+        #! Response type
+        static ZipCreateArchiveResponseDataType ResponseType();
     }
 
     private {
@@ -52,15 +59,16 @@ public class ZipCreateArchiveDataProvider inherits AbstractDataProvider {
     }
 
     private *AbstractDataProviderType getRequestTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipCreateArchiveRequest>"));
+        return RequestType;
     }
 
     private *AbstractDataProviderType getResponseTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipCreateArchiveResponse>"));
+        return ResponseType;
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipCreateArchiveRequest> request = req;
+        hash<ZipCreateArchiveRequest> request = cast<hash<ZipCreateArchiveRequest>>(req);
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: creating archive with %d entries", request.entries.size()));
 
         ZipFile zip;
         if (request.output_path) {

@@ -27,12 +27,19 @@ public namespace ZipDataProvider {
 #! Extract file data provider
 public class ZipExtractFileDataProvider inherits AbstractDataProvider {
     public {
+        #! Provider info
         const ProviderInfo = <DataProviderInfo>{
             "name": "extract",
             "desc": "Extract a single file from a ZIP archive",
             "type": "ZipExtractFileDataProvider",
             "supports_request": True,
         };
+
+        #! Request type
+        static ZipExtractFileRequestDataType RequestType();
+
+        #! Response type
+        static ZipExtractFileResponseDataType ResponseType();
     }
 
     private {
@@ -52,15 +59,16 @@ public class ZipExtractFileDataProvider inherits AbstractDataProvider {
     }
 
     private *AbstractDataProviderType getRequestTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipExtractFileRequest>"));
+        return RequestType;
     }
 
     private *AbstractDataProviderType getResponseTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipExtractFileResponse>"));
+        return ResponseType;
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipExtractFileRequest> request = req;
+        hash<ZipExtractFileRequest> request = cast<hash<ZipExtractFileRequest>>(req);
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: extracting entry %y", request.entry_name));
 
         ZipFile zip;
         if (request.archive_path) {

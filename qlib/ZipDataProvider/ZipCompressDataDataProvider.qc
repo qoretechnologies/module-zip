@@ -27,12 +27,19 @@ public namespace ZipDataProvider {
 #! Compress data data provider
 public class ZipCompressDataDataProvider inherits AbstractDataProvider {
     public {
+        #! Provider info
         const ProviderInfo = <DataProviderInfo>{
             "name": "compress",
             "desc": "Compress data into a ZIP archive",
             "type": "ZipCompressDataDataProvider",
             "supports_request": True,
         };
+
+        #! Request type
+        static ZipCompressDataRequestDataType RequestType();
+
+        #! Response type
+        static ZipCompressDataResponseDataType ResponseType();
     }
 
     private {
@@ -52,15 +59,16 @@ public class ZipCompressDataDataProvider inherits AbstractDataProvider {
     }
 
     private *AbstractDataProviderType getRequestTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipCompressDataRequest>"));
+        return RequestType;
     }
 
     private *AbstractDataProviderType getResponseTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipCompressDataResponse>"));
+        return ResponseType;
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipCompressDataRequest> request = req;
+        hash<ZipCompressDataRequest> request = cast<hash<ZipCompressDataRequest>>(req);
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: compressing %d entries", request.entries.size()));
 
         ZipFile zip();
 

@@ -27,12 +27,19 @@ public namespace ZipDataProvider {
 #! Archive info data provider
 public class ZipArchiveInfoDataProvider inherits AbstractDataProvider {
     public {
+        #! Provider info
         const ProviderInfo = <DataProviderInfo>{
             "name": "info",
             "desc": "Get ZIP archive metadata",
             "type": "ZipArchiveInfoDataProvider",
             "supports_request": True,
         };
+
+        #! Request type
+        static ZipArchiveInfoRequestDataType RequestType();
+
+        #! Response type
+        static ZipArchiveInfoResponseDataType ResponseType();
     }
 
     private {
@@ -52,15 +59,16 @@ public class ZipArchiveInfoDataProvider inherits AbstractDataProvider {
     }
 
     private *AbstractDataProviderType getRequestTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipArchiveInfoRequest>"));
+        return RequestType;
     }
 
     private *AbstractDataProviderType getResponseTypeImpl() {
-        return AbstractDataProviderType::get(new Type("hash<ZipArchiveInfoResponse>"));
+        return ResponseType;
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipArchiveInfoRequest> request = req;
+        hash<ZipArchiveInfoRequest> request = cast<hash<ZipArchiveInfoRequest>>(req);
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: getting archive info"));
 
         ZipFile zip;
         if (request.input_path) {
