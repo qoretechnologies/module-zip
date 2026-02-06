@@ -29,22 +29,24 @@
 #include "QC_ZipInputStream.h"
 #include "QC_ZipOutputStream.h"
 
-static QoreStringNode* zip_module_init();
-static void zip_module_ns_init(QoreNamespace* rns, QoreNamespace* qns);
+static void zip_module_init(QoreModuleInitContext& ctx, ExceptionSink& xsink);
+static void zip_module_ns_init(QoreNamespace* rns, QoreNamespace* qns, ExceptionSink& xsink);
 static void zip_module_delete();
 
-DLLEXPORT char qore_module_name[] = "zip";
-DLLEXPORT char qore_module_version[] = "1.0.0";
-DLLEXPORT char qore_module_description[] = "Qore ZIP archive module";
-DLLEXPORT char qore_module_author[] = "Qore Technologies, s.r.o.";
-DLLEXPORT char qore_module_url[] = "https://github.com/qoretechnologies/module-zip";
-DLLEXPORT int qore_module_api_major = QORE_MODULE_API_MAJOR;
-DLLEXPORT int qore_module_api_minor = QORE_MODULE_API_MINOR;
-DLLEXPORT qore_module_init_t qore_module_init = zip_module_init;
-DLLEXPORT qore_module_ns_init_t qore_module_ns_init = zip_module_ns_init;
-DLLEXPORT qore_module_delete_t qore_module_delete = zip_module_delete;
-DLLEXPORT qore_license_t qore_module_license = QL_MIT;
-DLLEXPORT char qore_module_license_str[] = "MIT";
+extern "C" DLLEXPORT void zip_qore_module_desc(QoreModuleInfo& mod_info) {
+    mod_info.name = "zip";
+    mod_info.version = "1.0.0";
+    mod_info.desc = "Qore ZIP archive module";
+    mod_info.author = "Qore Technologies, s.r.o.";
+    mod_info.url = "https://github.com/qoretechnologies/module-zip";
+    mod_info.api_major = QORE_MODULE_API_MAJOR;
+    mod_info.api_minor = QORE_MODULE_API_MINOR;
+    mod_info.init = zip_module_init;
+    mod_info.ns_init = zip_module_ns_init;
+    mod_info.del = zip_module_delete;
+    mod_info.license = QL_MIT;
+    mod_info.license_str = "MIT";
+}
 
 // Global hashdecl pointers
 const TypedHashDecl* hashdeclZipEntryInfo = nullptr;
@@ -53,7 +55,7 @@ const TypedHashDecl* hashdeclZipExtractOptions = nullptr;
 
 QoreNamespace ZipNs("Qore::Zip");
 
-static QoreStringNode* zip_module_init() {
+static void zip_module_init(QoreModuleInitContext& ctx, ExceptionSink& xsink) {
     // Initialize hashdecls (defined in QPP files for documentation)
     hashdeclZipEntryInfo = init_hashdecl_ZipEntryInfo(ZipNs);
     hashdeclZipAddOptions = init_hashdecl_ZipAddOptions(ZipNs);
@@ -66,10 +68,9 @@ static QoreStringNode* zip_module_init() {
     ZipNs.addSystemClass(initZipFileClass(ZipNs));
     ZipNs.addSystemClass(initZipEntryClass(ZipNs));
 
-    return nullptr;
 }
 
-static void zip_module_ns_init(QoreNamespace* rns, QoreNamespace* qns) {
+static void zip_module_ns_init(QoreNamespace* rns, QoreNamespace* qns, ExceptionSink& xsink) {
     qns->addNamespace(ZipNs.copy());
 }
 
