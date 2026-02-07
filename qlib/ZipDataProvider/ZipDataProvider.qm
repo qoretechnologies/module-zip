@@ -28,10 +28,7 @@
 %requires Mime
 %requires zip
 
-%new-style
-%strict-args
-%require-types
-%enable-all-warnings
+%modern
 
 module ZipDataProvider {
     version = "1.0";
