@@ -127,8 +127,8 @@ QoreZipFile::~QoreZipFile() {
 
 void QoreZipFile::openRead(ExceptionSink* xsink) {
     // Check filesystem sandbox access
-    QoreSandboxManager* sm = runtime_get_sandbox_manager();
-    if (sm && !sm->checkFilesystemAccess(filepath.c_str(), QSEC_READ, xsink)) {
+    QoreSandboxManagerHelper smh;
+    if (smh && !smh->checkFilesystemAccess(filepath.c_str(), QSEC_READ, xsink)) {
         return;
     }
 
@@ -149,8 +149,8 @@ void QoreZipFile::openRead(ExceptionSink* xsink) {
 
 void QoreZipFile::openWrite(ExceptionSink* xsink) {
     // Check filesystem sandbox access (need write and create for new files)
-    QoreSandboxManager* sm = runtime_get_sandbox_manager();
-    if (sm && !sm->checkFilesystemAccess(filepath.c_str(), QSEC_WRITE | QSEC_CREATE, xsink)) {
+    QoreSandboxManagerHelper smh;
+    if (smh && !smh->checkFilesystemAccess(filepath.c_str(), QSEC_WRITE | QSEC_CREATE, xsink)) {
         return;
     }
 
@@ -620,8 +620,8 @@ void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHash
     }
 
     // Check filesystem sandbox access before reading source file
-    QoreSandboxManager* sm = runtime_get_sandbox_manager();
-    if (sm && !sm->checkFilesystemAccess(filepath, QSEC_READ, xsink)) {
+    QoreSandboxManagerHelper smh;
+    if (smh && !smh->checkFilesystemAccess(filepath, QSEC_READ, xsink)) {
         return;
     }
 
@@ -688,8 +688,8 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
     }
 
     // Check filesystem sandbox access before writing to destination
-    QoreSandboxManager* sm = runtime_get_sandbox_manager();
-    if (sm && !sm->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
+    QoreSandboxManagerHelper smh;
+    if (smh && !smh->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
         return;
     }
 
@@ -727,8 +727,8 @@ void QoreZipFile::extractEntry(const char* name, const char* destPath, Exception
     }
 
     // Check filesystem sandbox access before writing to destination
-    QoreSandboxManager* sm = runtime_get_sandbox_manager();
-    if (sm && !sm->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
+    QoreSandboxManagerHelper smh;
+    if (smh && !smh->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
         return;
     }
 
