@@ -46,6 +46,7 @@ module ZipDataProvider {
             "display_name": "Zip Archive",
             "short_desc": "Zip archive operations",
             "desc": "Create, extract, and manage Zip archives with compression support",
+            "groups": (DataProvider::AppGroup::DataTransformation,),
             "logo": ZipLogo,
             "logo_file_name": "zip-logo.svg",
             "logo_mime_type": MimeTypeSvg,
