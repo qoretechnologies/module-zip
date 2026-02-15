@@ -60,6 +60,7 @@ public class ZipDataProviderTest inherits QUnit::Test {
         addTestCase("Extract file action tests", \extractFileActionTest());
         addTestCase("Compress data action tests", \compressDataActionTest());
         addTestCase("Decompress data action tests", \decompressDataActionTest());
+        addTestCase("Location input tests", \locationInputTest());
 
         set_return_value(main());
     }
@@ -180,6 +181,7 @@ public class ZipDataProviderTest inherits QUnit::Test {
             assertEq(1, groups.size(), "extract archive has one required group");
             assertTrue(inlist("input_path", groups[0]), "group contains input_path");
             assertTrue(inlist("data", groups[0]), "group contains data");
+            assertTrue(inlist("location", groups[0]), "group contains location");
 
             # Test validation via data provider
             AbstractDataProvider extractDp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
@@ -218,6 +220,7 @@ public class ZipDataProviderTest inherits QUnit::Test {
             assertEq(1, groups.size(), "extract file has one required group");
             assertTrue(inlist("archive_path", groups[0]), "group contains archive_path");
             assertTrue(inlist("archive_data", groups[0]), "group contains archive_data");
+            assertTrue(inlist("archive_location", groups[0]), "group contains archive_location");
 
             AbstractDataProvider extractFileDp = factory.getChildProviderEx("file").getChildProviderEx("extract");
             assertThrows("REQUIRED-FIELD-GROUP-ERROR", sub() {
@@ -280,7 +283,7 @@ public class ZipDataProviderTest inherits QUnit::Test {
         hash<ZipDecompressDataRequest> decompressReq = <ZipDecompressDataRequest>{
             "data": binary("test"),
         };
-        assertEq(True, exists decompressReq.data, "hashdecl decompress request works");
+        assertEq(True, decompressReq.data.val(), "hashdecl decompress request works");
 
         # Test response hashdecls
         hash<ZipCreateArchiveResponse> createResp = <ZipCreateArchiveResponse>{
@@ -821,6 +824,156 @@ public class ZipDataProviderTest inherits QUnit::Test {
             assertEq(True, exists response.entries{"decomp1.txt"}, "has decomp1.txt");
             assertEq(True, exists response.entries{"decomp3.txt"}, "has decomp3.txt");
             assertEq(False, exists response.entries{"decomp2.txt"}, "does not have decomp2.txt");
+        }
+    }
+
+    # ==================== Location Input Tests ====================
+
+    locationInputTest() {
+        # Create a test archive on disk
+        string zipPath = testDir + "/location_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("loc1.txt", "Location content 1");
+            zip.addText("loc2.txt", "Location content 2");
+            zip.close();
+        }
+
+        string fileUrl = "file://" + zipPath;
+        ZipDataProvider factory();
+
+        # Test list archive with location input
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("list");
+            hash<auto> response = dp.doRequest({"location": fileUrl});
+            assertEq(2, response.count, "list via location: count is 2");
+            assertEq(2, response.entries.size(), "list via location: entries has 2 items");
+        }
+
+        # Test archive info with location input
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("info");
+            hash<auto> response = dp.doRequest({"location": fileUrl});
+            assertEq(2, response.entry_count, "info via location: entry count is 2");
+            assertEq(True, response.total_size > 0, "info via location: has total size");
+        }
+
+        # Test extract archive with location input
+        {
+            string extractDir = testDir + "/location_extracted";
+            mkdir(extractDir);
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "location": fileUrl,
+                "destination": extractDir,
+            });
+            assertEq(True, response.success, "extract via location succeeded");
+            assertEq(2, response.entry_count, "extract via location: 2 entries");
+            assertEq(True, is_file(extractDir + "/loc1.txt"), "extract via location: loc1.txt exists");
+            assertEq("Location content 1",
+                ReadOnlyFile::readTextFile(extractDir + "/loc1.txt"),
+                "extract via location: content matches");
+        }
+
+        # Test extract file with archive_location input
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("file").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "archive_location": fileUrl,
+                "entry_name": "loc1.txt",
+            });
+            assertEq(True, response.success, "extract file via location succeeded");
+            assertEq("Location content 1", response.data.toString("UTF-8"),
+                "extract file via location: content matches");
+        }
+
+        # Test extract file with output_location
+        {
+            string outputPath = testDir + "/location_output.txt";
+            string outputUrl = "file://" + outputPath;
+            AbstractDataProvider dp = factory.getChildProviderEx("file").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "archive_location": fileUrl,
+                "entry_name": "loc2.txt",
+                "output_location": outputUrl,
+            });
+            assertEq(True, response.success, "extract file with output_location succeeded");
+            assertEq(True, is_file(outputPath), "output_location file exists");
+            assertEq("Location content 2", ReadOnlyFile::readTextFile(outputPath),
+                "output_location content matches");
+        }
+
+        # Test create archive with output_location
+        {
+            string outputPath = testDir + "/location_created.zip";
+            string outputUrl = "file://" + outputPath;
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("create");
+            hash<auto> response = dp.doRequest({
+                "output_location": outputUrl,
+                "entries": (
+                    {"name": "new1.txt", "data": binary("New content 1")},
+                ),
+            });
+            assertEq(True, response.success, "create with output_location succeeded");
+            assertEq(True, response.size > 0, "create with output_location: has size");
+            assertEq(True, is_file(outputPath), "output_location archive exists");
+
+            # Verify archive contents
+            ZipFile zip(outputPath, "r");
+            assertEq(1, zip.count(), "output_location archive has 1 entry");
+            assertEq("New content 1", zip.readText("new1.txt"), "output_location archive content matches");
+            zip.close();
+        }
+
+        # Test decompress data with archive_path
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("decompress");
+            hash<auto> response = dp.doRequest({
+                "archive_path": zipPath,
+            });
+            assertEq(2, response.entry_count, "decompress via archive_path: entry count is 2");
+            assertEq("Location content 1", response.entries{"loc1.txt"}.toString("UTF-8"),
+                "decompress via archive_path: content matches");
+        }
+
+        # Test decompress data with archive_location
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("decompress");
+            hash<auto> response = dp.doRequest({
+                "archive_location": fileUrl,
+            });
+            assertEq(2, response.entry_count, "decompress via archive_location: entry count is 2");
+            assertEq("Location content 2", response.entries{"loc2.txt"}.toString("UTF-8"),
+                "decompress via archive_location: content matches");
+        }
+
+        # Test decompress required groups validation
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("decompress");
+            assertThrows("REQUIRED-FIELD-GROUP-ERROR", sub() {
+                dp.doRequest({"entry_names": ("test.txt",)});
+            }, NOTHING, "decompress without input source throws REQUIRED-FIELD-GROUP-ERROR");
+        }
+
+        # Test compress data with output_location
+        {
+            string outputPath = testDir + "/location_compressed.zip";
+            string outputUrl = "file://" + outputPath;
+            AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("compress");
+            hash<auto> response = dp.doRequest({
+                "entries": (
+                    {"name": "compressed.txt", "data": binary("Compressed data")},
+                ),
+                "output_location": outputUrl,
+            });
+            assertEq(True, response.size > 0, "compress with output_location: has size");
+            assertEq(True, is_file(outputPath), "compress output_location file exists");
+
+            # Verify archive contents
+            ZipFile zip(outputPath, "r");
+            assertEq("Compressed data", zip.readText("compressed.txt"),
+                "compress output_location content matches");
+            zip.close();
         }
     }
 }

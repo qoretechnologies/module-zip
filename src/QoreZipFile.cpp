@@ -132,6 +132,11 @@ void QoreZipFile::openRead(ExceptionSink* xsink) {
         return;
     }
 
+    // Check for interrupt before file I/O
+    if (qore_check_io_interrupt(xsink, "opening ZIP archive for reading")) {
+        return;
+    }
+
     reader = mz_zip_reader_create();
     if (!reader) {
         xsink->raiseException("ZIP-ERROR", "failed to create zip reader");
@@ -151,6 +156,11 @@ void QoreZipFile::openWrite(ExceptionSink* xsink) {
     // Check filesystem sandbox access (need write and create for new files)
     QoreSandboxManagerHelper smh;
     if (smh && !smh->checkFilesystemAccess(filepath.c_str(), QSEC_WRITE | QSEC_CREATE, xsink)) {
+        return;
+    }
+
+    // Check for interrupt before file I/O
+    if (qore_check_io_interrupt(xsink, "opening ZIP archive for writing")) {
         return;
     }
 
@@ -363,6 +373,11 @@ QoreListNode* QoreZipFile::entries(ExceptionSink* xsink) {
         return nullptr;
     }
 
+    // Check for interrupt before iterating entries
+    if (qore_check_io_interrupt(xsink, "listing ZIP archive entries")) {
+        return nullptr;
+    }
+
     ReferenceHolder<QoreListNode> list(new QoreListNode(hashdeclZipEntryInfo->getTypeInfo(true)), xsink);
 
     int32_t err = mz_zip_reader_goto_first_entry(reader);
@@ -389,6 +404,11 @@ int64 QoreZipFile::count(ExceptionSink* xsink) {
     QoreAutoRWReadLocker lock(rwlock);
 
     if (!checkOpenUnlocked(xsink, false)) {
+        return -1;
+    }
+
+    // Check for interrupt before iterating entries
+    if (qore_check_io_interrupt(xsink, "counting ZIP archive entries")) {
         return -1;
     }
 
@@ -442,6 +462,11 @@ BinaryNode* QoreZipFile::read(const char* name, ExceptionSink* xsink) {
     if ((int64)file_info->uncompressed_size > max_alloc_size) {
         xsink->raiseException("ZIP-ERROR", "entry '%s' size %lld exceeds maximum allocation size %lld",
                               name, (long long)file_info->uncompressed_size, (long long)max_alloc_size);
+        return nullptr;
+    }
+
+    // Check for interrupt before reading entry data
+    if (qore_check_io_interrupt(xsink, "reading ZIP archive entry")) {
         return nullptr;
     }
 
@@ -561,6 +586,11 @@ void QoreZipFile::add(const char* name, const BinaryNode* data, const QoreHashNo
 }
 
 void QoreZipFile::addUnlocked(const char* name, const BinaryNode* data, const QoreHashNode* opts, ExceptionSink* xsink) {
+    // Check for interrupt before adding entry
+    if (qore_check_io_interrupt(xsink, "adding entry to ZIP archive")) {
+        return;
+    }
+
     int16_t compression_method, compression_level;
     std::string entry_password, comment;
     int64 modified_time;
@@ -622,6 +652,11 @@ void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHash
     // Check filesystem sandbox access before reading source file
     QoreSandboxManagerHelper smh;
     if (smh && !smh->checkFilesystemAccess(filepath, QSEC_READ, xsink)) {
+        return;
+    }
+
+    // Check for interrupt before file I/O
+    if (qore_check_io_interrupt(xsink, "adding file to ZIP archive")) {
         return;
     }
 
@@ -693,6 +728,11 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
         return;
     }
 
+    // Check for interrupt before extraction
+    if (qore_check_io_interrupt(xsink, "extracting ZIP archive")) {
+        return;
+    }
+
     // First, validate all entry paths for security
     int32_t err = mz_zip_reader_goto_first_entry(reader);
     while (err == MZ_OK) {
@@ -734,6 +774,11 @@ void QoreZipFile::extractEntry(const char* name, const char* destPath, Exception
 
     // Validate path for security
     if (!validateExtractPath(name, destPath, xsink)) {
+        return;
+    }
+
+    // Check for interrupt before extraction
+    if (qore_check_io_interrupt(xsink, "extracting ZIP archive entry")) {
         return;
     }
 

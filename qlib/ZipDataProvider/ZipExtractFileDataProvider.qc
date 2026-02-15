@@ -67,22 +67,27 @@ public class ZipExtractFileDataProvider inherits AbstractDataProvider {
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipExtractFileRequest> request = cast<hash<ZipExtractFileRequest>>(req);
+        hash<auto> request = req;
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: extracting entry %y", request.entry_name));
+
+        *binary archive_data = request.archive_data;
+        if (!archive_data && request.archive_location) {
+            archive_data = FileLocationHandler::getBinaryFileFromLocation(request.archive_location);
+        }
 
         ZipFile zip;
         if (request.archive_path) {
             zip = new ZipFile(request.archive_path, "r");
-        } else if (request.archive_data) {
-            zip = new ZipFile(request.archive_data);
+        } else if (archive_data) {
+            zip = new ZipFile(archive_data);
         } else {
-            throw "ZIP-ERROR", "Either archive_path or archive_data must be provided";
+            throw "ZIP-ERROR", "one of 'archive_path', 'archive_data', or 'archive_location' must be provided";
         }
 
         binary data = zip.read(request.entry_name);
         zip.close();
 
-        hash<ZipExtractFileResponse> response = <ZipExtractFileResponse>{
+        hash<auto> response = {
             "success": True,
             "entry_name": request.entry_name,
             "size": data.size(),
@@ -92,8 +97,10 @@ public class ZipExtractFileDataProvider inherits AbstractDataProvider {
             File f();
             f.open2(request.output_path, O_CREAT | O_WRONLY | O_TRUNC);
             f.write(data);
-            f.close();
             response.output_path = request.output_path;
+        } else if (request.output_location) {
+            FileLocationHandler::writeFileToLocation(request.output_location, data);
+            response.output_location = request.output_location;
         } else {
             response.data = data;
         }

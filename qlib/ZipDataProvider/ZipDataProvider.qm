@@ -25,6 +25,7 @@
 %requires qore >= 2.0
 
 %requires DataProvider
+%requires FileLocationHandler
 %requires Mime
 %requires zip
 

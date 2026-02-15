@@ -67,7 +67,7 @@ public class ZipAddFilesDataProvider inherits AbstractDataProvider {
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipAddFilesRequest> request = cast<hash<ZipAddFilesRequest>>(req);
+        hash<auto> request = req;
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: adding %d entries to %y", request.entries.size(),
             request.archive_path));
 
@@ -90,7 +90,7 @@ public class ZipAddFilesDataProvider inherits AbstractDataProvider {
 
         zip.close();
 
-        return <ZipAddFilesResponse>{
+        return {
             "success": True,
             "entries_added": entries_added,
         };

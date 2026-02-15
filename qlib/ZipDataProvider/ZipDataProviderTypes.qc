@@ -29,6 +29,9 @@ public hashdecl ZipCreateArchiveRequest {
     #! Output file path (optional if returning binary data)
     *string output_path;
 
+    #! Output location URL (alternative to output_path)
+    *string output_location;
+
     #! Entries to add: list of hashes with "name", "data" or "path", and optional "compression_method"
     list<hash<auto>> entries;
 
@@ -68,6 +71,9 @@ public hashdecl ZipExtractArchiveRequest {
     #! Binary data of the archive (alternative to input_path)
     *binary data;
 
+    #! Location URL for the archive (alternative to input_path or data)
+    *string location;
+
     #! Destination directory
     string destination;
 
@@ -97,6 +103,9 @@ public hashdecl ZipListArchiveRequest {
 
     #! Binary data of the archive (alternative to input_path)
     *binary data;
+
+    #! Location URL for the archive (alternative to input_path or data)
+    *string location;
 }
 
 #! Response type for listing archive contents
@@ -115,6 +124,9 @@ public hashdecl ZipArchiveInfoRequest {
 
     #! Binary data of the archive (alternative to input_path)
     *binary data;
+
+    #! Location URL for the archive (alternative to input_path or data)
+    *string location;
 }
 
 #! Response type for getting archive info
@@ -164,6 +176,9 @@ public hashdecl ZipExtractFileRequest {
     #! Binary data of the archive (alternative to archive_path)
     *binary archive_data;
 
+    #! Location URL for the archive (alternative to archive_path or archive_data)
+    *string archive_location;
+
     #! Name of the entry to extract
     string entry_name;
 
@@ -172,6 +187,9 @@ public hashdecl ZipExtractFileRequest {
 
     #! Output file path (optional, if not specified returns data)
     *string output_path;
+
+    #! Output location URL (alternative to output_path)
+    *string output_location;
 }
 
 #! Response type for extracting a single file
@@ -202,6 +220,9 @@ public hashdecl ZipCompressDataRequest {
 
     #! Password for encryption (optional)
     *string password;
+
+    #! Output location URL (alternative to returning data in response)
+    *string output_location;
 }
 
 #! Response type for compressing data
@@ -219,7 +240,13 @@ public hashdecl ZipCompressDataResponse {
 #! Request type for decompressing data
 public hashdecl ZipDecompressDataRequest {
     #! Compressed archive data
-    binary data;
+    *binary data;
+
+    #! Archive file path (alternative to data)
+    *string archive_path;
+
+    #! Location URL for the archive (alternative to data or archive_path)
+    *string archive_location;
 
     #! Password for decryption (optional)
     *string password;
@@ -253,6 +280,14 @@ public class ZipCreateArchiveRequestDataType inherits HashDataType {
                     "archive data is returned as binary data in the response.",
                 "example_value": "/path/to/archive.zip",
             },
+            "output_location": {
+                "type": StringOrNothingType,
+                "display_name": "Output Location",
+                "short_desc": "Output location URL",
+                "desc": "A FileLocationHandler location URL where the archive will be written "
+                    "(alternative to output_path).",
+                "example_value": "file:///path/to/archive.zip",
+            },
             "entries": {
                 "type": new ListDataType(new HashDataType(), True),
                 "display_name": "Entries",
@@ -269,7 +304,7 @@ public class ZipCreateArchiveRequestDataType inherits HashDataType {
                 "example_value": "Created by Qore ZipDataProvider",
             },
             "compression_method": {
-                "type": IntOrNothingType,
+                "type": IntType,
                 "display_name": "Compression Method",
                 "short_desc": "Default compression algorithm",
                 "desc": "Default compression method for all entries. Can be overridden per entry.",
@@ -345,15 +380,22 @@ public class ZipExtractArchiveRequestDataType inherits HashDataType {
                 "type": StringOrNothingType,
                 "display_name": "Input Path",
                 "short_desc": "Path to the archive file",
-                "desc": "Filesystem path to the ZIP archive to extract. Either input_path or data must "
-                    "be provided.",
+                "desc": "Filesystem path to the ZIP archive to extract.",
                 "example_value": "/path/to/archive.zip",
             },
             "data": {
                 "type": BinaryOrNothingType,
                 "display_name": "Archive Data",
                 "short_desc": "Binary archive data",
-                "desc": "Binary data containing the ZIP archive. Either input_path or data must be provided.",
+                "desc": "Binary data containing the ZIP archive.",
+            },
+            "location": {
+                "type": StringOrNothingType,
+                "display_name": "Location",
+                "short_desc": "Archive location URL",
+                "desc": "A FileLocationHandler location URL for the archive (alternative to input_path "
+                    "or data).",
+                "example_value": "file:///path/to/archive.zip",
             },
             "destination": {
                 "type": StringType,
@@ -375,8 +417,7 @@ public class ZipExtractArchiveRequestDataType inherits HashDataType {
     #! Creates the object
     constructor() {
         addQoreFields(Fields);
-        # Require either input_path or data
-        setRequiredGroups((("input_path", "data"),));
+        setRequiredGroups((("input_path", "data", "location"),));
     }
 }
 
@@ -427,15 +468,22 @@ public class ZipListArchiveRequestDataType inherits HashDataType {
                 "type": StringOrNothingType,
                 "display_name": "Input Path",
                 "short_desc": "Path to the archive file",
-                "desc": "Filesystem path to the ZIP archive to list. Either input_path or data must "
-                    "be provided.",
+                "desc": "Filesystem path to the ZIP archive to list.",
                 "example_value": "/path/to/archive.zip",
             },
             "data": {
                 "type": BinaryOrNothingType,
                 "display_name": "Archive Data",
                 "short_desc": "Binary archive data",
-                "desc": "Binary data containing the ZIP archive. Either input_path or data must be provided.",
+                "desc": "Binary data containing the ZIP archive.",
+            },
+            "location": {
+                "type": StringOrNothingType,
+                "display_name": "Location",
+                "short_desc": "Archive location URL",
+                "desc": "A FileLocationHandler location URL for the archive (alternative to input_path "
+                    "or data).",
+                "example_value": "file:///path/to/archive.zip",
             },
         };
     }
@@ -443,8 +491,7 @@ public class ZipListArchiveRequestDataType inherits HashDataType {
     #! Creates the object
     constructor() {
         addQoreFields(Fields);
-        # Require either input_path or data
-        setRequiredGroups((("input_path", "data"),));
+        setRequiredGroups((("input_path", "data", "location"),));
     }
 }
 
@@ -484,15 +531,22 @@ public class ZipArchiveInfoRequestDataType inherits HashDataType {
                 "type": StringOrNothingType,
                 "display_name": "Input Path",
                 "short_desc": "Path to the archive file",
-                "desc": "Filesystem path to the ZIP archive to get information about. Either input_path "
-                    "or data must be provided.",
+                "desc": "Filesystem path to the ZIP archive to get information about.",
                 "example_value": "/path/to/archive.zip",
             },
             "data": {
                 "type": BinaryOrNothingType,
                 "display_name": "Archive Data",
                 "short_desc": "Binary archive data",
-                "desc": "Binary data containing the ZIP archive. Either input_path or data must be provided.",
+                "desc": "Binary data containing the ZIP archive.",
+            },
+            "location": {
+                "type": StringOrNothingType,
+                "display_name": "Location",
+                "short_desc": "Archive location URL",
+                "desc": "A FileLocationHandler location URL for the archive (alternative to input_path "
+                    "or data).",
+                "example_value": "file:///path/to/archive.zip",
             },
         };
     }
@@ -500,8 +554,7 @@ public class ZipArchiveInfoRequestDataType inherits HashDataType {
     #! Creates the object
     constructor() {
         addQoreFields(Fields);
-        # Require either input_path or data
-        setRequiredGroups((("input_path", "data"),));
+        setRequiredGroups((("input_path", "data", "location"),));
     }
 }
 
@@ -619,16 +672,22 @@ public class ZipExtractFileRequestDataType inherits HashDataType {
                 "type": StringOrNothingType,
                 "display_name": "Archive Path",
                 "short_desc": "Path to the archive file",
-                "desc": "Filesystem path to the ZIP archive. Either archive_path or archive_data must "
-                    "be provided.",
+                "desc": "Filesystem path to the ZIP archive.",
                 "example_value": "/path/to/archive.zip",
             },
             "archive_data": {
                 "type": BinaryOrNothingType,
                 "display_name": "Archive Data",
                 "short_desc": "Binary archive data",
-                "desc": "Binary data containing the ZIP archive. Either archive_path or archive_data "
-                    "must be provided.",
+                "desc": "Binary data containing the ZIP archive.",
+            },
+            "archive_location": {
+                "type": StringOrNothingType,
+                "display_name": "Archive Location",
+                "short_desc": "Archive location URL",
+                "desc": "A FileLocationHandler location URL for the archive (alternative to archive_path "
+                    "or archive_data).",
+                "example_value": "file:///path/to/archive.zip",
             },
             "entry_name": {
                 "type": StringType,
@@ -652,14 +711,21 @@ public class ZipExtractFileRequestDataType inherits HashDataType {
                     "the file data is returned in the response.",
                 "example_value": "/path/to/output/file.txt",
             },
+            "output_location": {
+                "type": StringOrNothingType,
+                "display_name": "Output Location",
+                "short_desc": "Output location URL",
+                "desc": "A FileLocationHandler location URL where the extracted file should be written "
+                    "(alternative to output_path).",
+                "example_value": "file:///path/to/output/file.txt",
+            },
         };
     }
 
     #! Creates the object
     constructor() {
         addQoreFields(Fields);
-        # Require either archive_path or archive_data
-        setRequiredGroups((("archive_path", "archive_data"),));
+        setRequiredGroups((("archive_path", "archive_data", "archive_location"),));
     }
 }
 
@@ -719,7 +785,7 @@ public class ZipCompressDataRequestDataType inherits HashDataType {
                 "desc": "List of entries to compress. Each entry should have 'name' and 'data' (binary data).",
             },
             "compression_method": {
-                "type": IntOrNothingType,
+                "type": IntType,
                 "display_name": "Compression Method",
                 "short_desc": "Compression algorithm",
                 "desc": "Compression method to use for all entries.",
@@ -732,6 +798,14 @@ public class ZipCompressDataRequestDataType inherits HashDataType {
                 "short_desc": "Encryption password",
                 "desc": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
                 "sensitive": True,
+            },
+            "output_location": {
+                "type": StringOrNothingType,
+                "display_name": "Output Location",
+                "short_desc": "Output location URL",
+                "desc": "A FileLocationHandler location URL where the compressed archive will be written. "
+                    "If not specified, the archive data is returned in the response.",
+                "example_value": "file:///path/to/archive.zip",
             },
         };
     }
@@ -780,10 +854,25 @@ public class ZipDecompressDataRequestDataType inherits HashDataType {
         #! Field descriptions
         const Fields = {
             "data": {
-                "type": BinaryType,
+                "type": BinaryOrNothingType,
                 "display_name": "Compressed Data",
                 "short_desc": "Compressed archive data",
                 "desc": "Binary data containing the ZIP archive to decompress.",
+            },
+            "archive_path": {
+                "type": StringOrNothingType,
+                "display_name": "Archive Path",
+                "short_desc": "Path to the archive file",
+                "desc": "Filesystem path to the ZIP archive to decompress (alternative to data).",
+                "example_value": "/path/to/archive.zip",
+            },
+            "archive_location": {
+                "type": StringOrNothingType,
+                "display_name": "Archive Location",
+                "short_desc": "Archive location URL",
+                "desc": "A FileLocationHandler location URL for the archive (alternative to data "
+                    "or archive_path).",
+                "example_value": "file:///path/to/archive.zip",
             },
             "password": {
                 "type": StringOrNothingType,
@@ -805,6 +894,7 @@ public class ZipDecompressDataRequestDataType inherits HashDataType {
     #! Creates the object
     constructor() {
         addQoreFields(Fields);
+        setRequiredGroups((("data", "archive_path", "archive_location"),));
     }
 }
 

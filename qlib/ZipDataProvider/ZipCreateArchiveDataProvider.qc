@@ -67,7 +67,7 @@ public class ZipCreateArchiveDataProvider inherits AbstractDataProvider {
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipCreateArchiveRequest> request = cast<hash<ZipCreateArchiveRequest>>(req);
+        hash<auto> request = req;
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: creating archive with %d entries", request.entries.size()));
 
         ZipFile zip;
@@ -99,14 +99,19 @@ public class ZipCreateArchiveDataProvider inherits AbstractDataProvider {
             ++entry_count;
         }
 
-        hash<ZipCreateArchiveResponse> response();
-        response.success = True;
-        response.entry_count = entry_count;
+        hash<auto> response = {
+            "success": True,
+            "entry_count": entry_count,
+        };
 
         if (request.output_path) {
             zip.close();
             response.output_path = request.output_path;
             response.size = hstat(request.output_path).size;
+        } else if (request.output_location) {
+            binary archive_data = zip.toData();
+            FileLocationHandler::writeFileToLocation(request.output_location, archive_data);
+            response.size = archive_data.size();
         } else {
             response.data = zip.toData();
             response.size = response.data.size();

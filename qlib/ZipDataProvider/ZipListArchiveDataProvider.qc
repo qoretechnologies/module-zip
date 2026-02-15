@@ -67,22 +67,27 @@ public class ZipListArchiveDataProvider inherits AbstractDataProvider {
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipListArchiveRequest> request = cast<hash<ZipListArchiveRequest>>(req);
+        hash<auto> request = req;
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: listing archive contents"));
+
+        *binary archive_data = request.data;
+        if (!archive_data && request.location) {
+            archive_data = FileLocationHandler::getBinaryFileFromLocation(request.location);
+        }
 
         ZipFile zip;
         if (request.input_path) {
             zip = new ZipFile(request.input_path, "r");
-        } else if (request.data) {
-            zip = new ZipFile(request.data);
+        } else if (archive_data) {
+            zip = new ZipFile(archive_data);
         } else {
-            throw "ZIP-ERROR", "Either input_path or data must be provided";
+            throw "ZIP-ERROR", "one of 'input_path', 'data', or 'location' must be provided";
         }
 
         list<hash<ZipEntryInfo>> entries = zip.entries();
         zip.close();
 
-        return <ZipListArchiveResponse>{
+        return {
             "entries": entries,
             "count": entries.size(),
         };

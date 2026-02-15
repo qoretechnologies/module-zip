@@ -67,7 +67,7 @@ public class ZipCompressDataDataProvider inherits AbstractDataProvider {
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipCompressDataRequest> request = cast<hash<ZipCompressDataRequest>>(req);
+        hash<auto> request = req;
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: compressing %d entries", request.entries.size()));
 
         ZipFile zip();
@@ -86,7 +86,11 @@ public class ZipCompressDataDataProvider inherits AbstractDataProvider {
 
         binary data = zip.toData();
 
-        return <ZipCompressDataResponse>{
+        if (request.output_location) {
+            FileLocationHandler::writeFileToLocation(request.output_location, data);
+        }
+
+        return {
             "data": data,
             "entry_count": request.entries.size(),
             "size": data.size(),

@@ -67,11 +67,23 @@ public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
     }
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
-        hash<ZipDecompressDataRequest> request = cast<hash<ZipDecompressDataRequest>>(req);
-        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: decompressing archive data (%d bytes)",
-            request.data.size()));
+        hash<auto> request = req;
 
-        ZipFile zip(request.data);
+        *binary archive_data = request.data;
+        if (!archive_data && request.archive_location) {
+            archive_data = FileLocationHandler::getBinaryFileFromLocation(request.archive_location);
+        }
+
+        ZipFile zip;
+        if (request.archive_path) {
+            zip = new ZipFile(request.archive_path, "r");
+        } else if (archive_data) {
+            zip = new ZipFile(archive_data);
+        } else {
+            throw "ZIP-ERROR", "one of 'data', 'archive_path', or 'archive_location' must be provided";
+        }
+
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: decompressing archive"));
 
         hash<string, binary> entries();
         list<hash<ZipEntryInfo>> entry_list = zip.entries();
@@ -93,7 +105,7 @@ public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
 
         zip.close();
 
-        return <ZipDecompressDataResponse>{
+        return {
             "entries": entries,
             "entry_count": entries.size(),
         };
