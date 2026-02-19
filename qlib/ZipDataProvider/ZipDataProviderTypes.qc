@@ -336,7 +336,7 @@ public class ZipCreateArchiveResponseDataType inherits HashDataType {
                 "type": BoolType,
                 "display_name": "Success",
                 "short_desc": "Operation success status",
-                "desc": "True if the archive was created successfully.",
+                "desc": "`True` if the archive was created successfully.",
             },
             "output_path": {
                 "type": StringOrNothingType,
@@ -430,7 +430,7 @@ public class ZipExtractArchiveResponseDataType inherits HashDataType {
                 "type": BoolType,
                 "display_name": "Success",
                 "short_desc": "Operation success status",
-                "desc": "True if the archive was extracted successfully.",
+                "desc": "`True` if the archive was extracted successfully.",
             },
             "entry_count": {
                 "type": IntType,
@@ -646,7 +646,7 @@ public class ZipAddFilesResponseDataType inherits HashDataType {
                 "type": BoolType,
                 "display_name": "Success",
                 "short_desc": "Operation success status",
-                "desc": "True if the files were added successfully.",
+                "desc": "`True` if the files were added successfully.",
             },
             "entries_added": {
                 "type": IntType,
@@ -738,7 +738,7 @@ public class ZipExtractFileResponseDataType inherits HashDataType {
                 "type": BoolType,
                 "display_name": "Success",
                 "short_desc": "Operation success status",
-                "desc": "True if the file was extracted successfully.",
+                "desc": "`True` if the file was extracted successfully.",
             },
             "entry_name": {
                 "type": StringType,
