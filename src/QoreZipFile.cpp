@@ -133,7 +133,7 @@ void QoreZipFile::openRead(ExceptionSink* xsink) {
     }
 
     // Check for interrupt before file I/O
-    if (qore_check_io_interrupt(xsink, "opening ZIP archive for reading")) {
+    if (qore_check_cancel(xsink, "opening ZIP archive for reading")) {
         return;
     }
 
@@ -160,7 +160,7 @@ void QoreZipFile::openWrite(ExceptionSink* xsink) {
     }
 
     // Check for interrupt before file I/O
-    if (qore_check_io_interrupt(xsink, "opening ZIP archive for writing")) {
+    if (qore_check_cancel(xsink, "opening ZIP archive for writing")) {
         return;
     }
 
@@ -374,7 +374,7 @@ QoreListNode* QoreZipFile::entries(ExceptionSink* xsink) {
     }
 
     // Check for interrupt before iterating entries
-    if (qore_check_io_interrupt(xsink, "listing ZIP archive entries")) {
+    if (qore_check_cancel(xsink, "listing ZIP archive entries")) {
         return nullptr;
     }
 
@@ -408,7 +408,7 @@ int64 QoreZipFile::count(ExceptionSink* xsink) {
     }
 
     // Check for interrupt before iterating entries
-    if (qore_check_io_interrupt(xsink, "counting ZIP archive entries")) {
+    if (qore_check_cancel(xsink, "counting ZIP archive entries")) {
         return -1;
     }
 
@@ -466,7 +466,7 @@ BinaryNode* QoreZipFile::read(const char* name, ExceptionSink* xsink) {
     }
 
     // Check for interrupt before reading entry data
-    if (qore_check_io_interrupt(xsink, "reading ZIP archive entry")) {
+    if (qore_check_cancel(xsink, "reading ZIP archive entry")) {
         return nullptr;
     }
 
@@ -587,7 +587,7 @@ void QoreZipFile::add(const char* name, const BinaryNode* data, const QoreHashNo
 
 void QoreZipFile::addUnlocked(const char* name, const BinaryNode* data, const QoreHashNode* opts, ExceptionSink* xsink) {
     // Check for interrupt before adding entry
-    if (qore_check_io_interrupt(xsink, "adding entry to ZIP archive")) {
+    if (qore_check_cancel(xsink, "adding entry to ZIP archive")) {
         return;
     }
 
@@ -656,7 +656,7 @@ void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHash
     }
 
     // Check for interrupt before file I/O
-    if (qore_check_io_interrupt(xsink, "adding file to ZIP archive")) {
+    if (qore_check_cancel(xsink, "adding file to ZIP archive")) {
         return;
     }
 
@@ -729,7 +729,7 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
     }
 
     // Check for interrupt before extraction
-    if (qore_check_io_interrupt(xsink, "extracting ZIP archive")) {
+    if (qore_check_cancel(xsink, "extracting ZIP archive")) {
         return;
     }
 
@@ -778,7 +778,7 @@ void QoreZipFile::extractEntry(const char* name, const char* destPath, Exception
     }
 
     // Check for interrupt before extraction
-    if (qore_check_io_interrupt(xsink, "extracting ZIP archive entry")) {
+    if (qore_check_cancel(xsink, "extracting ZIP archive entry")) {
         return;
     }
 
