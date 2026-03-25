@@ -80,6 +80,9 @@ public class ZipCompressDataDataProvider inherits AbstractDataProvider {
             if (request.password) {
                 add_opts.password = request.password;
             }
+            if (request.encryption_method) {
+                add_opts.encryption_method = request.encryption_method;
+            }
 
             zip.add(entry.name, entry.data, add_opts);
         }

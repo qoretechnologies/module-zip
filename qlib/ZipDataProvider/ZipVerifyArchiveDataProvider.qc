@@ -1,7 +1,7 @@
 # -*- mode: qore; indent-tabs-mode: nil -*-
-#! Qore ZipListArchiveDataProvider class definition
+#! Qore ZipVerifyArchiveDataProvider class definition
 
-/** ZipListArchiveDataProvider.qc Copyright (C) 2026 Qore Technologies, s.r.o.
+/** ZipVerifyArchiveDataProvider.qc Copyright (C) 2026 Qore Technologies, s.r.o.
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
@@ -24,22 +24,22 @@
 
 #! Contains all public definitions in the ZipDataProvider module
 public namespace ZipDataProvider {
-#! List archive data provider
-public class ZipListArchiveDataProvider inherits AbstractDataProvider {
+#! Verify archive data provider
+public class ZipVerifyArchiveDataProvider inherits AbstractDataProvider {
     public {
         #! Provider info
         const ProviderInfo = <DataProviderInfo>{
-            "name": "list",
-            "desc": "List contents of a ZIP archive",
-            "type": "ZipListArchiveDataProvider",
+            "name": "verify",
+            "desc": "Verify the integrity of a ZIP archive by checking CRC checksums",
+            "type": "ZipVerifyArchiveDataProvider",
             "supports_request": True,
         };
 
         #! Request type
-        static ZipListArchiveRequestDataType RequestType();
+        static ZipVerifyArchiveRequestDataType RequestType();
 
         #! Response type
-        static ZipListArchiveResponseDataType ResponseType();
+        static ZipVerifyArchiveResponseDataType ResponseType();
     }
 
     private {
@@ -68,7 +68,7 @@ public class ZipListArchiveDataProvider inherits AbstractDataProvider {
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
         hash<auto> request = req;
-        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: listing archive contents"));
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: verifying archive integrity"));
 
         *binary archive_data = request.data;
         if (!archive_data && request.location) {
@@ -84,17 +84,42 @@ public class ZipListArchiveDataProvider inherits AbstractDataProvider {
             throw "ZIP-ERROR", "one of 'input_path', 'data', or 'location' must be provided";
         }
 
-        list<hash<ZipEntryInfo>> entries = zip.entries();
+        hash<ZipExtractOptions> verify_opts();
+        if (request.password) {
+            verify_opts.password = request.password;
+        }
+
+        list<hash<ZipVerifyResult>> all_results = zip.verify(verify_opts);
         zip.close();
 
         # Apply filters if any
-        entries = filter_entries(entries, cast<*list<string>>(request.include_patterns),
-            cast<*list<string>>(request.exclude_patterns),
-            request.include_regex, request.exclude_regex);
+        if (request.include_patterns || request.exclude_patterns
+                || request.include_regex || request.exclude_regex) {
+            # Build fake entry list for filtering
+            list<hash<ZipEntryInfo>> fake = map <ZipEntryInfo>{"name": $1.name}, all_results;
+            list<hash<ZipEntryInfo>> filtered = filter_entries(fake,
+                cast<*list<string>>(request.include_patterns),
+                cast<*list<string>>(request.exclude_patterns),
+                request.include_regex, request.exclude_regex);
+            hash<string, bool> keep;
+            foreach hash<ZipEntryInfo> e in (filtered) {
+                keep{e.name} = True;
+            }
+            all_results = select all_results, keep{$1.name};
+        }
+
+        int failed = 0;
+        foreach hash<ZipVerifyResult> r in (all_results) {
+            if (!r.valid) {
+                ++failed;
+            }
+        }
 
         return {
-            "entries": entries,
-            "count": entries.size(),
+            "valid": failed == 0,
+            "verified_count": all_results.size(),
+            "failed_count": failed,
+            "results": all_results,
         };
     }
 }

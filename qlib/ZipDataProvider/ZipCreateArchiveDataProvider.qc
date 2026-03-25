@@ -90,6 +90,9 @@ public class ZipCreateArchiveDataProvider inherits AbstractDataProvider {
             if (request.password) {
                 add_opts.password = request.password;
             }
+            if (request.encryption_method) {
+                add_opts.encryption_method = request.encryption_method;
+            }
 
             if (entry.data) {
                 zip.add(entry.name, entry.data, add_opts);

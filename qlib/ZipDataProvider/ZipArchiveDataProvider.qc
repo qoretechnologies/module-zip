@@ -48,7 +48,7 @@ public class ZipArchiveDataProvider inherits AbstractDataProvider {
     }
 
     private *list<string> getChildProviderNamesImpl() {
-        return ("create", "extract", "list", "info", "add");
+        return ("create", "extract", "list", "info", "verify", "add", "add-path", "replace");
     }
 
     private *AbstractDataProvider getChildProviderImpl(string name) {
@@ -61,8 +61,14 @@ public class ZipArchiveDataProvider inherits AbstractDataProvider {
                 return new ZipListArchiveDataProvider(opts);
             case "info":
                 return new ZipArchiveInfoDataProvider(opts);
+            case "verify":
+                return new ZipVerifyArchiveDataProvider(opts);
             case "add":
                 return new ZipAddFilesDataProvider(opts);
+            case "add-path":
+                return new ZipAddPathDataProvider(opts);
+            case "replace":
+                return new ZipReplaceEntriesDataProvider(opts);
         }
         return NOTHING;
     }

@@ -77,9 +77,9 @@ public class ZipExtractArchiveDataProvider inherits AbstractDataProvider {
 
         ZipFile zip;
         if (request.input_path) {
-            zip = new ZipFile(request.input_path, "r");
+            zip = new ZipFile(request.input_path, "r", request.recover);
         } else if (archive_data) {
-            zip = new ZipFile(archive_data);
+            zip = new ZipFile(archive_data, request.recover);
         } else {
             throw "ZIP-ERROR", "one of 'input_path', 'data', or 'location' must be provided";
         }
@@ -88,11 +88,66 @@ public class ZipExtractArchiveDataProvider inherits AbstractDataProvider {
         if (request.password) {
             extract_opts.password = request.password;
         }
+        if (request.allow_symlinks) {
+            extract_opts.allow_symlinks = request.allow_symlinks;
+        }
+        if (request.overwrite) {
+            extract_opts.overwrite = request.overwrite;
+        }
+        if (exists request.preserve_paths) {
+            extract_opts.preserve_paths = request.preserve_paths;
+        }
+        if (request.strip_prefix) {
+            extract_opts.strip_prefix = request.strip_prefix;
+        }
+        if (request.add_prefix) {
+            extract_opts.add_prefix = request.add_prefix;
+        }
 
         # Get list of entries before extraction
-        list<hash<ZipEntryInfo>> entries = zip.entries();
+        list<hash<ZipEntryInfo>> all_entries = zip.entries();
+
+        # Apply filters if any
+        bool has_filters = request.include_patterns || request.exclude_patterns
+            || request.include_regex || request.exclude_regex;
+
+        if (has_filters) {
+            list<hash<ZipEntryInfo>> filtered = filter_entries(all_entries,
+                cast<*list<string>>(request.include_patterns),
+                cast<*list<string>>(request.exclude_patterns),
+                request.include_regex, request.exclude_regex);
+
+            # Build lists of filtered names and skipped names
+            list<string> filtered_names = map $1.name, filtered;
+            list<string> extracted_files = zip.extractEntries(request.destination, filtered_names, extract_opts);
+
+            # Compute skipped entries
+            hash<string, bool> filtered_set;
+            foreach string name in (filtered_names) {
+                filtered_set{name} = True;
+            }
+            list<string> skipped_files = ();
+            foreach hash<ZipEntryInfo> entry in (all_entries) {
+                if (!entry.is_directory && !filtered_set{entry.name}) {
+                    skipped_files += entry.name;
+                }
+            }
+
+            zip.close();
+
+            return {
+                "success": True,
+                "entry_count": filtered.size(),
+                "destination": request.destination,
+                "extracted_files": extracted_files,
+                "skipped_count": skipped_files.size(),
+                "skipped_files": skipped_files,
+            };
+        }
+
+        # No filters: extract all
         list<string> extracted_files = ();
-        foreach hash<ZipEntryInfo> entry in (entries) {
+        foreach hash<ZipEntryInfo> entry in (all_entries) {
             if (!entry.is_directory) {
                 extracted_files += request.destination + "/" + entry.name;
             }
@@ -103,7 +158,7 @@ public class ZipExtractArchiveDataProvider inherits AbstractDataProvider {
 
         return {
             "success": True,
-            "entry_count": entries.size(),
+            "entry_count": all_entries.size(),
             "destination": request.destination,
             "extracted_files": extracted_files,
         };

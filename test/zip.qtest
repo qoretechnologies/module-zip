@@ -59,6 +59,20 @@ public class ZipTest inherits QUnit::Test {
         addTestCase("deleteEntry tests", \deleteEntryTest());
         addTestCase("Encryption with password tests", \encryptionPasswordTest());
         addTestCase("Sandbox filesystem tests", \sandboxFilesystemTest());
+        addTestCase("extractEntries tests", \extractEntriesTest());
+        addTestCase("Overwrite option tests", \overwriteOptionTest());
+        addTestCase("Preserve paths option tests", \preservePathsTest());
+        addTestCase("Path remapping tests", \pathRemappingTest());
+        addTestCase("Entry callback tests", \entryCallbackTest());
+        addTestCase("addPath tests", \addPathTest());
+        addTestCase("Symlink security tests", \symlinkSecurityTest());
+        addTestCase("Verify tests", \verifyTest());
+        addTestCase("Replace/delete tests", \replaceDeleteTest());
+        addTestCase("Enhanced entry info tests", \enhancedEntryInfoTest());
+        addTestCase("Encryption method tests", \encryptionMethodTest());
+        addTestCase("setPassword tests", \setPasswordTest());
+        addTestCase("Diff tests", \diffTest());
+        addTestCase("Recompress tests", \recompressTest());
 
         set_return_value(main());
     }
@@ -989,5 +1003,880 @@ public class ZipTest inherits QUnit::Test {
 
         result = p3.callFunction("test_allowed_zip");
         assertEq("Hello, World!", result, "ZIP access inside sandbox works");
+    }
+
+    extractEntriesTest() {
+        # Create test archive with mixed file types
+        string zipPath = testDir + "/extract_entries_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("readme.txt", "README");
+            zip.addText("src/main.cpp", "int main() {}");
+            zip.addText("src/util.cpp", "void util() {}");
+            zip.addText("docs/guide.md", "# Guide");
+            zip.addDirectory("empty/");
+            zip.close();
+        }
+
+        # Test extracting specific entries
+        {
+            string extractDir = testDir + "/extract_entries_1";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            list<string> files = zip.extractEntries(extractDir, ("readme.txt", "src/main.cpp"));
+            zip.close();
+
+            assertEq(2, files.size(), "2 files extracted");
+            assertEq(True, is_file(extractDir + "/readme.txt"), "readme.txt extracted");
+            assertEq(True, is_file(extractDir + "/src/main.cpp"), "src/main.cpp extracted");
+            assertEq(False, is_file(extractDir + "/src/util.cpp"), "util.cpp not extracted");
+            assertEq(False, is_file(extractDir + "/docs/guide.md"), "guide.md not extracted");
+        }
+
+        # Test extracting empty list (no files)
+        {
+            string extractDir = testDir + "/extract_entries_2";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            list<string> files = zip.extractEntries(extractDir, ());
+            zip.close();
+
+            assertEq(0, files.size(), "0 files extracted with empty list");
+        }
+
+        # Test extracting with non-existent entry name (silently skips)
+        {
+            string extractDir = testDir + "/extract_entries_3";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            list<string> files = zip.extractEntries(extractDir, ("nonexistent.txt", "readme.txt"));
+            zip.close();
+
+            assertEq(1, files.size(), "only existing file extracted");
+            assertEq(True, is_file(extractDir + "/readme.txt"), "readme.txt extracted");
+        }
+
+        # Test content verification
+        {
+            string extractDir = testDir + "/extract_entries_4";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractEntries(extractDir, ("src/main.cpp",));
+            zip.close();
+
+            string content = ReadOnlyFile::readTextFile(extractDir + "/src/main.cpp");
+            assertEq("int main() {}", content, "extracted content matches");
+        }
+    }
+
+    overwriteOptionTest() {
+        string zipPath = testDir + "/overwrite_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("file.txt", "New content");
+            zip.close();
+        }
+
+        string extractDir = testDir + "/overwrite_dir";
+        mkdir(extractDir);
+
+        # Create pre-existing file
+        {
+            File f();
+            f.open2(extractDir + "/file.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("Old content");
+        }
+
+        # Test overwrite=False (default): existing file should remain
+        {
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir);
+            zip.close();
+
+            string content = ReadOnlyFile::readTextFile(extractDir + "/file.txt");
+            assertEq("Old content", content, "file not overwritten when overwrite=False");
+        }
+
+        # Test overwrite=True: existing file should be overwritten
+        {
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir, <ZipExtractOptions>{"overwrite": True});
+            zip.close();
+
+            string content = ReadOnlyFile::readTextFile(extractDir + "/file.txt");
+            assertEq("New content", content, "file overwritten when overwrite=True");
+        }
+
+        # Test overwrite with extractEntries
+        {
+            # Reset file to old content
+            File f();
+            f.open2(extractDir + "/file.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("Old again");
+        }
+
+        {
+            ZipFile zip(zipPath, "r");
+            zip.extractEntries(extractDir, ("file.txt",), <ZipExtractOptions>{"overwrite": True});
+            zip.close();
+
+            string content = ReadOnlyFile::readTextFile(extractDir + "/file.txt");
+            assertEq("New content", content, "extractEntries overwrite works");
+        }
+    }
+
+    preservePathsTest() {
+        string zipPath = testDir + "/preserve_paths_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addDirectory("subdir/");
+            zip.addText("subdir/file.txt", "Nested file");
+            zip.addText("root.txt", "Root file");
+            zip.close();
+        }
+
+        # Test preserve_paths=False: flat extraction
+        {
+            string extractDir = testDir + "/flat_extract";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir, <ZipExtractOptions>{"preserve_paths": False});
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/file.txt"), "nested file extracted flat");
+            assertEq(True, is_file(extractDir + "/root.txt"), "root file extracted");
+            string content = ReadOnlyFile::readTextFile(extractDir + "/file.txt");
+            assertEq("Nested file", content, "flat extracted content matches");
+        }
+
+        # Test preserve_paths=False with extractEntries
+        {
+            string extractDir = testDir + "/flat_extract_entries";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractEntries(extractDir, ("subdir/file.txt",),
+                <ZipExtractOptions>{"preserve_paths": False});
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/file.txt"), "extractEntries flat extraction works");
+        }
+    }
+
+    pathRemappingTest() {
+        string zipPath = testDir + "/remap_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addDirectory("src/");
+            zip.addText("src/main.cpp", "main");
+            zip.addText("src/util.cpp", "util");
+            zip.addText("readme.txt", "readme");
+            zip.close();
+        }
+
+        # Test strip_prefix
+        {
+            string extractDir = testDir + "/strip_prefix";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractEntries(extractDir, ("src/main.cpp", "src/util.cpp"),
+                <ZipExtractOptions>{"strip_prefix": "src/"});
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/main.cpp"), "strip_prefix: main.cpp extracted");
+            assertEq(True, is_file(extractDir + "/util.cpp"), "strip_prefix: util.cpp extracted");
+            assertEq(False, is_dir(extractDir + "/src"), "strip_prefix: src/ dir not created");
+        }
+
+        # Test add_prefix
+        {
+            string extractDir = testDir + "/add_prefix";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractEntries(extractDir, ("readme.txt",),
+                <ZipExtractOptions>{"add_prefix": "output"});
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/output/readme.txt"),
+                "add_prefix: file under output/");
+        }
+
+        # Test strip_prefix + add_prefix combined
+        {
+            string extractDir = testDir + "/combined_remap";
+            mkdir(extractDir);
+
+            ZipFile zip(zipPath, "r");
+            zip.extractEntries(extractDir, ("src/main.cpp",),
+                <ZipExtractOptions>{"strip_prefix": "src/", "add_prefix": "build/"});
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/build/main.cpp"),
+                "combined remap: src/main.cpp -> build/main.cpp");
+        }
+    }
+
+    entryCallbackTest() {
+        string zipPath = testDir + "/callback_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("a.txt", "A");
+            zip.addText("b.txt", "B");
+            zip.addText("c.txt", "C");
+            zip.close();
+        }
+
+        # Test entry callback with extractAll
+        {
+            string extractDir = testDir + "/callback_extract";
+            mkdir(extractDir);
+
+            list<string> callback_entries = ();
+            code<nothing(string)> cb = sub (string name) {
+                callback_entries += name;
+            };
+
+            ZipFile zip(zipPath, "r");
+            zip.extractAll(extractDir, <ZipExtractOptions>{"entry_callback": cb});
+            zip.close();
+
+            assertEq(3, callback_entries.size(), "callback called 3 times");
+            assertEq(True, inlist("a.txt", callback_entries), "callback received a.txt");
+            assertEq(True, inlist("b.txt", callback_entries), "callback received b.txt");
+            assertEq(True, inlist("c.txt", callback_entries), "callback received c.txt");
+        }
+
+        # Test entry callback with extractEntries
+        {
+            string extractDir = testDir + "/callback_extract_entries";
+            mkdir(extractDir);
+
+            list<string> callback_entries = ();
+            code<nothing(string)> cb = sub (string name) {
+                callback_entries += name;
+            };
+
+            ZipFile zip(zipPath, "r");
+            zip.extractEntries(extractDir, ("a.txt", "c.txt"),
+                <ZipExtractOptions>{"entry_callback": cb});
+            zip.close();
+
+            assertEq(2, callback_entries.size(), "callback called for 2 entries");
+            assertEq(True, inlist("a.txt", callback_entries), "callback received a.txt");
+            assertEq(True, inlist("c.txt", callback_entries), "callback received c.txt");
+        }
+    }
+
+    addPathTest() {
+        # Create a directory structure to add
+        string srcDir = testDir + "/addpath_src";
+        mkdir(srcDir);
+        mkdir(srcDir + "/subdir");
+        {
+            File f();
+            f.open2(srcDir + "/file1.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("File 1");
+        }
+        {
+            File f();
+            f.open2(srcDir + "/subdir/file2.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("File 2");
+        }
+
+        # Test addPath
+        string zipPath = testDir + "/addpath_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addPath(srcDir, dirname(srcDir));
+            zip.close();
+        }
+
+        # Verify the archive has the correct entries
+        {
+            ZipFile zip(zipPath, "r");
+            list<hash<ZipEntryInfo>> entries = zip.entries();
+            assertEq(True, entries.size() >= 2, "addPath added files");
+
+            # Verify we can read content
+            bool found = False;
+            foreach hash<ZipEntryInfo> entry in (entries) {
+                if (entry.name =~ /file1\.txt$/) {
+                    binary data = zip.read(entry.name);
+                    assertEq("File 1", data.toString(), "addPath file content matches");
+                    found = True;
+                }
+            }
+            assertEq(True, found, "file1.txt found in archive");
+            zip.close();
+        }
+    }
+
+    symlinkSecurityTest() {
+        # Test 1: Symlinks skipped by default
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addText("safe.txt", "safe content");
+                zip.addSymlink("escape_link", "../../etc/passwd");
+                zip.addText("other.txt", "other content");
+                archive_data = zip.toData();
+            }
+
+            string extractDir = testDir + "/symlink_default";
+            mkdir(extractDir);
+
+            ZipFile zip(archive_data);
+            zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/safe.txt"), "safe.txt extracted");
+            assertEq(True, is_file(extractDir + "/other.txt"), "other.txt extracted");
+            assertEq(False, is_link(extractDir + "/escape_link"),
+                "symlink skipped by default");
+        }
+
+        # Test 2: Absolute symlink target skipped by default
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addText("normal.txt", "normal");
+                zip.addSymlink("abs_link", "/etc/passwd");
+                archive_data = zip.toData();
+            }
+
+            string extractDir = testDir + "/symlink_abs";
+            mkdir(extractDir);
+
+            ZipFile zip(archive_data);
+            zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/normal.txt"), "normal.txt extracted");
+            assertEq(False, is_link(extractDir + "/abs_link"),
+                "absolute symlink skipped by default");
+        }
+
+        # Test 3: Safe symlink allowed with allow_symlinks=True
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addText("target.txt", "target content");
+                zip.addSymlink("safe_link", "target.txt");
+                archive_data = zip.toData();
+            }
+
+            string extractDir = testDir + "/symlink_safe";
+            mkdir(extractDir);
+
+            ZipFile zip(archive_data);
+            zip.extractAll(extractDir, <ZipExtractOptions>{"allow_symlinks": True});
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/target.txt"), "target.txt extracted");
+            assertEq(True, is_link(extractDir + "/safe_link"), "safe symlink created");
+            # Verify the symlink target is correct
+            string link_target = readlink(extractDir + "/safe_link");
+            assertEq("target.txt", link_target, "symlink target is correct");
+        }
+
+        # Test 4: Escape symlink rejected with allow_symlinks=True
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addSymlink("escape", "../../outside");
+                archive_data = zip.toData();
+            }
+
+            string extractDir = testDir + "/symlink_escape";
+            mkdir(extractDir);
+
+            ZipFile zip(archive_data);
+            try {
+                zip.extractAll(extractDir, <ZipExtractOptions>{"allow_symlinks": True});
+                assertEq(True, False, "should have thrown");
+            } catch (hash<ExceptionInfo> ex) {
+                assertEq("ZIP-SECURITY-ERROR", ex.err,
+                    "escape symlink raises ZIP-SECURITY-ERROR");
+            }
+            zip.close();
+        }
+
+        # Test 5: Absolute target rejected with allow_symlinks=True
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addSymlink("abs_escape", "/etc/passwd");
+                archive_data = zip.toData();
+            }
+
+            string extractDir = testDir + "/symlink_abs_escape";
+            mkdir(extractDir);
+
+            ZipFile zip(archive_data);
+            try {
+                zip.extractAll(extractDir, <ZipExtractOptions>{"allow_symlinks": True});
+                assertEq(True, False, "should have thrown");
+            } catch (hash<ExceptionInfo> ex) {
+                assertEq("ZIP-SECURITY-ERROR", ex.err,
+                    "absolute symlink raises ZIP-SECURITY-ERROR");
+            }
+            zip.close();
+        }
+
+        # Test 6: extractEntries also skips symlinks by default
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addText("file.txt", "content");
+                zip.addSymlink("link", "../escape");
+                archive_data = zip.toData();
+            }
+
+            string extractDir = testDir + "/symlink_entries";
+            mkdir(extractDir);
+
+            ZipFile zip(archive_data);
+            list<string> files = zip.extractEntries(extractDir, ("file.txt", "link"));
+            zip.close();
+
+            assertEq(1, files.size(), "only file extracted, symlink skipped");
+            assertEq(False, is_link(extractDir + "/link"),
+                "extractEntries skips symlinks by default");
+        }
+
+        # Test 7: Symlink loop entries — both skipped by default
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addSymlink("a", "b");
+                zip.addSymlink("b", "a");
+                zip.addText("safe.txt", "safe");
+                archive_data = zip.toData();
+            }
+
+            string extractDir = testDir + "/symlink_loop";
+            mkdir(extractDir);
+
+            ZipFile zip(archive_data);
+            zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(True, is_file(extractDir + "/safe.txt"), "safe.txt extracted despite loop entries");
+            assertEq(False, is_link(extractDir + "/a"), "loop symlink a skipped");
+            assertEq(False, is_link(extractDir + "/b"), "loop symlink b skipped");
+        }
+    }
+
+    verifyTest() {
+        # Test verify on valid archive
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addText("file1.txt", "content 1");
+                zip.addText("file2.txt", "content 2");
+                zip.addDirectory("dir/");
+                archive_data = zip.toData();
+            }
+
+            ZipFile zip(archive_data);
+            list<hash<ZipVerifyResult>> results = zip.verify();
+            zip.close();
+
+            assertEq(2, results.size(), "verify: 2 file entries verified (dirs skipped)");
+            assertEq(True, results[0].valid, "verify: file1.txt valid");
+            assertEq(True, results[1].valid, "verify: file2.txt valid");
+        }
+
+        # Test verify with password
+        {
+            binary archive_data;
+            {
+                ZipFile zip();
+                zip.addText("secret.txt", "secret data", NOTHING,
+                    <ZipAddOptions>{"password": "test123"});
+                archive_data = zip.toData();
+            }
+
+            ZipFile zip(archive_data);
+            list<hash<ZipVerifyResult>> results = zip.verify(
+                <ZipExtractOptions>{"password": "test123"});
+            zip.close();
+
+            assertEq(1, results.size(), "verify encrypted: 1 entry");
+            assertEq(True, results[0].valid, "verify encrypted: valid with correct password");
+        }
+    }
+
+    replaceDeleteTest() {
+        # Test delete
+        {
+            string zipPath = testDir + "/replace_delete_test.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("keep.txt", "keep");
+                zip.addText("remove.txt", "remove");
+                zip.addText("also_keep.txt", "also keep");
+                zip.close();
+            }
+
+            hash<auto> result = ZipFile::replaceEntries(zipPath, NOTHING, ("remove.txt",));
+            assertEq(True, result.success, "delete: success");
+            assertEq(1, result.deleted_count, "delete: 1 deleted");
+            assertEq(2, result.copied_count, "delete: 2 copied");
+
+            ZipFile zip(zipPath, "r");
+            assertEq(2, zip.count(), "delete: 2 entries remain");
+            assertEq(False, zip.hasEntry("remove.txt"), "delete: remove.txt gone");
+            assertEq("keep", zip.readText("keep.txt"), "delete: keep.txt intact");
+            zip.close();
+        }
+
+        # Test replace
+        {
+            string zipPath = testDir + "/replace_test2.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("config.txt", "old config");
+                zip.addText("data.bin", "old data");
+                zip.close();
+            }
+
+            hash<auto> result = ZipFile::replaceEntries(zipPath,
+                {"config.txt": binary("new config")});
+            assertEq(True, result.success, "replace: success");
+            assertEq(1, result.replaced_count, "replace: 1 replaced");
+            assertEq(1, result.copied_count, "replace: 1 copied");
+
+            ZipFile zip(zipPath, "r");
+            assertEq("new config", zip.readText("config.txt"), "replace: content updated");
+            assertEq("old data", zip.readText("data.bin"), "replace: other entry unchanged");
+            zip.close();
+        }
+
+        # Test combined replace + delete
+        {
+            string zipPath = testDir + "/replace_delete_combo.zip";
+            {
+                ZipFile zip(zipPath, "w");
+                zip.addText("a.txt", "a");
+                zip.addText("b.txt", "b");
+                zip.addText("c.txt", "c");
+                zip.close();
+            }
+
+            hash<auto> result = ZipFile::replaceEntries(zipPath,
+                {"b.txt": binary("new b")},
+                ("c.txt",));
+            assertEq(1, result.replaced_count, "combo: 1 replaced");
+            assertEq(1, result.deleted_count, "combo: 1 deleted");
+            assertEq(1, result.copied_count, "combo: 1 copied");
+
+            ZipFile zip(zipPath, "r");
+            assertEq(2, zip.count(), "combo: 2 entries remain");
+            assertEq("a", zip.readText("a.txt"), "combo: a.txt unchanged");
+            assertEq("new b", zip.readText("b.txt"), "combo: b.txt replaced");
+            zip.close();
+        }
+    }
+
+    enhancedEntryInfoTest() {
+        # Test permissions and created_by_system from filesystem archive
+        {
+            string srcDir = testDir + "/entryinfo_src";
+            mkdir(srcDir);
+            {
+                File f();
+                f.open2(srcDir + "/file.txt", O_CREAT | O_WRONLY | O_TRUNC);
+                f.write("test");
+            }
+
+            ZipFile zip();
+            zip.addPath(srcDir, dirname(srcDir));
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            list<hash<ZipEntryInfo>> entries = readZip.entries();
+            readZip.close();
+
+            bool found_file = False;
+            foreach hash<ZipEntryInfo> entry in (entries) {
+                if (entry.name =~ /file\.txt$/) {
+                    found_file = True;
+                    assertEq(True, entry.permissions >= 0, "permissions available");
+                    assertEq(True, (entry.permissions & 0400) > 0, "owner read permission set");
+                    assertEq(False, entry.is_symlink, "regular file is not symlink");
+                    assertEq(True, entry.created_by_system >= 0, "created_by_system set");
+                    assertEq(0, entry.encryption_method, "no encryption");
+                }
+            }
+            assertEq(True, found_file, "file.txt found in entries");
+        }
+
+        # Test symlink entry info
+        {
+            ZipFile zip();
+            zip.addText("target.txt", "target");
+            zip.addSymlink("link", "target.txt");
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            list<hash<ZipEntryInfo>> entries = readZip.entries();
+            readZip.close();
+
+            hash<ZipEntryInfo> link_entry;
+            foreach hash<ZipEntryInfo> entry in (entries) {
+                if (entry.name == "link") {
+                    link_entry = entry;
+                }
+            }
+            assertEq(True, link_entry.is_symlink, "symlink entry detected");
+            assertEq(True, link_entry.permissions >= 0, "symlink has permissions");
+        }
+
+        # Test encryption method in entry info
+        {
+            ZipFile zip();
+            zip.addText("encrypted.txt", "secret", NOTHING,
+                <ZipAddOptions>{"password": "test123"});
+            zip.addText("plain.txt", "plain");
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            list<hash<ZipEntryInfo>> entries = readZip.entries();
+            readZip.close();
+
+            foreach hash<ZipEntryInfo> entry in (entries) {
+                if (entry.name == "encrypted.txt") {
+                    assertEq(True, entry.is_encrypted, "encrypted entry detected");
+                    assertEq(True, entry.encryption_method > 0,
+                        "encryption method set for encrypted entry");
+                } else if (entry.name == "plain.txt") {
+                    assertEq(False, entry.is_encrypted, "plain entry not encrypted");
+                    assertEq(0, entry.encryption_method,
+                        "encryption method is 0 for plain entry");
+                }
+            }
+        }
+    }
+
+    encryptionMethodTest() {
+        # Test PKWARE encryption
+        {
+            ZipFile zip();
+            zip.addText("pkware.txt", "pkware data", NOTHING,
+                <ZipAddOptions>{"password": "test", "encryption_method": ZIP_EM_TRAD_PKWARE});
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            list<hash<ZipEntryInfo>> entries = readZip.entries();
+            assertEq(True, entries[0].is_encrypted, "PKWARE entry is encrypted");
+            assertEq(ZIP_EM_TRAD_PKWARE, entries[0].encryption_method,
+                "PKWARE encryption method detected");
+            readZip.close();
+
+            # Verify can be extracted with correct password
+            string extractDir = testDir + "/pkware_extract";
+            mkdir(extractDir);
+            ZipFile extractZip(archive_data);
+            extractZip.extractAll(extractDir, <ZipExtractOptions>{"password": "test"});
+            extractZip.close();
+            string content = ReadOnlyFile::readTextFile(extractDir + "/pkware.txt");
+            assertEq("pkware data", content, "PKWARE encrypted content readable");
+        }
+
+        # Test AES-256 explicit
+        {
+            ZipFile zip();
+            zip.addText("aes256.txt", "aes data", NOTHING,
+                <ZipAddOptions>{"password": "test", "encryption_method": ZIP_EM_AES_256});
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            list<hash<ZipEntryInfo>> entries = readZip.entries();
+            assertEq(ZIP_EM_AES_256, entries[0].encryption_method,
+                "AES-256 encryption method detected");
+            readZip.close();
+        }
+
+        # Test default (no encryption_method = AES-256)
+        {
+            ZipFile zip();
+            zip.addText("default.txt", "default data", NOTHING,
+                <ZipAddOptions>{"password": "test"});
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            list<hash<ZipEntryInfo>> entries = readZip.entries();
+            assertEq(ZIP_EM_AES_256, entries[0].encryption_method,
+                "default encryption is AES-256");
+            readZip.close();
+        }
+    }
+
+    setPasswordTest() {
+        string secret = "MyPassword123";
+        string content = "encrypted content";
+
+        # Create encrypted in-memory archive
+        binary archive_data;
+        {
+            ZipFile zip();
+            zip.addText("secret.txt", content, NOTHING, <ZipAddOptions>{"password": secret});
+            archive_data = zip.toData();
+        }
+
+        # Test: readText without password returns wrong content or throws
+        {
+            ZipFile zip(archive_data);
+            *string result;
+            bool threw = False;
+            try {
+                result = zip.readText("secret.txt");
+            } catch () {
+                threw = True;
+            }
+            assertEq(True, threw || result != content,
+                "read without password fails or returns wrong content");
+            zip.close();
+        }
+
+        # Test: readText succeeds after setPassword
+        {
+            ZipFile zip(archive_data);
+            zip.setPassword(secret);
+            string result = zip.readText("secret.txt");
+            assertEq(content, result, "readText works after setPassword");
+            zip.close();
+        }
+
+        # Test: clear password with NOTHING
+        {
+            ZipFile zip(archive_data);
+            zip.setPassword(secret);
+            zip.setPassword();  # clear
+            *string result;
+            bool threw = False;
+            try {
+                result = zip.readText("secret.txt");
+            } catch () {
+                threw = True;
+            }
+            assertEq(True, threw || result != content,
+                "read after clearing password fails or returns wrong content");
+            zip.close();
+        }
+
+        # Test: openRead (streaming) works with setPassword
+        {
+            ZipFile zip(archive_data);
+            zip.setPassword(secret);
+            {
+                ZipInputStream is = zip.openRead("secret.txt");
+                binary data = is.read(65536);
+                assertEq(content, data.toString(), "streaming read works after setPassword");
+            }
+            zip.close();
+        }
+    }
+
+    diffTest() {
+        # Create two archives with overlapping entries
+        string path1 = testDir + "/diff1.zip";
+        string path2 = testDir + "/diff2.zip";
+        {
+            ZipFile zip(path1, "w");
+            zip.addText("same.txt", "same content");
+            zip.addText("modified.txt", "old content");
+            zip.addText("deleted.txt", "will be deleted");
+            zip.close();
+        }
+        {
+            ZipFile zip(path2, "w");
+            zip.addText("same.txt", "same content");
+            zip.addText("modified.txt", "new content");
+            zip.addText("added.txt", "new file");
+            zip.close();
+        }
+
+        hash<ZipDiffResult> result = ZipFile::diff(path1, path2);
+
+        assertEq(1, result.added_count, "diff: 1 added");
+        assertEq(1, result.deleted_count, "diff: 1 deleted");
+        assertEq(1, result.modified_count, "diff: 1 modified");
+        assertEq(1, result.unchanged_count, "diff: 1 unchanged");
+
+        assertEq("added.txt", result.added[0].name, "diff: added entry name");
+        assertEq("deleted.txt", result.deleted[0].name, "diff: deleted entry name");
+        assertEq("modified.txt", result.modified[0].old.name, "diff: modified entry name");
+        assertEq("same.txt", result.unchanged[0].name, "diff: unchanged entry name");
+
+        # Test identical archives
+        hash<ZipDiffResult> same = ZipFile::diff(path1, path1);
+        assertEq(0, same.added_count, "diff same: 0 added");
+        assertEq(0, same.deleted_count, "diff same: 0 deleted");
+        assertEq(0, same.modified_count, "diff same: 0 modified");
+        assertEq(3, same.unchanged_count, "diff same: all unchanged");
+    }
+
+    recompressTest() {
+        string zipPath = testDir + "/recompress_test.zip";
+
+        # Create archive with deflate
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("file1.txt", "Hello World");
+            zip.addText("file2.txt", "Another file with some content for compression testing");
+            zip.addDirectory("dir/");
+            zip.close();
+        }
+
+        # Verify entries use deflate
+        {
+            ZipFile zip(zipPath, "r");
+            list<hash<ZipEntryInfo>> entries = zip.entries();
+            foreach hash<ZipEntryInfo> e in (entries) {
+                if (!e.is_directory) {
+                    assertEq(ZIP_CM_DEFLATE, e.compression_method,
+                        "original uses deflate: " + e.name);
+                }
+            }
+            zip.close();
+        }
+
+        # Recompress to store (no compression)
+        hash<auto> result = ZipFile::recompress(zipPath, ZIP_CM_STORE);
+        assertEq(True, result.success, "recompress: success");
+        assertEq(3, result.entry_count, "recompress: 3 entries");
+
+        # Verify entries now use store
+        {
+            ZipFile zip(zipPath, "r");
+            list<hash<ZipEntryInfo>> entries = zip.entries();
+            foreach hash<ZipEntryInfo> e in (entries) {
+                if (!e.is_directory) {
+                    assertEq(ZIP_CM_STORE, e.compression_method,
+                        "recompressed uses store: " + e.name);
+                }
+            }
+            # Verify content preserved
+            assertEq("Hello World", zip.readText("file1.txt"),
+                "recompress: content preserved");
+            zip.close();
+        }
     }
 }

@@ -51,6 +51,8 @@ extern "C" DLLEXPORT void zip_qore_module_desc(QoreModuleInfo& mod_info) {
 // Global hashdecl pointers
 const TypedHashDecl* hashdeclZipEntryInfo = nullptr;
 const TypedHashDecl* hashdeclZipAddOptions = nullptr;
+const TypedHashDecl* hashdeclZipVerifyResult = nullptr;
+const TypedHashDecl* hashdeclZipDiffResult = nullptr;
 const TypedHashDecl* hashdeclZipExtractOptions = nullptr;
 
 QoreNamespace ZipNs("Qore::Zip");
@@ -59,6 +61,8 @@ static void zip_module_init(QoreModuleInitContext& ctx, ExceptionSink& xsink) {
     // Initialize hashdecls (defined in QPP files for documentation)
     hashdeclZipEntryInfo = init_hashdecl_ZipEntryInfo(ZipNs);
     hashdeclZipAddOptions = init_hashdecl_ZipAddOptions(ZipNs);
+    hashdeclZipVerifyResult = init_hashdecl_ZipVerifyResult(ZipNs);
+    hashdeclZipDiffResult = init_hashdecl_ZipDiffResult(ZipNs);
     hashdeclZipExtractOptions = init_hashdecl_ZipExtractOptions(ZipNs);
 
     // Initialize classes - stream classes must be initialized before ZipFile

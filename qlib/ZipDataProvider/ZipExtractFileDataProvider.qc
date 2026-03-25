@@ -77,9 +77,9 @@ public class ZipExtractFileDataProvider inherits AbstractDataProvider {
 
         ZipFile zip;
         if (request.archive_path) {
-            zip = new ZipFile(request.archive_path, "r");
+            zip = new ZipFile(request.archive_path, "r", request.recover);
         } else if (archive_data) {
-            zip = new ZipFile(archive_data);
+            zip = new ZipFile(archive_data, request.recover);
         } else {
             throw "ZIP-ERROR", "one of 'archive_path', 'archive_data', or 'archive_location' must be provided";
         }

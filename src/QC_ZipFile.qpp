@@ -119,6 +119,35 @@ hashdecl Qore::Zip::ZipEntryInfo {
     //! True if this entry is password-protected
     bool is_encrypted;
 
+    //! The encryption method used (one of @ref zip_encryption_methods), or 0 if not encrypted
+    /** @since %zip 1.1
+    */
+    int encryption_method;
+
+    //! True if this entry is a symbolic link
+    /** @since %zip 1.1
+    */
+    bool is_symlink;
+
+    //! Unix file permissions (e.g., 0644, 0755), or -1 if not available
+    /** Only set for entries created on Unix or macOS systems.
+
+        @since %zip 1.1
+    */
+    int permissions;
+
+    //! The operating system that created this entry
+    /** Common values: 0 = DOS/Windows, 3 = Unix, 10 = Windows NTFS, 19 = macOS
+
+        @since %zip 1.1
+    */
+    int created_by_system;
+
+    //! Symlink target path (only set for symlink entries)
+    /** @since %zip 1.1
+    */
+    *string link_target;
+
     //! Optional comment associated with this entry
     *string comment;
 }
@@ -141,6 +170,63 @@ hashdecl Qore::Zip::ZipAddOptions {
 
     //! Last modification time (defaults to current time)
     *date modified;
+
+    //! Encryption method (one of @ref zip_encryption_methods)
+    /** If not set, defaults to AES-256 when a password is provided.
+        Use \c ZIP_EM_TRAD_PKWARE for legacy PKWARE encryption, or
+        \c ZIP_EM_NONE to disable encryption even with a password.
+
+        @note AES-128 and AES-192 are only supported for in-memory data entries
+        (via add() or data provider). The addFile() method always uses AES-256.
+
+        @since %zip 1.1
+    */
+    *int encryption_method;
+}
+
+//! Result of verifying a single archive entry
+/** @since %zip 1.1
+*/
+hashdecl Qore::Zip::ZipVerifyResult {
+    //! The name/path of the entry
+    string name;
+
+    //! True if the entry passed integrity verification
+    bool valid;
+
+    //! Error message if verification failed, or NOTHING if valid
+    *string error;
+}
+
+//! Result of comparing two ZIP archives
+/** @since %zip 1.1
+*/
+hashdecl Qore::Zip::ZipDiffResult {
+    //! Entries present only in the second archive
+    list<hash<ZipEntryInfo>> added;
+
+    //! Entries present only in the first archive
+    list<hash<ZipEntryInfo>> deleted;
+
+    //! Entries present in both archives with different content (CRC32 mismatch)
+    /** Each element is a hash with \c "old" and \c "new" keys containing ZipEntryInfo hashes.
+    */
+    list<hash<auto>> modified;
+
+    //! Entries present in both archives with identical content
+    list<hash<ZipEntryInfo>> unchanged;
+
+    //! Count of entries only in the second archive
+    int added_count;
+
+    //! Count of entries only in the first archive
+    int deleted_count;
+
+    //! Count of entries with different content
+    int modified_count;
+
+    //! Count of entries with identical content
+    int unchanged_count;
 }
 
 //! Options for extracting entries from a ZIP archive
@@ -150,11 +236,50 @@ hashdecl Qore::Zip::ZipExtractOptions {
     //! Password for decryption (required for encrypted entries)
     *string password;
 
-    //! If True, overwrite existing files during extraction
+    //! If True, overwrite existing files during extraction (default: False)
     *bool overwrite;
 
-    //! If True, preserve directory paths during extraction
+    //! If True, preserve directory paths during extraction (default: True)
+    /** When False, all entries are extracted as flat files in the destination directory
+        (directory components are stripped from entry names).
+    */
     *bool preserve_paths;
+
+    //! Strip this prefix from entry paths during extraction
+    /** If set, entries whose names start with this prefix will have it removed.
+        For example, with \c strip_prefix = \c "src/", the entry \c "src/main.cpp"
+        would be extracted as \c "main.cpp".
+    */
+    *string strip_prefix;
+
+    //! Add this prefix to entry paths during extraction
+    /** If set, this prefix is prepended to all entry names.
+        For example, with \c add_prefix = \c "output/", the entry \c "main.cpp"
+        would be extracted as \c "output/main.cpp".
+    */
+    *string add_prefix;
+
+    //! If True, allow symlink entries to be extracted (default: False)
+    /** Symlinks in archives are a security risk as they can point outside the
+        destination directory. By default, symlink entries are silently skipped
+        during extraction. Set to \c True to allow symlink extraction (targets
+        are still validated to stay within the destination directory).
+
+        @since %zip 1.1
+    */
+    *bool allow_symlinks;
+
+    //! Optional callback called for each entry being extracted
+    /** The callback receives the entry name as a string argument.
+
+        @par Example:
+        @code{.py}
+        zip.extractAll("/dest", {"entry_callback": sub (string name) { printf("Extracting: %s\n", name); }});
+        @endcode
+
+        @since %zip 1.1
+    */
+    *code<nothing(string)> entry_callback;
 }
 
 //! The ZipFile class provides functionality for creating, reading, and modifying ZIP archives
@@ -189,6 +314,11 @@ zip.extractAll("/destination/path", {"overwrite": True});
 zip.close();
     @endcode
 
+    @par ZIP64 Support
+    ZIP64 extensions are handled automatically. Archives with more than 65,535 entries, files
+    larger than 4 GB, or total archive sizes exceeding 4 GB are supported transparently without
+    any special configuration.
+
     @since %zip 1.0
 */
 qclass ZipFile [arg=QoreZipFile* zf; ns=Qore::Zip];
@@ -196,10 +326,11 @@ qclass ZipFile [arg=QoreZipFile* zf; ns=Qore::Zip];
 //! Creates a ZipFile object for reading, writing, or appending to an archive
 /** @param path the path to the ZIP archive file
     @param mode the open mode: \c "r" for read, \c "w" for write (create/overwrite), \c "a" for append
+    @param recover if True, enable recovery mode to read archives with corrupted central directories
 
     @throw ZIP-ERROR error opening the archive
 */
-ZipFile::constructor(string path, string mode = "r") [dom=FILESYSTEM] {
+ZipFile::constructor(string path, string mode = "r", *bool recover) [dom=FILESYSTEM] {
     ZipMode zm = ZIP_MODE_READ;
     if (mode->empty() || mode->c_str()[0] == 'r') {
         zm = ZIP_MODE_READ;
@@ -212,7 +343,7 @@ ZipFile::constructor(string path, string mode = "r") [dom=FILESYSTEM] {
         return;
     }
 
-    ReferenceHolder<QoreZipFile> holder(new QoreZipFile(path->c_str(), zm, xsink), xsink);
+    ReferenceHolder<QoreZipFile> holder(new QoreZipFile(path->c_str(), zm, xsink, (bool)recover), xsink);
     if (*xsink) {
         return;
     }
@@ -221,11 +352,12 @@ ZipFile::constructor(string path, string mode = "r") [dom=FILESYSTEM] {
 
 //! Creates a ZipFile object from binary data (in-memory archive)
 /** @param data binary data containing a ZIP archive
+    @param recover if True, enable recovery mode to read archives with corrupted central directories
 
     @throw ZIP-ERROR error parsing the archive data
 */
-ZipFile::constructor(binary data) {
-    ReferenceHolder<QoreZipFile> holder(new QoreZipFile(data, xsink), xsink);
+ZipFile::constructor(binary data, *bool recover) {
+    ReferenceHolder<QoreZipFile> holder(new QoreZipFile(data, xsink, (bool)recover), xsink);
     if (*xsink) {
         return;
     }
@@ -373,6 +505,32 @@ nothing ZipFile::addDirectory(string name) {
     zf->addDirectory(name->c_str(), xsink);
 }
 
+//! Verifies the integrity of all entries in the archive
+/** Reads each entry and verifies its CRC32 checksum without extracting to disk.
+
+    @param opts optional @ref Qore::Zip::ZipExtractOptions for password
+
+    @return a list of @ref Qore::Zip::ZipVerifyResult hashes with per-entry verification results
+
+    @throw ZIP-ERROR error reading archive
+
+    @par Example:
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+list<hash<ZipVerifyResult>> results = zip.verify();
+foreach hash<ZipVerifyResult> r in (results) {
+    if (!r.valid) {
+        printf("FAILED: %s - %s\n", r.name, r.error);
+    }
+}
+    @endcode
+
+    @since %zip 1.1
+*/
+list<hash<ZipVerifyResult>> ZipFile::verify(*hash<ZipExtractOptions> opts) {
+    return zf->verify(opts, xsink);
+}
+
 //! Extracts all entries to a destination directory
 /** @param destPath the destination directory path
     @param opts optional @ref Qore::Zip::ZipExtractOptions for extraction settings
@@ -381,6 +539,28 @@ nothing ZipFile::addDirectory(string name) {
 */
 nothing ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) [dom=FILESYSTEM] {
     zf->extractAll(destPath->c_str(), opts, xsink);
+}
+
+//! Extracts specific entries to a destination directory
+/** @param destPath the destination directory path
+    @param entryNames list of entry names to extract
+    @param opts optional @ref Qore::Zip::ZipExtractOptions for extraction settings
+
+    @return a list of extracted file paths (excluding directories)
+
+    @throw ZIP-ERROR error extracting archive
+    @throw ZIP-SECURITY-ERROR path traversal detected
+
+    @par Example:
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+list<string> files = zip.extractEntries("/dest", ("readme.txt", "src/main.cpp"));
+    @endcode
+
+    @since %zip 1.1
+*/
+list<string> ZipFile::extractEntries(string destPath, list<string> entryNames, *hash<ZipExtractOptions> opts) [dom=FILESYSTEM] {
+    return zf->extractEntries(destPath->c_str(), entryNames, opts, xsink);
 }
 
 //! Extracts a single entry to a destination path
@@ -393,6 +573,124 @@ nothing ZipFile::extractEntry(string name, string destPath) [dom=FILESYSTEM] {
     zf->extractEntry(name->c_str(), destPath->c_str(), xsink);
 }
 
+//! Recursively adds a file or directory to the archive
+/** @param path the filesystem path to add (file or directory)
+    @param root_path the base path for computing relative entry names; if not provided, the parent
+        directory of \a path is used
+    @param opts optional @ref Qore::Zip::ZipAddOptions for compression and encryption settings
+
+    @throw ZIP-ERROR error adding path or archive not open for writing
+
+    @par Example:
+    @code{.py}
+ZipFile zip("archive.zip", "w");
+zip.addPath("/path/to/directory", "/path/to");
+zip.close();
+    @endcode
+
+    @since %zip 1.1
+*/
+nothing ZipFile::addPath(string path, *string root_path, *hash<ZipAddOptions> opts) [dom=FILESYSTEM] {
+    zf->addPath(path->c_str(), root_path ? root_path->c_str() : nullptr, opts, xsink);
+}
+
+//! Replaces or deletes entries in an archive
+/** Creates a new archive with the specified modifications. Entries not in the
+    replacement or deletion lists are copied as-is (zero-copy).
+
+    @param archive_path path to the archive to modify
+    @param replacements hash mapping entry names to replacement binary data (or hashes with
+        a \c "data" key containing binary data)
+    @param delete_names list of entry names to remove
+
+    @return a hash with \c success (bool), \c replaced_count, \c deleted_count, and
+        \c copied_count fields
+
+    @throw ZIP-ERROR error processing the archive
+
+    @par Example:
+    @code{.py}
+# Replace one entry and delete another
+ZipFile::replaceEntries("archive.zip",
+    {"config.json": <bead>},
+    ("temp.log",));
+    @endcode
+
+    @since %zip 1.1
+*/
+static hash<auto> ZipFile::replaceEntries(string archive_path, *hash<auto> replacements,
+    *list<string> delete_names) [dom=FILESYSTEM] {
+    return QoreZipFile::replaceEntries(archive_path->c_str(), replacements, delete_names, xsink);
+}
+
+//! Compares two ZIP archives and returns the differences
+/** Compares entries by name and CRC32 checksum to detect added, deleted, modified,
+    and unchanged entries without extracting any data.
+
+    @param archive1 path to the first archive (base)
+    @param archive2 path to the second archive (target)
+
+    @return a @ref Qore::Zip::ZipDiffResult hash with lists of added, deleted, modified,
+        and unchanged entries
+
+    @throw ZIP-ERROR error reading either archive
+
+    @par Example:
+    @code{.py}
+hash<ZipDiffResult> diff = ZipFile::diff("old.zip", "new.zip");
+printf("Added: %d, Deleted: %d, Modified: %d, Unchanged: %d\n",
+    diff.added_count, diff.deleted_count, diff.modified_count, diff.unchanged_count);
+    @endcode
+
+    @since %zip 1.1
+*/
+static hash<ZipDiffResult> ZipFile::diff(string archive1, string archive2) [dom=FILESYSTEM] {
+    return QoreZipFile::diff(archive1->c_str(), archive2->c_str(), xsink);
+}
+
+//! Re-compresses an archive with a different compression method
+/** Reads all entries from the archive and rewrites them using the specified compression
+    method and level. Directory entries and metadata are preserved.
+
+    @param archive_path path to the archive to recompress
+    @param compression_method the new compression method (one of @ref zip_compression_methods)
+    @param compression_level optional compression level (0-9)
+    @param password optional password for encrypted archives
+
+    @return a hash with \c success (bool), \c entry_count, \c original_size, and
+        \c new_size fields
+
+    @throw ZIP-ERROR error processing the archive
+
+    @par Example:
+    @code{.py}
+# Convert from deflate to zstd
+ZipFile::recompress("archive.zip", ZIP_CM_ZSTD, 3);
+    @endcode
+
+    @since %zip 1.1
+*/
+static hash<auto> ZipFile::recompress(string archive_path, int compression_method,
+    *int compression_level, *string password) [dom=FILESYSTEM] {
+    return QoreZipFile::recompress(archive_path->c_str(), (int16_t)compression_method,
+        compression_level ? (int16_t)compression_level : MZ_COMPRESS_LEVEL_DEFAULT,
+        password ? password->c_str() : nullptr, xsink);
+}
+
+//! Adds a symbolic link entry to the archive
+/** @param name the name for the symlink entry in the archive
+    @param target the symlink target path
+
+    @throw ZIP-ERROR error adding entry or archive not open for writing
+
+    @note This is primarily intended for testing symlink security validation.
+
+    @since %zip 1.1
+*/
+nothing ZipFile::addSymlink(string name, string target) {
+    zf->addSymlink(name->c_str(), target->c_str(), xsink);
+}
+
 //! Deletes an entry from the archive
 /** @param name the name of the entry to delete
 
@@ -402,6 +700,23 @@ nothing ZipFile::extractEntry(string name, string destPath) [dom=FILESYSTEM] {
 */
 nothing ZipFile::delete(string name) [dom=FILESYSTEM] {
     zf->deleteEntry(name->c_str(), xsink);
+}
+
+//! Sets the password for reading encrypted entries
+/** @param password the password to use for subsequent read operations (read(), readText(),
+        openRead(), extractEntry()), or \c NOTHING to clear
+
+    @par Example:
+    @code{.py}
+ZipFile zip(encrypted_data);
+zip.setPassword("secret");
+string content = zip.readText("file.txt");
+    @endcode
+
+    @since %zip 1.1
+*/
+nothing ZipFile::setPassword(*string password) {
+    zf->setPassword(password ? password->c_str() : nullptr);
 }
 
 //! Returns the path of the archive file

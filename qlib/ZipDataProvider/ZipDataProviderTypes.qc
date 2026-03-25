@@ -43,6 +43,9 @@ public hashdecl ZipCreateArchiveRequest {
 
     #! Password for encryption (optional)
     *string password;
+
+    #! Encryption method (one of the ZIP_EM_* constants; default: AES-256 when password set)
+    *int encryption_method;
 }
 
 #! Response type for creating a ZIP archive
@@ -79,6 +82,36 @@ public hashdecl ZipExtractArchiveRequest {
 
     #! Password for decryption (optional)
     *string password;
+
+    #! If True, enable recovery mode for corrupted archives
+    *bool recover;
+
+    #! Glob patterns for including entries (whitelist); if set, only matching entries are extracted
+    *list<string> include_patterns;
+
+    #! Glob patterns for excluding entries (blacklist); matching entries are skipped
+    *list<string> exclude_patterns;
+
+    #! Regex pattern for including entries (whitelist); if set, only matching entries are extracted
+    *string include_regex;
+
+    #! Regex pattern for excluding entries (blacklist); matching entries are skipped
+    *string exclude_regex;
+
+    #! If True, allow symlink entries to be extracted (default: False)
+    *bool allow_symlinks;
+
+    #! If True, overwrite existing files during extraction (default: False)
+    *bool overwrite;
+
+    #! If True, preserve directory structure (default: True)
+    *bool preserve_paths;
+
+    #! Strip this prefix from entry paths during extraction
+    *string strip_prefix;
+
+    #! Add this prefix to entry paths during extraction
+    *string add_prefix;
 }
 
 #! Response type for extracting a ZIP archive
@@ -94,6 +127,12 @@ public hashdecl ZipExtractArchiveResponse {
 
     #! List of extracted file paths
     list<string> extracted_files;
+
+    #! Number of entries skipped by filters
+    *int skipped_count;
+
+    #! List of skipped entry names (when filters are active)
+    *list<string> skipped_files;
 }
 
 #! Request type for listing archive contents
@@ -106,6 +145,21 @@ public hashdecl ZipListArchiveRequest {
 
     #! Location URL for the archive (alternative to input_path or data)
     *string location;
+
+    #! If True, enable recovery mode for corrupted archives
+    *bool recover;
+
+    #! Glob patterns for including entries (whitelist)
+    *list<string> include_patterns;
+
+    #! Glob patterns for excluding entries (blacklist)
+    *list<string> exclude_patterns;
+
+    #! Regex pattern for including entries (whitelist)
+    *string include_regex;
+
+    #! Regex pattern for excluding entries (blacklist)
+    *string exclude_regex;
 }
 
 #! Response type for listing archive contents
@@ -125,8 +179,23 @@ public hashdecl ZipArchiveInfoRequest {
     #! Binary data of the archive (alternative to input_path)
     *binary data;
 
+    #! If True, enable recovery mode for corrupted archives
+    *bool recover;
+
     #! Location URL for the archive (alternative to input_path or data)
     *string location;
+
+    #! Glob patterns for including entries (whitelist)
+    *list<string> include_patterns;
+
+    #! Glob patterns for excluding entries (blacklist)
+    *list<string> exclude_patterns;
+
+    #! Regex pattern for including entries (whitelist)
+    *string include_regex;
+
+    #! Regex pattern for excluding entries (blacklist)
+    *string exclude_regex;
 }
 
 #! Response type for getting archive info
@@ -157,6 +226,9 @@ public hashdecl ZipAddFilesRequest {
 
     #! Password for new entries (optional)
     *string password;
+
+    #! Encryption method (one of the ZIP_EM_* constants; default: AES-256 when password set)
+    *int encryption_method;
 }
 
 #! Response type for adding files to archive
@@ -184,6 +256,9 @@ public hashdecl ZipExtractFileRequest {
 
     #! Password for decryption (optional)
     *string password;
+
+    #! If True, enable recovery mode for corrupted archives
+    *bool recover;
 
     #! Output file path (optional, if not specified returns data)
     *string output_path;
@@ -223,6 +298,9 @@ public hashdecl ZipCompressDataRequest {
 
     #! Output location URL (alternative to returning data in response)
     *string output_location;
+
+    #! Encryption method (one of the ZIP_EM_* constants; default: AES-256 when password set)
+    *int encryption_method;
 }
 
 #! Response type for compressing data
@@ -235,6 +313,113 @@ public hashdecl ZipCompressDataResponse {
 
     #! Compressed size
     int size;
+}
+
+#! Request type for adding a filesystem path to an archive
+public hashdecl ZipAddPathRequest {
+    #! Archive file path
+    string archive_path;
+
+    #! Filesystem path to add (file or directory)
+    string source_path;
+
+    #! Base path for computing relative entry names
+    *string root_path;
+
+    #! Password for encryption (optional)
+    *string password;
+
+    #! Compression method (0=store, 8=deflate)
+    *int compression_method;
+
+    #! Encryption method (one of the ZIP_EM_* constants; default: AES-256 when password set)
+    *int encryption_method;
+}
+
+#! Response type for adding a filesystem path
+public hashdecl ZipAddPathResponse {
+    #! True if successful
+    bool success;
+}
+
+#! Data type for add path requests
+public class ZipAddPathRequestDataType inherits HashDataType {
+    public {
+        #! Field descriptions
+        const Fields = {
+            "archive_path": {
+                "type": StringType,
+                "display_name": "Archive Path",
+                "short_desc": "Path to the archive file",
+                "desc": "Filesystem path to the ZIP archive to add files to.",
+                "example_value": "/path/to/archive.zip",
+            },
+            "source_path": {
+                "type": StringType,
+                "display_name": "Source Path",
+                "short_desc": "File or directory to add",
+                "desc": "Filesystem path to a file or directory to add recursively to the archive.",
+                "example_value": "/path/to/directory",
+            },
+            "root_path": {
+                "type": StringOrNothingType,
+                "display_name": "Root Path",
+                "short_desc": "Base path for relative entry names",
+                "desc": "Base path for computing relative entry names in the archive. "
+                    "For example, if source_path='/a/b/c' and root_path='/a', entries will be "
+                    "stored as 'b/c/...'.",
+                "example_value": "/path/to",
+            },
+            "password": {
+                "type": StringOrNothingType,
+                "display_name": "Password",
+                "short_desc": "Encryption password",
+                "desc": "Password for AES-256 encryption of new entries.",
+                "sensitive": True,
+            },
+            "compression_method": {
+                "type": IntType,
+                "display_name": "Compression Method",
+                "short_desc": "Compression algorithm",
+                "desc": "Compression method for all entries.",
+                "default_value": CompressionMethod::Deflate,
+                "allowed_values": CompressionMethodAllowedValues,
+            },
+            "encryption_method": {
+                "type": IntOrNothingType,
+                "display_name": "Encryption Method",
+                "short_desc": "Encryption algorithm",
+                "desc": "Encryption method to use when a password is provided. Defaults to AES-256.",
+                "default_value": EncryptionMethod::Aes256,
+                "allowed_values": EncryptionMethodAllowedValues,
+            },
+        };
+    }
+
+    #! Creates the object
+    constructor() {
+        addQoreFields(Fields);
+    }
+}
+
+#! Data type for add path responses
+public class ZipAddPathResponseDataType inherits HashDataType {
+    private {
+        #! Field descriptions
+        const Fields = {
+            "success": {
+                "type": BoolType,
+                "display_name": "Success",
+                "short_desc": "Operation success status",
+                "desc": "`True` if the path was added successfully.",
+            },
+        };
+    }
+
+    #! Creates the object
+    constructor() {
+        addQoreFields(Fields);
+    }
 }
 
 #! Request type for decompressing data
@@ -251,8 +436,23 @@ public hashdecl ZipDecompressDataRequest {
     #! Password for decryption (optional)
     *string password;
 
+    #! If True, enable recovery mode for corrupted archives
+    *bool recover;
+
     #! Specific entry names to extract (optional, extracts all if not specified)
     *list<string> entry_names;
+
+    #! Glob patterns for including entries (whitelist)
+    *list<string> include_patterns;
+
+    #! Glob patterns for excluding entries (blacklist)
+    *list<string> exclude_patterns;
+
+    #! Regex pattern for including entries (whitelist)
+    *string include_regex;
+
+    #! Regex pattern for excluding entries (blacklist)
+    *string exclude_regex;
 }
 
 #! Response type for decompressing data
@@ -264,12 +464,87 @@ public hashdecl ZipDecompressDataResponse {
     int entry_count;
 }
 
+#! Request type for verifying archive integrity
+public hashdecl ZipVerifyArchiveRequest {
+    #! Input file path
+    *string input_path;
+
+    #! Binary data of the archive (alternative to input_path)
+    *binary data;
+
+    #! Location URL for the archive (alternative to input_path or data)
+    *string location;
+
+    #! Password for decryption (optional)
+    *string password;
+
+    #! If True, enable recovery mode for corrupted archives
+    *bool recover;
+
+    #! Glob patterns for including entries (whitelist)
+    *list<string> include_patterns;
+
+    #! Glob patterns for excluding entries (blacklist)
+    *list<string> exclude_patterns;
+
+    #! Regex pattern for including entries (whitelist)
+    *string include_regex;
+
+    #! Regex pattern for excluding entries (blacklist)
+    *string exclude_regex;
+}
+
+#! Response type for verifying archive integrity
+public hashdecl ZipVerifyArchiveResponse {
+    #! True if all verified entries are valid
+    bool valid;
+
+    #! Number of entries verified
+    int verified_count;
+
+    #! Number of entries that failed verification
+    int failed_count;
+
+    #! Per-entry verification results
+    list<hash<auto>> results;
+}
+
+#! Request type for replacing or deleting entries
+public hashdecl ZipReplaceEntriesRequest {
+    #! Archive file path
+    string archive_path;
+
+    #! Hash mapping entry names to replacement data (binary or hash with "data" key)
+    *hash<auto> replacements;
+
+    #! List of entry names to delete
+    *list<string> delete_names;
+
+    #! Password for encrypted entries (optional)
+    *string password;
+}
+
+#! Response type for replacing or deleting entries
+public hashdecl ZipReplaceEntriesResponse {
+    #! True if successful
+    bool success;
+
+    #! Number of entries replaced
+    int replaced_count;
+
+    #! Number of entries deleted
+    int deleted_count;
+
+    #! Number of entries copied unchanged
+    int copied_count;
+}
+
 #! Data type for create archive requests
 /** Provides rich metadata for the create archive request including field descriptions,
     display names, and allowed values for compression methods.
 */
 public class ZipCreateArchiveRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "output_path": {
@@ -317,6 +592,14 @@ public class ZipCreateArchiveRequestDataType inherits HashDataType {
                 "short_desc": "Encryption password",
                 "desc": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
                 "sensitive": True,
+            },
+            "encryption_method": {
+                "type": IntOrNothingType,
+                "display_name": "Encryption Method",
+                "short_desc": "Encryption algorithm",
+                "desc": "Encryption method to use when a password is provided. Defaults to AES-256.",
+                "default_value": EncryptionMethod::Aes256,
+                "allowed_values": EncryptionMethodAllowedValues,
             },
         };
     }
@@ -371,9 +654,10 @@ public class ZipCreateArchiveResponseDataType inherits HashDataType {
     }
 }
 
+
 #! Data type for extract archive requests
 public class ZipExtractArchiveRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "input_path": {
@@ -412,11 +696,96 @@ public class ZipExtractArchiveRequestDataType inherits HashDataType {
                 "sensitive": True,
             },
         };
+
+        #! Extract option fields
+        const ExtractOptionFields = {
+            "allow_symlinks": {
+                "type": SoftBoolOrNothingType,
+                "display_name": "Allow Symlinks",
+                "short_desc": "Allow symlink extraction",
+                "desc": "If `True`, allow symlink entries to be extracted. Symlinks are a security "
+                    "risk as they can point outside the destination directory. Default is `False` "
+                    "(symlinks are silently skipped). When enabled, symlink targets are still "
+                    "validated to stay within the destination directory.",
+                "default_value": False,
+            },
+            "overwrite": {
+                "type": SoftBoolOrNothingType,
+                "display_name": "Overwrite",
+                "short_desc": "Overwrite existing files",
+                "desc": "If `True`, overwrite existing files during extraction. Default is `False` "
+                    "(skip existing files).",
+                "default_value": False,
+            },
+            "preserve_paths": {
+                "type": SoftBoolOrNothingType,
+                "display_name": "Preserve Paths",
+                "short_desc": "Preserve directory structure",
+                "desc": "If `True` (default), preserve directory paths during extraction. If `False`, "
+                    "all entries are extracted as flat files in the destination directory.",
+                "default_value": True,
+            },
+            "strip_prefix": {
+                "type": StringOrNothingType,
+                "display_name": "Strip Prefix",
+                "short_desc": "Strip prefix from entry paths",
+                "desc": "If set, entries whose names start with this prefix will have it removed. "
+                    "For example, with `strip_prefix` = `src/`, the entry `src/main.cpp` becomes `main.cpp`.",
+                "example_value": "src/",
+            },
+            "add_prefix": {
+                "type": StringOrNothingType,
+                "display_name": "Add Prefix",
+                "short_desc": "Add prefix to entry paths",
+                "desc": "If set, this prefix is prepended to all entry names during extraction. "
+                    "For example, with `add_prefix` = `output/`, the entry `main.cpp` becomes `output/main.cpp`.",
+                "example_value": "output/",
+            },
+        };
+
+        #! Filter fields
+        const FilterFields = {
+            "include_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Include Patterns",
+                "short_desc": "Glob whitelist patterns",
+                "desc": "List of glob patterns to include (whitelist). Only entries matching at least "
+                    "one pattern will be included. Use `*` to match any characters and `?` to match "
+                    "a single character.",
+                "example_value": ("*.txt", "data/*"),
+            },
+            "exclude_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Exclude Patterns",
+                "short_desc": "Glob blacklist patterns",
+                "desc": "List of glob patterns to exclude (blacklist). Entries matching any pattern "
+                    "will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+                "example_value": ("*.log", "temp_*"),
+            },
+            "include_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Include Regex",
+                "short_desc": "Regex whitelist pattern",
+                "desc": "Regular expression pattern for including entries (whitelist). Only entries "
+                    "whose names match the regex will be included.",
+                "example_value": "^src/.*\\.cpp$",
+            },
+            "exclude_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Exclude Regex",
+                "short_desc": "Regex blacklist pattern",
+                "desc": "Regular expression pattern for excluding entries (blacklist). Entries whose "
+                    "names match the regex will be skipped.",
+                "example_value": "\\.tmp$",
+            },
+        };
     }
 
     #! Creates the object
     constructor() {
         addQoreFields(Fields);
+        addQoreFields(ExtractOptionFields);
+        addQoreFields(FilterFields);
         setRequiredGroups((("input_path", "data", "location"),));
     }
 }
@@ -450,6 +819,20 @@ public class ZipExtractArchiveResponseDataType inherits HashDataType {
                 "short_desc": "List of extracted file paths",
                 "desc": "List of filesystem paths to all extracted files.",
             },
+            "skipped_count": {
+                "type": IntOrNothingType,
+                "display_name": "Skipped Count",
+                "short_desc": "Number of entries skipped by filters",
+                "desc": "The number of entries that were skipped due to filter settings. "
+                    "Only present when filters are active.",
+            },
+            "skipped_files": {
+                "type": SoftListOrNothingType,
+                "display_name": "Skipped Files",
+                "short_desc": "List of skipped entry names",
+                "desc": "List of entry names that were skipped due to filter settings. "
+                    "Only present when filters are active.",
+            },
         };
     }
 
@@ -461,7 +844,7 @@ public class ZipExtractArchiveResponseDataType inherits HashDataType {
 
 #! Data type for list archive requests
 public class ZipListArchiveRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "input_path": {
@@ -484,6 +867,39 @@ public class ZipListArchiveRequestDataType inherits HashDataType {
                 "desc": "A FileLocationHandler location URL for the archive (alternative to input_path "
                     "or data).",
                 "example_value": "file:///path/to/archive.zip",
+            },
+            "include_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Include Patterns",
+                "short_desc": "Glob whitelist patterns",
+                "desc": "List of glob patterns to include (whitelist). Only entries matching at least "
+                    "one pattern will be included. Use `*` to match any characters and `?` to match "
+                    "a single character.",
+                "example_value": ("*.txt", "data/*"),
+            },
+            "exclude_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Exclude Patterns",
+                "short_desc": "Glob blacklist patterns",
+                "desc": "List of glob patterns to exclude (blacklist). Entries matching any pattern "
+                    "will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+                "example_value": ("*.log", "temp_*"),
+            },
+            "include_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Include Regex",
+                "short_desc": "Regex whitelist pattern",
+                "desc": "Regular expression pattern for including entries (whitelist). Only entries "
+                    "whose names match the regex will be included.",
+                "example_value": "^src/.*\\.cpp$",
+            },
+            "exclude_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Exclude Regex",
+                "short_desc": "Regex blacklist pattern",
+                "desc": "Regular expression pattern for excluding entries (blacklist). Entries whose "
+                    "names match the regex will be skipped.",
+                "example_value": "\\.tmp$",
             },
         };
     }
@@ -524,7 +940,7 @@ public class ZipListArchiveResponseDataType inherits HashDataType {
 
 #! Data type for archive info requests
 public class ZipArchiveInfoRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "input_path": {
@@ -547,6 +963,39 @@ public class ZipArchiveInfoRequestDataType inherits HashDataType {
                 "desc": "A FileLocationHandler location URL for the archive (alternative to input_path "
                     "or data).",
                 "example_value": "file:///path/to/archive.zip",
+            },
+            "include_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Include Patterns",
+                "short_desc": "Glob whitelist patterns",
+                "desc": "List of glob patterns to include (whitelist). Only entries matching at least "
+                    "one pattern will be included. Use `*` to match any characters and `?` to match "
+                    "a single character.",
+                "example_value": ("*.txt", "data/*"),
+            },
+            "exclude_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Exclude Patterns",
+                "short_desc": "Glob blacklist patterns",
+                "desc": "List of glob patterns to exclude (blacklist). Entries matching any pattern "
+                    "will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+                "example_value": ("*.log", "temp_*"),
+            },
+            "include_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Include Regex",
+                "short_desc": "Regex whitelist pattern",
+                "desc": "Regular expression pattern for including entries (whitelist). Only entries "
+                    "whose names match the regex will be included.",
+                "example_value": "^src/.*\\.cpp$",
+            },
+            "exclude_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Exclude Regex",
+                "short_desc": "Regex blacklist pattern",
+                "desc": "Regular expression pattern for excluding entries (blacklist). Entries whose "
+                    "names match the regex will be skipped.",
+                "example_value": "\\.tmp$",
             },
         };
     }
@@ -604,7 +1053,7 @@ public class ZipArchiveInfoResponseDataType inherits HashDataType {
 
 #! Data type for add files requests
 public class ZipAddFilesRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "archive_path": {
@@ -627,6 +1076,14 @@ public class ZipAddFilesRequestDataType inherits HashDataType {
                 "short_desc": "Encryption password for new entries",
                 "desc": "Password for AES-256 encryption of new entries.",
                 "sensitive": True,
+            },
+            "encryption_method": {
+                "type": IntOrNothingType,
+                "display_name": "Encryption Method",
+                "short_desc": "Encryption algorithm",
+                "desc": "Encryption method to use when a password is provided. Defaults to AES-256.",
+                "default_value": EncryptionMethod::Aes256,
+                "allowed_values": EncryptionMethodAllowedValues,
             },
         };
     }
@@ -665,7 +1122,7 @@ public class ZipAddFilesResponseDataType inherits HashDataType {
 
 #! Data type for extract file requests
 public class ZipExtractFileRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "archive_path": {
@@ -775,7 +1232,7 @@ public class ZipExtractFileResponseDataType inherits HashDataType {
 
 #! Data type for compress data requests
 public class ZipCompressDataRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "entries": {
@@ -798,6 +1255,14 @@ public class ZipCompressDataRequestDataType inherits HashDataType {
                 "short_desc": "Encryption password",
                 "desc": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
                 "sensitive": True,
+            },
+            "encryption_method": {
+                "type": IntOrNothingType,
+                "display_name": "Encryption Method",
+                "short_desc": "Encryption algorithm",
+                "desc": "Encryption method to use when a password is provided. Defaults to AES-256.",
+                "default_value": EncryptionMethod::Aes256,
+                "allowed_values": EncryptionMethodAllowedValues,
             },
             "output_location": {
                 "type": StringOrNothingType,
@@ -850,7 +1315,7 @@ public class ZipCompressDataResponseDataType inherits HashDataType {
 
 #! Data type for decompress data requests
 public class ZipDecompressDataRequestDataType inherits HashDataType {
-    private {
+    public {
         #! Field descriptions
         const Fields = {
             "data": {
@@ -888,6 +1353,39 @@ public class ZipDecompressDataRequestDataType inherits HashDataType {
                 "desc": "Optional list of specific entry names to extract. If not specified, all "
                     "entries are extracted.",
             },
+            "include_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Include Patterns",
+                "short_desc": "Glob whitelist patterns",
+                "desc": "List of glob patterns to include (whitelist). Only entries matching at least "
+                    "one pattern will be included. Use `*` to match any characters and `?` to match "
+                    "a single character.",
+                "example_value": ("*.txt", "data/*"),
+            },
+            "exclude_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Exclude Patterns",
+                "short_desc": "Glob blacklist patterns",
+                "desc": "List of glob patterns to exclude (blacklist). Entries matching any pattern "
+                    "will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+                "example_value": ("*.log", "temp_*"),
+            },
+            "include_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Include Regex",
+                "short_desc": "Regex whitelist pattern",
+                "desc": "Regular expression pattern for including entries (whitelist). Only entries "
+                    "whose names match the regex will be included.",
+                "example_value": "^src/.*\\.cpp$",
+            },
+            "exclude_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Exclude Regex",
+                "short_desc": "Regex blacklist pattern",
+                "desc": "Regular expression pattern for excluding entries (blacklist). Entries whose "
+                    "names match the regex will be skipped.",
+                "example_value": "\\.tmp$",
+            },
         };
     }
 
@@ -919,6 +1417,191 @@ public class ZipDecompressDataResponseDataType inherits HashDataType {
     }
 
     #! Creates the object
+    constructor() {
+        addQoreFields(Fields);
+    }
+}
+
+#! Data type for verify archive requests
+public class ZipVerifyArchiveRequestDataType inherits HashDataType {
+    public {
+        const Fields = {
+            "input_path": {
+                "type": StringOrNothingType,
+                "display_name": "Input Path",
+                "short_desc": "Path to the archive file",
+                "desc": "Filesystem path to the ZIP archive to verify.",
+                "example_value": "/path/to/archive.zip",
+            },
+            "data": {
+                "type": BinaryOrNothingType,
+                "display_name": "Archive Data",
+                "short_desc": "Binary archive data",
+                "desc": "Binary data containing the ZIP archive.",
+            },
+            "location": {
+                "type": StringOrNothingType,
+                "display_name": "Location",
+                "short_desc": "Archive location URL",
+                "desc": "A FileLocationHandler location URL for the archive.",
+                "example_value": "file:///path/to/archive.zip",
+            },
+            "password": {
+                "type": StringOrNothingType,
+                "display_name": "Password",
+                "short_desc": "Decryption password",
+                "desc": "Password for decrypting encrypted entries.",
+                "sensitive": True,
+            },
+            "recover": {
+                "type": SoftBoolOrNothingType,
+                "display_name": "Recovery Mode",
+                "short_desc": "Enable recovery for corrupted archives",
+                "desc": "If `True`, enable recovery mode to read archives with corrupted "
+                    "central directories by reading local file headers.",
+                "default_value": False,
+            },
+            "include_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Include Patterns",
+                "short_desc": "Glob whitelist patterns",
+                "desc": "List of glob patterns to include (whitelist).",
+                "example_value": ("*.txt", "data/*"),
+            },
+            "exclude_patterns": {
+                "type": SoftListOrNothingType,
+                "display_name": "Exclude Patterns",
+                "short_desc": "Glob blacklist patterns",
+                "desc": "List of glob patterns to exclude (blacklist).",
+                "example_value": ("*.log", "temp_*"),
+            },
+            "include_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Include Regex",
+                "short_desc": "Regex whitelist pattern",
+                "desc": "Regular expression pattern for including entries.",
+            },
+            "exclude_regex": {
+                "type": StringOrNothingType,
+                "display_name": "Exclude Regex",
+                "short_desc": "Regex blacklist pattern",
+                "desc": "Regular expression pattern for excluding entries.",
+            },
+        };
+    }
+
+    constructor() {
+        addQoreFields(Fields);
+        setRequiredGroups((("input_path", "data", "location"),));
+    }
+}
+
+#! Data type for verify archive responses
+public class ZipVerifyArchiveResponseDataType inherits HashDataType {
+    private {
+        const Fields = {
+            "valid": {
+                "type": BoolType,
+                "display_name": "Valid",
+                "short_desc": "Overall verification result",
+                "desc": "`True` if all verified entries passed integrity checks.",
+            },
+            "verified_count": {
+                "type": IntType,
+                "display_name": "Verified Count",
+                "short_desc": "Number of entries verified",
+                "desc": "The total number of entries that were verified.",
+            },
+            "failed_count": {
+                "type": IntType,
+                "display_name": "Failed Count",
+                "short_desc": "Number of entries that failed",
+                "desc": "The number of entries that failed integrity verification.",
+            },
+            "results": {
+                "type": new ListDataType(new HashDataType(), True),
+                "display_name": "Results",
+                "short_desc": "Per-entry verification results",
+                "desc": "List of per-entry results with `name`, `valid`, and optional `error` fields.",
+            },
+        };
+    }
+
+    constructor() {
+        addQoreFields(Fields);
+    }
+}
+
+#! Data type for replace entries requests
+public class ZipReplaceEntriesRequestDataType inherits HashDataType {
+    public {
+        const Fields = {
+            "archive_path": {
+                "type": StringType,
+                "display_name": "Archive Path",
+                "short_desc": "Path to the archive file",
+                "desc": "Filesystem path to the ZIP archive to modify.",
+                "example_value": "/path/to/archive.zip",
+            },
+            "replacements": {
+                "type": new HashDataType(),
+                "display_name": "Replacements",
+                "short_desc": "Entries to replace",
+                "desc": "Hash mapping entry names to replacement data. Values can be binary data "
+                    "or a hash with a `data` key containing binary data.",
+            },
+            "delete_names": {
+                "type": SoftListOrNothingType,
+                "display_name": "Delete Entries",
+                "short_desc": "Entry names to delete",
+                "desc": "List of entry names to remove from the archive.",
+            },
+            "password": {
+                "type": StringOrNothingType,
+                "display_name": "Password",
+                "short_desc": "Encryption password",
+                "desc": "Password for encrypted entries.",
+                "sensitive": True,
+            },
+        };
+    }
+
+    constructor() {
+        addQoreFields(Fields);
+    }
+}
+
+#! Data type for replace entries responses
+public class ZipReplaceEntriesResponseDataType inherits HashDataType {
+    private {
+        const Fields = {
+            "success": {
+                "type": BoolType,
+                "display_name": "Success",
+                "short_desc": "Operation success status",
+                "desc": "`True` if the operation completed successfully.",
+            },
+            "replaced_count": {
+                "type": IntType,
+                "display_name": "Replaced Count",
+                "short_desc": "Number of entries replaced",
+                "desc": "The number of entries that were replaced with new data.",
+            },
+            "deleted_count": {
+                "type": IntType,
+                "display_name": "Deleted Count",
+                "short_desc": "Number of entries deleted",
+                "desc": "The number of entries that were removed from the archive.",
+            },
+            "copied_count": {
+                "type": IntType,
+                "display_name": "Copied Count",
+                "short_desc": "Number of entries copied unchanged",
+                "desc": "The number of entries that were copied to the new archive unchanged.",
+            },
+        };
+    }
+
     constructor() {
         addQoreFields(Fields);
     }

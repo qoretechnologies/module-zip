@@ -31,6 +31,9 @@
 
 #include <string>
 #include <atomic>
+#include <unordered_set>
+#include <vector>
+#include <sstream>
 
 //! Default maximum size for memory allocations (1GB)
 #define ZIP_DEFAULT_MAX_ALLOC_SIZE (1024LL * 1024 * 1024)
@@ -54,10 +57,10 @@ enum ZipMode {
 class QoreZipFile : public AbstractPrivateData {
 public:
     //! Constructor for file-based archive
-    DLLLOCAL QoreZipFile(const char* path, ZipMode mode, ExceptionSink* xsink);
+    DLLLOCAL QoreZipFile(const char* path, ZipMode mode, ExceptionSink* xsink, bool recover = false);
 
     //! Constructor for in-memory archive (from binary data)
-    DLLLOCAL QoreZipFile(const BinaryNode* data, ExceptionSink* xsink);
+    DLLLOCAL QoreZipFile(const BinaryNode* data, ExceptionSink* xsink, bool recover = false);
 
     //! Constructor for new in-memory archive
     DLLLOCAL QoreZipFile(ExceptionSink* xsink);
@@ -117,14 +120,42 @@ public:
     //! Add directory entry
     DLLLOCAL void addDirectory(const char* name, ExceptionSink* xsink);
 
+    //! Add symlink entry
+    DLLLOCAL void addSymlink(const char* name, const char* target, ExceptionSink* xsink);
+
+    //! Verify archive integrity by reading all entries and checking CRC
+    DLLLOCAL QoreListNode* verify(const QoreHashNode* opts, ExceptionSink* xsink);
+
     //! Extract all entries to directory
     DLLLOCAL void extractAll(const char* destPath, const QoreHashNode* opts, ExceptionSink* xsink);
+
+    //! Extract specific entries to directory; returns list of extracted file paths
+    DLLLOCAL QoreListNode* extractEntries(const char* destPath, const QoreListNode* entryNames,
+                                          const QoreHashNode* opts, ExceptionSink* xsink);
 
     //! Extract single entry
     DLLLOCAL void extractEntry(const char* name, const char* destPath, ExceptionSink* xsink);
 
-    //! Delete entry
+    //! Add a filesystem path (file or directory) recursively to the archive
+    DLLLOCAL void addPath(const char* path, const char* root_path, const QoreHashNode* opts, ExceptionSink* xsink);
+
+    //! Delete entry (not supported)
     DLLLOCAL void deleteEntry(const char* name, ExceptionSink* xsink);
+
+    //! Replace or delete entries in an archive (static — operates on closed archive files)
+    DLLLOCAL static QoreHashNode* replaceEntries(const char* archive_path, const QoreHashNode* replacements,
+                                                  const QoreListNode* delete_names, ExceptionSink* xsink);
+
+    //! Compare two archives and return differences
+    DLLLOCAL static QoreHashNode* diff(const char* archive1, const char* archive2, ExceptionSink* xsink);
+
+    //! Re-compress an archive with a different compression method
+    DLLLOCAL static QoreHashNode* recompress(const char* archive_path, int16_t compression_method,
+                                              int16_t compression_level, const char* pwd,
+                                              ExceptionSink* xsink);
+
+    //! Set password for reading encrypted entries
+    DLLLOCAL void setPassword(const char* pwd);
 
     //! Get archive path
     DLLLOCAL QoreStringNode* getPath() const;
@@ -157,6 +188,7 @@ private:
     std::string password;
     bool in_memory;
     bool closed;
+    bool recover;                    //!< Recovery mode for corrupted archives
     std::atomic<int> active_streams;     //!< Count of active stream objects
     int64 max_alloc_size;                //!< Maximum size for memory allocations
 
@@ -166,7 +198,7 @@ private:
     //! Parse add options
     DLLLOCAL void parseAddOptions(const QoreHashNode* opts, int16_t& compression_method, int16_t& compression_level,
                                   std::string& entry_password, std::string& comment, int64& modified_time,
-                                  ExceptionSink* xsink);
+                                  int& encryption_method, ExceptionSink* xsink);
 
     //! Check archive is open and in correct mode (must be called with lock held)
     DLLLOCAL bool checkOpenUnlocked(ExceptionSink* xsink, bool forWrite = false);
@@ -180,8 +212,39 @@ private:
     //! Validate path for extraction (check for path traversal)
     DLLLOCAL static bool validateExtractPath(const char* entry_name, const char* dest_path, ExceptionSink* xsink);
 
+    //! Validate a symlink target stays within the destination directory
+    DLLLOCAL static bool validateSymlink(const char* entry_name, const char* link_target,
+                                          const char* dest_path, ExceptionSink* xsink);
+
+    //! Check if the current reader entry is a symlink
+    DLLLOCAL bool isSymlinkEntry();
+
+    //! Get the symlink target for the current entry (from linkname or entry data)
+    DLLLOCAL std::string getSymlinkTarget(ExceptionSink* xsink);
+
+    //! Normalize a path by collapsing . and .. components (no filesystem access)
+    DLLLOCAL static std::string normalizePath(const std::string& path);
+
     //! Add binary data as entry (must be called with write lock held)
     DLLLOCAL void addUnlocked(const char* name, const BinaryNode* data, const QoreHashNode* opts, ExceptionSink* xsink);
+
+    //! Parse extract options from QoreHashNode
+    DLLLOCAL void parseExtractOptions(const QoreHashNode* opts, std::string& pwd, bool& overwrite,
+                                      bool& preserve_paths, bool& allow_symlinks,
+                                      std::string& strip_prefix, std::string& add_prefix,
+                                      ResolvedCallReferenceNode*& entry_callback,
+                                      ExceptionSink* xsink);
+
+    //! Set up overwrite and entry callbacks on the reader
+    DLLLOCAL void setupCallbacks(struct QoreExtractCallbackData& cb_data);
+
+    //! Clear all callbacks on the reader
+    DLLLOCAL void clearCallbacks();
+
+    //! Extract a single entry to a constructed path (must be called with lock held and entry positioned)
+    DLLLOCAL int32_t extractCurrentEntry(const char* destPath, const char* entry_name, bool preserve_paths,
+                                          const std::string& strip_prefix, const std::string& add_prefix,
+                                          std::string& out_path, ExceptionSink* xsink);
 };
 
 //! QoreZipEntry - private data class for ZipEntry Qore class

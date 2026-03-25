@@ -27,6 +27,7 @@
 %requires DataProvider
 %requires FileLocationHandler
 %requires Mime
+%requires Util
 %requires zip
 
 %modern
@@ -62,6 +63,15 @@ module ZipDataProvider {
             "short_desc": "Create a new zip archive",
             "desc": "Create a new zip archive from files, directories, or binary data",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipCreateArchiveRequestDataType::Fields{"entries",}, {
+                    "preselected": True,
+                    "required": True,
+                },
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipCreateArchiveRequestDataType::Fields - ("entries",),
+            ),
+            "output_type": ZipCreateArchiveDataProvider::ResponseType,
         });
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
@@ -70,8 +80,22 @@ module ZipDataProvider {
             "action": "extract-archive",
             "display_name": "Extract Archive",
             "short_desc": "Extract a zip archive",
-            "desc": "Extract all contents of a zip archive to a destination directory",
+            "desc": "Extract contents of a zip archive to a destination directory with optional "
+                "filtering (glob/regex whitelist/blacklist) and path remapping",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipExtractArchiveRequestDataType::Fields{"destination",}, {
+                    "preselected": True,
+                    "required": True,
+                },
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipExtractArchiveRequestDataType::Fields - ("destination",),
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipExtractArchiveRequestDataType::ExtractOptionFields,
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipExtractArchiveRequestDataType::FilterFields,
+            ),
+            "output_type": ZipExtractArchiveDataProvider::ResponseType,
         });
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
@@ -82,6 +106,10 @@ module ZipDataProvider {
             "short_desc": "List files in a zip archive",
             "desc": "Get a list of all entries in a zip archive with metadata",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipListArchiveRequestDataType::Fields,
+            ),
+            "output_type": ZipListArchiveDataProvider::ResponseType,
         });
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
@@ -92,6 +120,10 @@ module ZipDataProvider {
             "short_desc": "Get zip archive metadata",
             "desc": "Get metadata and statistics about a zip archive",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipArchiveInfoRequestDataType::Fields,
+            ),
+            "output_type": ZipArchiveInfoDataProvider::ResponseType,
         });
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
@@ -102,6 +134,69 @@ module ZipDataProvider {
             "short_desc": "Add files to an existing archive",
             "desc": "Add new files or update existing files in a zip archive",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipAddFilesRequestDataType::Fields{"archive_path", "entries"}, {
+                    "preselected": True,
+                    "required": True,
+                },
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipAddFilesRequestDataType::Fields - ("archive_path", "entries"),
+            ),
+            "output_type": ZipAddFilesDataProvider::ResponseType,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/verify",
+            "action": "verify-archive",
+            "display_name": "Verify Archive",
+            "short_desc": "Verify archive integrity",
+            "desc": "Verify the integrity of a ZIP archive by checking CRC checksums for all entries "
+                "without extracting",
+            "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipVerifyArchiveRequestDataType::Fields,
+            ),
+            "output_type": ZipVerifyArchiveDataProvider::ResponseType,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/replace",
+            "action": "replace-entries",
+            "display_name": "Replace/Delete Entries",
+            "short_desc": "Replace or delete archive entries",
+            "desc": "Replace or delete entries in a ZIP archive. Unchanged entries are copied "
+                "efficiently without re-compression",
+            "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipReplaceEntriesRequestDataType::Fields{"archive_path",}, {
+                    "preselected": True,
+                    "required": True,
+                },
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipReplaceEntriesRequestDataType::Fields - ("archive_path",),
+            ),
+            "output_type": ZipReplaceEntriesDataProvider::ResponseType,
+        });
+
+        DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
+            "app": ZipDataProvider::AppName,
+            "path": "/archive/add-path",
+            "action": "add-path",
+            "display_name": "Add Path to Archive",
+            "short_desc": "Recursively add a file or directory",
+            "desc": "Recursively add a file or directory from the filesystem to an existing zip archive",
+            "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipAddPathRequestDataType::Fields{"archive_path", "source_path"}, {
+                    "preselected": True,
+                    "required": True,
+                },
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipAddPathRequestDataType::Fields - ("archive_path", "source_path"),
+            ),
+            "output_type": ZipAddPathDataProvider::ResponseType,
         });
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
@@ -112,6 +207,15 @@ module ZipDataProvider {
             "short_desc": "Extract one file from archive",
             "desc": "Extract a single file from a zip archive to memory or disk",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipExtractFileRequestDataType::Fields{"entry_name",}, {
+                    "preselected": True,
+                    "required": True,
+                },
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipExtractFileRequestDataType::Fields - ("entry_name",),
+            ),
+            "output_type": ZipExtractFileDataProvider::ResponseType,
         });
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
@@ -122,6 +226,15 @@ module ZipDataProvider {
             "short_desc": "Compress data to zip format",
             "desc": "Compress binary data or files into an in-memory zip archive",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipCompressDataRequestDataType::Fields{"entries",}, {
+                    "preselected": True,
+                    "required": True,
+                },
+            ) + DataProviderActionCatalog::getActionOptionFromFields(
+                ZipCompressDataRequestDataType::Fields - ("entries",),
+            ),
+            "output_type": ZipCompressDataDataProvider::ResponseType,
         });
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
@@ -132,6 +245,10 @@ module ZipDataProvider {
             "short_desc": "Decompress zip data",
             "desc": "Decompress an in-memory zip archive and return file contents",
             "action_code": DPAT_API,
+            "options": DataProviderActionCatalog::getActionOptionFromFields(
+                ZipDecompressDataRequestDataType::Fields,
+            ),
+            "output_type": ZipDecompressDataDataProvider::ResponseType,
         });
     };
 }

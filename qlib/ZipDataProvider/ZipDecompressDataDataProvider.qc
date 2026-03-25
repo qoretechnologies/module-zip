@@ -76,18 +76,23 @@ public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
 
         ZipFile zip;
         if (request.archive_path) {
-            zip = new ZipFile(request.archive_path, "r");
+            zip = new ZipFile(request.archive_path, "r", request.recover);
         } else if (archive_data) {
-            zip = new ZipFile(archive_data);
+            zip = new ZipFile(archive_data, request.recover);
         } else {
             throw "ZIP-ERROR", "one of 'data', 'archive_path', or 'archive_location' must be provided";
         }
 
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: decompressing archive"));
 
-        hash<string, binary> entries();
         list<hash<ZipEntryInfo>> entry_list = zip.entries();
 
+        # Apply pattern/regex filters
+        entry_list = filter_entries(entry_list, cast<*list<string>>(request.include_patterns),
+            cast<*list<string>>(request.exclude_patterns),
+            request.include_regex, request.exclude_regex);
+
+        hash<string, binary> entries();
         foreach hash<ZipEntryInfo> entry in (entry_list) {
             if (entry.is_directory) {
                 continue;

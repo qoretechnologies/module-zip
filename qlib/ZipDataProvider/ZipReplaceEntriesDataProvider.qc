@@ -1,7 +1,7 @@
 # -*- mode: qore; indent-tabs-mode: nil -*-
-#! Qore ZipAddFilesDataProvider class definition
+#! Qore ZipReplaceEntriesDataProvider class definition
 
-/** ZipAddFilesDataProvider.qc Copyright (C) 2026 Qore Technologies, s.r.o.
+/** ZipReplaceEntriesDataProvider.qc Copyright (C) 2026 Qore Technologies, s.r.o.
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
@@ -24,22 +24,22 @@
 
 #! Contains all public definitions in the ZipDataProvider module
 public namespace ZipDataProvider {
-#! Add files data provider
-public class ZipAddFilesDataProvider inherits AbstractDataProvider {
+#! Replace or delete entries data provider
+public class ZipReplaceEntriesDataProvider inherits AbstractDataProvider {
     public {
         #! Provider info
         const ProviderInfo = <DataProviderInfo>{
-            "name": "add",
-            "desc": "Add files to an existing ZIP archive",
-            "type": "ZipAddFilesDataProvider",
+            "name": "replace",
+            "desc": "Replace or delete entries in a ZIP archive",
+            "type": "ZipReplaceEntriesDataProvider",
             "supports_request": True,
         };
 
         #! Request type
-        static ZipAddFilesRequestDataType RequestType();
+        static ZipReplaceEntriesRequestDataType RequestType();
 
         #! Response type
-        static ZipAddFilesResponseDataType ResponseType();
+        static ZipReplaceEntriesResponseDataType ResponseType();
     }
 
     private {
@@ -68,35 +68,11 @@ public class ZipAddFilesDataProvider inherits AbstractDataProvider {
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
         hash<auto> request = req;
-        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: adding %d entries to %y", request.entries.size(),
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: replacing/deleting entries in %y",
             request.archive_path));
 
-        ZipFile zip(request.archive_path, "a");
-
-        int entries_added = 0;
-        foreach hash<auto> entry in (request.entries) {
-            hash<ZipAddOptions> add_opts();
-            if (request.password) {
-                add_opts.password = request.password;
-            }
-            if (request.encryption_method) {
-                add_opts.encryption_method = request.encryption_method;
-            }
-
-            if (entry.data) {
-                zip.add(entry.name, entry.data, add_opts);
-            } else if (entry.path) {
-                zip.addFile(entry.name ?? basename(entry.path), entry.path, add_opts);
-            }
-            ++entries_added;
-        }
-
-        zip.close();
-
-        return {
-            "success": True,
-            "entries_added": entries_added,
-        };
+        return ZipFile::replaceEntries(request.archive_path, request.replacements,
+            cast<*list<string>>(request.delete_names));
     }
 }
 }

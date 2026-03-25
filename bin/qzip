@@ -1,0 +1,986 @@
+#!/usr/bin/env qore
+# -*- mode: qore; indent-tabs-mode: nil -*-
+
+/** qzip - command-line interface for ZIP archive operations
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+%modern
+%requires Util
+%requires zip
+
+%exec-class QZip
+
+class QZip {
+    public {
+        const Version = "1.0";
+
+        #! Commands with short alias and description
+        const Commands = (
+            {"short": "c", "name": "create",     "desc": "Create a new archive"},
+            {"short": "x", "name": "extract",    "desc": "Extract archive contents"},
+            {"short": "t", "name": "list",       "desc": "List archive contents"},
+            {"short": "a", "name": "add",        "desc": "Add files to an existing archive"},
+            {"short": "i", "name": "info",       "desc": "Show archive metadata"},
+            {"short": "v", "name": "verify",     "desc": "Verify archive integrity"},
+            {"short": "d", "name": "diff",       "desc": "Compare two archives"},
+            {"short": "r", "name": "recompress", "desc": "Re-compress with a different method"},
+            {"short": "",  "name": "add-path",   "desc": "Recursively add a file or directory"},
+            {"short": "",  "name": "delete",     "desc": "Delete entries from an archive"},
+            {"short": "",  "name": "replace",    "desc": "Replace entries in an archive"},
+        );
+
+        #! Map of command names and aliases to canonical names
+        const CommandMap = (map {$1.name: $1.name}, Commands)
+            + (map {$1.short: $1.name}, Commands, $1.short.val());
+
+        const CommonOpts = {
+            "help": "h,help",
+            "no-color": "C,no-color",
+            "password": "p,password=s",
+        };
+
+        const ListOpts = CommonOpts + {
+            "include": "i,include=s@",
+            "exclude": "x,exclude=s@",
+            "include-regex": "I,include-regex=s",
+            "exclude-regex": "X,exclude-regex=s",
+            "long": "l,long",
+        };
+
+        const ExtractOpts = CommonOpts + {
+            "include": "i,include=s@",
+            "exclude": "x,exclude=s@",
+            "include-regex": "I,include-regex=s",
+            "exclude-regex": "X,exclude-regex=s",
+            "dest": "d,dest=s",
+            "overwrite": "o,overwrite",
+            "flat": "f,flat",
+            "strip-prefix": "s,strip-prefix=s",
+            "add-prefix": "a,add-prefix=s",
+            "allow-symlinks": "L,allow-symlinks",
+            "verbose": "v,verbose",
+        };
+
+        const CreateOpts = CommonOpts + {
+            "compression": "c,compression=s",
+            "level": "l,level=i",
+        };
+
+        const AddOpts = CommonOpts + {
+            "compression": "c,compression=s",
+        };
+
+        const DiffOpts = {
+            "help": "h,help",
+            "no-color": "C,no-color",
+            "all": "a,all",
+        };
+
+        const AddPathOpts = CommonOpts + {
+            "root": "r,root=s",
+            "compression": "c,compression=s",
+        };
+
+        const VerifyOpts = CommonOpts + {
+            "include": "i,include=s@",
+            "exclude": "x,exclude=s@",
+            "include-regex": "I,include-regex=s",
+            "exclude-regex": "X,exclude-regex=s",
+        };
+
+        const InfoOpts = CommonOpts + {
+            "include": "i,include=s@",
+            "exclude": "x,exclude=s@",
+            "include-regex": "I,include-regex=s",
+            "exclude-regex": "X,exclude-regex=s",
+        };
+
+        const CompressionMethods = {
+            "store": ZIP_CM_STORE,
+            "deflate": ZIP_CM_DEFLATE,
+            "bzip2": ZIP_CM_BZIP2,
+            "lzma": ZIP_CM_LZMA,
+            "zstd": ZIP_CM_ZSTD,
+            "xz": ZIP_CM_XZ,
+        };
+
+        const CompressionNames = {
+            ZIP_CM_STORE: "store",
+            ZIP_CM_DEFLATE: "deflate",
+            ZIP_CM_BZIP2: "bzip2",
+            ZIP_CM_LZMA: "lzma",
+            ZIP_CM_ZSTD: "zstd",
+            ZIP_CM_XZ: "xz",
+        };
+    }
+
+    private {
+        TerminalColor c;
+    }
+
+    constructor() {
+        if (ARGV.empty()) {
+            usage();
+            exit(1);
+        }
+
+        string command = shift ARGV;
+        if (command == "--help" || command == "-h") {
+            usage();
+            exit(0);
+        }
+        if (command == "--version") {
+            printf("qzip %s\n", Version);
+            exit(0);
+        }
+
+        # Resolve alias to canonical name
+        *string resolved = CommandMap{command};
+        if (!resolved) {
+            stderr.printf("qzip: unknown command '%s'\n\n", command);
+            usage();
+            exit(1);
+        }
+
+        try {
+            switch (resolved) {
+                case "list": cmdList(); break;
+                case "extract": cmdExtract(); break;
+                case "create": cmdCreate(); break;
+                case "info": cmdInfo(); break;
+                case "verify": cmdVerify(); break;
+                case "add": cmdAdd(); break;
+                case "add-path": cmdAddPath(); break;
+                case "delete": cmdDelete(); break;
+                case "replace": cmdReplace(); break;
+                case "diff": cmdDiff(); break;
+                case "recompress": cmdRecompress(); break;
+            }
+        } catch (hash<ExceptionInfo> ex) {
+            # Initialize color late for error handling if not yet done
+            if (!c) {
+                c = new TerminalColor();
+            }
+            stderr.printf("%s: %s\n", c.error("ERROR"), ex.desc);
+            exit(1);
+        }
+    }
+
+    private usage() {
+        TerminalColor tc();
+        printf("%s - Qore ZIP archive utility\n\n", tc.bold("qzip"));
+        printf("%s:\n", tc.bold("Usage"));
+        printf("  qzip %s [options] [args...]\n\n", tc.cyan("<command>"));
+        printf("%s:\n", tc.bold("Commands"));
+        foreach hash<auto> cmd in (Commands) {
+            string padded_name = tc.cyan(sprintf("%-12s", cmd.name));
+            if (cmd.short) {
+                printf("  %s %s %s\n", tc.yellow(cmd.short), padded_name, cmd.desc);
+            } else {
+                printf("    %s %s\n", padded_name, cmd.desc);
+            }
+        }
+        printf("\n%s:\n", tc.bold("Global Options"));
+        printf("  %-20s %s\n", tc.key("-h, --help"), "Show help");
+        printf("  %-20s %s\n", tc.key("-C, --no-color"), "Disable color output");
+        printf("  %-20s %s\n", tc.key("-p, --password"), "Archive password");
+        printf("  %-20s %s\n", tc.key("--version"), "Show version");
+        printf("\nRun %s for command-specific help.\n", tc.cyan("qzip <command> --help"));
+    }
+
+    private printUsage(string usage_line, list<auto> options) {
+        printf("%s: %s\n\n", c.bold("Usage"), usage_line);
+        printf("%s:\n", c.bold("Options"));
+        foreach hash<auto> opt in (options) {
+            printf("  %s  %s\n",
+                c.key(sprintf("%-24s", opt.flags)),
+                opt.desc);
+        }
+    }
+
+    private hash<auto> parseOpts(hash<auto> opt_spec) {
+        GetOpt g(opt_spec);
+        hash<auto> opts = g.parse3(\ARGV);
+        c = new TerminalColor(!opts."no-color");
+        if (opts.help) {
+            return opts;
+        }
+        return opts;
+    }
+
+    # ── list ──────────────────────────────────────────────────
+
+    private cmdList() {
+        hash<auto> opts = parseOpts(ListOpts);
+        if (opts.help) {
+            printUsage("qzip list [options] " + c.cyan("<archive>"), (
+                {"flags": "-l, --long", "desc": "Show detailed entry info"},
+                {"flags": "-i, --include <glob>", "desc": "Include entries matching glob (repeatable)"},
+                {"flags": "-x, --exclude <glob>", "desc": "Exclude entries matching glob (repeatable)"},
+                {"flags": "-I, --include-regex <r>", "desc": "Include entries matching regex"},
+                {"flags": "-X, --exclude-regex <r>", "desc": "Exclude entries matching regex"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.empty()) {
+            stderr.printf("%s: archive path required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        ZipFile zip(archive_path, "r");
+        list<hash<ZipEntryInfo>> entries = zip.entries();
+
+        entries = filterEntries(entries, opts);
+
+        if (opts.long) {
+            printLongList(entries);
+        } else {
+            foreach hash<ZipEntryInfo> entry in (entries) {
+                if (entry.is_directory) {
+                    printf("%s\n", c.blue(entry.name));
+                } else {
+                    printf("%s\n", entry.name);
+                }
+            }
+        }
+        zip.close();
+    }
+
+    private printLongList(list<hash<ZipEntryInfo>> entries) {
+        # Header
+        printf("%s  %s  %s  %s  %s  %s\n",
+            c.dim(sprintf("%-10s", "Perms")),
+            c.dim(sprintf("%-10s", "Size")),
+            c.dim(sprintf("%-10s", "Compressed")),
+            c.dim(sprintf("%-8s", "Method")),
+            c.dim(sprintf("%-20s", "Modified")),
+            c.dim("Name"));
+
+        foreach hash<ZipEntryInfo> entry in (entries) {
+            string method = CompressionNames{entry.compression_method} ?? sprintf("%d", entry.compression_method);
+            string modified = entry.modified.format("YYYY-MM-DD HH:mm:SS");
+            string name;
+            if (entry.is_symlink) {
+                name = c.magenta(entry.name);
+                if (entry.link_target) {
+                    name += " " + c.dim("-> " + entry.link_target);
+                }
+            } else if (entry.is_directory) {
+                name = c.blue(entry.name);
+            } else if (entry.is_encrypted) {
+                name = c.yellow(entry.name) + " " + c.dim("[encrypted]");
+            } else {
+                name = entry.name;
+            }
+
+            string perms = formatPermissions(entry);
+
+            printf("%s  %s  %s  %s  %s  %s\n",
+                c.dim(sprintf("%-10s", perms)),
+                c.number(sprintf("%10d", entry.size)),
+                c.dim(sprintf("%10d", entry.compressed_size)),
+                c.cyan(sprintf("%-8s", method)),
+                modified,
+                name);
+        }
+
+        # Summary
+        int total_size = 0;
+        int total_compressed = 0;
+        int file_count = 0;
+        int dir_count = 0;
+        foreach hash<ZipEntryInfo> entry in (entries) {
+            total_size += entry.size;
+            total_compressed += entry.compressed_size;
+            if (entry.is_directory) {
+                ++dir_count;
+            } else {
+                ++file_count;
+            }
+        }
+        printf("\n%s files, %s directories, %s total (%s compressed)\n",
+            c.number(sprintf("%d", file_count)),
+            c.number(sprintf("%d", dir_count)),
+            c.number(formatBytes(total_size)),
+            c.number(formatBytes(total_compressed)));
+    }
+
+    # ── extract ───────────────────────────────────────────────
+
+    private cmdExtract() {
+        hash<auto> opts = parseOpts(ExtractOpts);
+        if (opts.help) {
+            printUsage("qzip extract [options] " + c.cyan("<archive>"), (
+                {"flags": "-d, --dest <dir>", "desc": "Destination directory (default: current dir)"},
+                {"flags": "-o, --overwrite", "desc": "Overwrite existing files"},
+                {"flags": "-f, --flat", "desc": "Flatten directory structure (no subdirs)"},
+                {"flags": "-s, --strip-prefix <p>", "desc": "Strip prefix from entry paths"},
+                {"flags": "-a, --add-prefix <p>", "desc": "Add prefix to entry paths"},
+                {"flags": "-L, --allow-symlinks", "desc": "Allow symlink extraction (validated targets only)"},
+                {"flags": "-v, --verbose", "desc": "Show each file as it's extracted"},
+                {"flags": "-i, --include <glob>", "desc": "Include entries matching glob (repeatable)"},
+                {"flags": "-x, --exclude <glob>", "desc": "Exclude entries matching glob (repeatable)"},
+                {"flags": "-I, --include-regex <r>", "desc": "Include entries matching regex"},
+                {"flags": "-X, --exclude-regex <r>", "desc": "Exclude entries matching regex"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.empty()) {
+            stderr.printf("%s: archive path required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        string dest = opts.dest ?? ".";
+
+        if (!is_dir(dest)) {
+            mkdir_ex(dest, 0755, True);
+        }
+
+        ZipFile zip(archive_path, "r");
+        list<hash<ZipEntryInfo>> all_entries = zip.entries();
+
+        hash<ZipExtractOptions> extract_opts();
+        if (opts.password) {
+            extract_opts.password = opts.password;
+        }
+        if (opts.overwrite) {
+            extract_opts.overwrite = True;
+        }
+        if (opts.flat) {
+            extract_opts.preserve_paths = False;
+        }
+        if (opts."allow-symlinks") {
+            extract_opts.allow_symlinks = True;
+        }
+        if (opts."strip-prefix") {
+            extract_opts.strip_prefix = opts."strip-prefix";
+        }
+        if (opts."add-prefix") {
+            extract_opts.add_prefix = opts."add-prefix";
+        }
+
+        if (opts.verbose) {
+            extract_opts.entry_callback = sub (string name) {
+                printf("  %s %s\n", c.success("x"), name);
+            };
+        }
+
+        # Check if filtering is needed
+        bool has_filters = opts.include || opts.exclude || opts."include-regex" || opts."exclude-regex";
+
+        list<string> extracted_files;
+        if (has_filters) {
+            list<hash<ZipEntryInfo>> filtered = filterEntries(all_entries, opts);
+            list<string> names = map $1.name, filtered;
+            extracted_files = zip.extractEntries(dest, names, extract_opts);
+        } else {
+            zip.extractAll(dest, extract_opts);
+            extracted_files = map dest + "/" + $1.name, all_entries, !$1.is_directory;
+        }
+
+        zip.close();
+
+        int count = extracted_files.size();
+        printf("%s %s extracted to %s\n",
+            c.success("OK"),
+            c.number(sprintf("%d", count)) + " file" + (count != 1 ? "s" : ""),
+            c.cyan(dest));
+    }
+
+    # ── create ────────────────────────────────────────────────
+
+    private cmdCreate() {
+        hash<auto> opts = parseOpts(CreateOpts);
+        if (opts.help) {
+            printUsage("qzip create [options] " + c.cyan("<archive>") + " " + c.cyan("<file|dir>")
+                + " [file|dir...]", (
+                {"flags": "-c, --compression <m>", "desc": "Compression method (store, deflate, bzip2, "
+                    "lzma, zstd, xz)"},
+                {"flags": "-l, --level <n>", "desc": "Compression level (0-9)"},
+                {"flags": "-p, --password <pw>", "desc": "Encrypt entries with password"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.size() < 2) {
+            stderr.printf("%s: archive path and at least one input file required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        list<auto> inputs = ARGV;
+
+        ZipFile zip(archive_path, "w");
+
+        hash<ZipAddOptions> add_opts();
+        if (opts.compression) {
+            *int cm = CompressionMethods{opts.compression};
+            if (!exists cm) {
+                throw "QZIP-ERROR", sprintf("unknown compression method '%s'; valid: %y",
+                    opts.compression, keys CompressionMethods);
+            }
+            add_opts.compression_method = cm;
+        }
+        if (exists opts.level) {
+            add_opts.compression_level = opts.level;
+        }
+        if (opts.password) {
+            add_opts.password = opts.password;
+        }
+
+        int count = 0;
+        foreach string input in (inputs) {
+            if (is_dir(input)) {
+                # Add directory recursively
+                zip.addPath(input, dirname(input), add_opts);
+                string display = input;
+                if (!display.empty() && display[display.size() - 1] != "/") {
+                    display += "/";
+                }
+                printf("  %s %s\n", c.success("+"), c.blue(display) + " " + c.dim("(recursive)"));
+                ++count;
+            } else if (is_file(input)) {
+                zip.addFile(basename(input), input, add_opts);
+                printf("  %s %s\n", c.success("+"), basename(input));
+                ++count;
+            } else {
+                stderr.printf("  %s %s: not found, skipping\n", c.warning("!"), input);
+            }
+        }
+
+        zip.close();
+        int size = hstat(archive_path).size;
+        printf("%s created %s (%s, %s entries)\n",
+            c.success("OK"),
+            c.cyan(archive_path),
+            c.number(formatBytes(size)),
+            c.number(sprintf("%d", count)));
+    }
+
+    # ── info ──────────────────────────────────────────────────
+
+    private cmdInfo() {
+        hash<auto> opts = parseOpts(InfoOpts);
+        if (opts.help) {
+            printUsage("qzip info [options] " + c.cyan("<archive>"), (
+                {"flags": "-i, --include <glob>", "desc": "Include entries matching glob (repeatable)"},
+                {"flags": "-x, --exclude <glob>", "desc": "Exclude entries matching glob (repeatable)"},
+                {"flags": "-I, --include-regex <r>", "desc": "Include entries matching regex"},
+                {"flags": "-X, --exclude-regex <r>", "desc": "Exclude entries matching regex"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.empty()) {
+            stderr.printf("%s: archive path required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        ZipFile zip(archive_path, "r");
+        list<hash<ZipEntryInfo>> entries = zip.entries();
+        *string comment = zip.comment();
+        zip.close();
+
+        entries = filterEntries(entries, opts);
+
+        int total_size = 0;
+        int total_compressed = 0;
+        int file_count = 0;
+        int dir_count = 0;
+        int encrypted_count = 0;
+        hash<string, int> methods;
+        foreach hash<ZipEntryInfo> entry in (entries) {
+            total_size += entry.size;
+            total_compressed += entry.compressed_size;
+            if (entry.is_directory) {
+                ++dir_count;
+            } else {
+                ++file_count;
+                string method = CompressionNames{entry.compression_method} ?? "unknown";
+                ++methods{method};
+            }
+            if (entry.is_encrypted) {
+                ++encrypted_count;
+            }
+        }
+
+        float ratio = total_size > 0 ? (1.0 - (total_compressed.toFloat() / total_size.toFloat())) * 100 : 0;
+
+        printf("%s: %s\n", c.key("Archive"), c.cyan(archive_path));
+        if (comment) {
+            printf("%s: %s\n", c.key("Comment"), comment);
+        }
+        printf("%s: %s files, %s directories\n", c.key("Entries"),
+            c.number(sprintf("%d", file_count)),
+            c.number(sprintf("%d", dir_count)));
+        printf("%s: %s\n", c.key("Total size"), c.number(formatBytes(total_size)));
+        printf("%s: %s (%s reduction)\n", c.key("Compressed"),
+            c.number(formatBytes(total_compressed)),
+            c.number(sprintf("%.1f%%", ratio)));
+        if (encrypted_count > 0) {
+            printf("%s: %s\n", c.key("Encrypted"), c.warning(sprintf("%d entries", encrypted_count)));
+        }
+        if (methods.size() > 0) {
+            list<string> parts = ();
+            foreach hash<auto> m in (methods.pairIterator()) {
+                parts += sprintf("%s (%d)", m.key, m.value);
+            }
+            printf("%s: %s\n", c.key("Methods"), (foldl $1 + ", " + $2, parts));
+        }
+    }
+
+    # ── verify ────────────────────────────────────────────────
+
+    private cmdVerify() {
+        hash<auto> opts = parseOpts(VerifyOpts);
+        if (opts.help) {
+            printUsage("qzip verify [options] " + c.cyan("<archive>"), (
+                {"flags": "-i, --include <glob>", "desc": "Include entries matching glob (repeatable)"},
+                {"flags": "-x, --exclude <glob>", "desc": "Exclude entries matching glob (repeatable)"},
+                {"flags": "-I, --include-regex <r>", "desc": "Include entries matching regex"},
+                {"flags": "-X, --exclude-regex <r>", "desc": "Exclude entries matching regex"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.empty()) {
+            stderr.printf("%s: archive path required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        ZipFile zip(archive_path, "r");
+
+        hash<ZipExtractOptions> verify_opts();
+        if (opts.password) {
+            verify_opts.password = opts.password;
+        }
+
+        list<hash<ZipVerifyResult>> results = zip.verify(verify_opts);
+        zip.close();
+
+        # Apply filters if any (filter by name)
+        bool has_filters = opts.include || opts.exclude || opts."include-regex" || opts."exclude-regex";
+        if (has_filters) {
+            # Build a ZipEntryInfo-like list for filtering
+            list<hash<ZipEntryInfo>> fake_entries = map <ZipEntryInfo>{"name": $1.name}, results;
+            list<hash<ZipEntryInfo>> filtered = filterEntries(fake_entries, opts);
+            hash<string, bool> keep;
+            foreach hash<ZipEntryInfo> e in (filtered) {
+                keep{e.name} = True;
+            }
+            results = select results, keep{$1.name};
+        }
+
+        int pass_count = 0;
+        int fail_count = 0;
+        foreach hash<ZipVerifyResult> r in (results) {
+            if (r.valid) {
+                printf("  %s %s\n", c.success("OK"), r.name);
+                ++pass_count;
+            } else {
+                printf("  %s %s: %s\n", c.error("FAIL"), r.name, r.error);
+                ++fail_count;
+            }
+        }
+
+        printf("\n%s verified, %s passed, %s failed\n",
+            c.number(sprintf("%d", results.size())),
+            c.success(sprintf("%d", pass_count)),
+            fail_count > 0 ? c.error(sprintf("%d", fail_count)) : c.dim("0"));
+
+        if (fail_count > 0) {
+            exit(1);
+        }
+    }
+
+    # ── add ───────────────────────────────────────────────────
+
+    private cmdAdd() {
+        hash<auto> opts = parseOpts(AddOpts);
+        if (opts.help) {
+            printUsage("qzip add [options] " + c.cyan("<archive>") + " " + c.cyan("<file>")
+                + " [file...]", (
+                {"flags": "-c, --compression <m>", "desc": "Compression method (store, deflate, bzip2, "
+                    "lzma, zstd, xz)"},
+                {"flags": "-p, --password <pw>", "desc": "Encrypt new entries with password"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.size() < 2) {
+            stderr.printf("%s: archive path and at least one file required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        list<auto> inputs = ARGV;
+
+        ZipFile zip(archive_path, "a");
+
+        hash<ZipAddOptions> add_opts();
+        if (opts.compression) {
+            *int cm = CompressionMethods{opts.compression};
+            if (!exists cm) {
+                throw "QZIP-ERROR", sprintf("unknown compression method '%s'; valid: %y",
+                    opts.compression, keys CompressionMethods);
+            }
+            add_opts.compression_method = cm;
+        }
+        if (opts.password) {
+            add_opts.password = opts.password;
+        }
+
+        int count = 0;
+        foreach string input in (inputs) {
+            if (is_file(input)) {
+                zip.addFile(basename(input), input, add_opts);
+                printf("  %s %s\n", c.success("+"), basename(input));
+                ++count;
+            } else {
+                stderr.printf("  %s %s: not found, skipping\n", c.warning("!"), input);
+            }
+        }
+
+        zip.close();
+        printf("%s added %s to %s\n",
+            c.success("OK"),
+            c.number(sprintf("%d", count)) + " file" + (count != 1 ? "s" : ""),
+            c.cyan(archive_path));
+    }
+
+    # ── add-path ──────────────────────────────────────────────
+
+    private cmdAddPath() {
+        hash<auto> opts = parseOpts(AddPathOpts);
+        if (opts.help) {
+            printUsage("qzip add-path [options] " + c.cyan("<archive>") + " " + c.cyan("<path>"), (
+                {"flags": "-r, --root <dir>", "desc": "Base path for relative entry names"},
+                {"flags": "-c, --compression <m>", "desc": "Compression method (store, deflate, bzip2, "
+                    "lzma, zstd, xz)"},
+                {"flags": "-p, --password <pw>", "desc": "Encrypt new entries with password"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.size() < 2) {
+            stderr.printf("%s: archive path and source path required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        string source_path = shift ARGV;
+
+        ZipFile zip(archive_path, "a");
+
+        hash<ZipAddOptions> add_opts();
+        if (opts.compression) {
+            *int cm = CompressionMethods{opts.compression};
+            if (!exists cm) {
+                throw "QZIP-ERROR", sprintf("unknown compression method '%s'; valid: %y",
+                    opts.compression, keys CompressionMethods);
+            }
+            add_opts.compression_method = cm;
+        }
+        if (opts.password) {
+            add_opts.password = opts.password;
+        }
+
+        string root = opts.root ?? dirname(source_path);
+        zip.addPath(source_path, root, add_opts);
+        zip.close();
+
+        printf("%s added %s to %s %s\n",
+            c.success("OK"),
+            c.cyan(source_path),
+            c.cyan(archive_path),
+            c.dim("(root: " + root + ")"));
+    }
+
+    # ── delete ─────────────────────────────────────────────────
+
+    private cmdDelete() {
+        hash<auto> opts = parseOpts(CommonOpts);
+        if (opts.help) {
+            printUsage("qzip delete " + c.cyan("<archive>") + " " + c.cyan("<entry>") + " [entry...]", ());
+            exit(0);
+        }
+
+        if (ARGV.size() < 2) {
+            stderr.printf("%s: archive path and at least one entry name required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        list<string> entries = cast<list<string>>(ARGV);
+
+        hash<auto> result = ZipFile::replaceEntries(archive_path, NOTHING, entries);
+
+        printf("%s deleted %s from %s (%s entries kept)\n",
+            c.success("OK"),
+            c.number(sprintf("%d", result.deleted_count)) + " entr"
+                + (result.deleted_count != 1 ? "ies" : "y"),
+            c.cyan(archive_path),
+            c.number(sprintf("%d", result.copied_count)));
+    }
+
+    # ── replace ───────────────────────────────────────────────
+
+    private cmdReplace() {
+        hash<auto> opts = parseOpts(CommonOpts);
+        if (opts.help) {
+            printUsage("qzip replace " + c.cyan("<archive>") + " " + c.cyan("<entry>=<file>")
+                + " [entry=file...]", ());
+            exit(0);
+        }
+
+        if (ARGV.size() < 2) {
+            stderr.printf("%s: archive path and at least one entry=file pair required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        hash<auto> replacements();
+        foreach string arg in (ARGV) {
+            int eq_pos = arg.find("=");
+            if (eq_pos < 0) {
+                stderr.printf("%s: invalid argument '%s' — expected entry_name=file_path\n",
+                    c.error("ERROR"), arg);
+                exit(1);
+            }
+            string entry_name = arg.substr(0, eq_pos);
+            string file_path = arg.substr(eq_pos + 1);
+            if (!is_file(file_path)) {
+                stderr.printf("%s: file '%s' not found\n", c.error("ERROR"), file_path);
+                exit(1);
+            }
+            replacements{entry_name} = ReadOnlyFile::readBinaryFile(file_path);
+        }
+
+        hash<auto> result = ZipFile::replaceEntries(archive_path, replacements);
+
+        printf("%s replaced %s in %s (%s entries kept)\n",
+            c.success("OK"),
+            c.number(sprintf("%d", result.replaced_count)) + " entr"
+                + (result.replaced_count != 1 ? "ies" : "y"),
+            c.cyan(archive_path),
+            c.number(sprintf("%d", result.copied_count)));
+    }
+
+    # ── recompress ─────────────────────────────────────────────
+
+    private cmdRecompress() {
+        hash<auto> opts = parseOpts(CreateOpts);
+        if (opts.help) {
+            printUsage("qzip recompress [options] " + c.cyan("<archive>"), (
+                {"flags": "-c, --compression <m>", "desc": "Compression method (store, deflate, bzip2, "
+                    "lzma, zstd, xz)"},
+                {"flags": "-l, --level <n>", "desc": "Compression level (0-9)"},
+                {"flags": "-p, --password <pw>", "desc": "Password for encrypted archives"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.empty()) {
+            stderr.printf("%s: archive path required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive_path = shift ARGV;
+        string method_name = opts.compression ?? "deflate";
+        *int cm = CompressionMethods{method_name};
+        if (!exists cm) {
+            throw "QZIP-ERROR", sprintf("unknown compression method '%s'; valid: %y",
+                method_name, keys CompressionMethods);
+        }
+
+        hash<auto> result = ZipFile::recompress(archive_path, cm, opts.level, opts.password);
+
+        printf("%s recompressed %s to %s (%s entries, %s -> %s)\n",
+            c.success("OK"),
+            c.cyan(archive_path),
+            c.cyan(method_name),
+            c.number(sprintf("%d", result.entry_count)),
+            c.dim(formatBytes(result.original_size)),
+            c.number(formatBytes(result.new_size)));
+    }
+
+    # ── diff ──────────────────────────────────────────────────
+
+    private cmdDiff() {
+        hash<auto> opts = parseOpts(DiffOpts);
+        if (opts.help) {
+            printUsage("qzip diff [options] " + c.cyan("<archive1>") + " " + c.cyan("<archive2>"), (
+                {"flags": "-a, --all", "desc": "Show unchanged entries too"},
+            ));
+            exit(0);
+        }
+
+        if (ARGV.size() < 2) {
+            stderr.printf("%s: two archive paths required\n", c.error("ERROR"));
+            exit(1);
+        }
+
+        string archive1 = shift ARGV;
+        string archive2 = shift ARGV;
+
+        hash<ZipDiffResult> result = ZipFile::diff(archive1, archive2);
+
+        foreach hash<ZipEntryInfo> entry in (result.added) {
+            printf("  %s %s %s\n", c.success("+"), c.green(entry.name),
+                c.dim(formatBytes(entry.size)));
+        }
+        foreach hash<ZipEntryInfo> entry in (result.deleted) {
+            printf("  %s %s %s\n", c.error("-"), c.red(entry.name),
+                c.dim(formatBytes(entry.size)));
+        }
+        foreach hash<auto> entry in (result.modified) {
+            printf("  %s %s %s -> %s\n", c.warning("~"), c.yellow(entry.old.name),
+                c.dim(formatBytes(entry.old.size)),
+                c.dim(formatBytes(entry.new.size)));
+        }
+        if (opts.all) {
+            foreach hash<ZipEntryInfo> entry in (result.unchanged) {
+                printf("  %s %s\n", c.dim("="), c.dim(entry.name));
+            }
+        }
+
+        printf("\n%s added, %s deleted, %s modified, %s unchanged\n",
+            c.success(sprintf("%d", result.added_count)),
+            result.deleted_count > 0 ? c.error(sprintf("%d", result.deleted_count)) : c.dim("0"),
+            result.modified_count > 0 ? c.warning(sprintf("%d", result.modified_count)) : c.dim("0"),
+            c.dim(sprintf("%d", result.unchanged_count)));
+
+        if (result.added_count > 0 || result.deleted_count > 0 || result.modified_count > 0) {
+            exit(1);
+        }
+    }
+
+    # ── helpers ───────────────────────────────────────────────
+
+    private list<hash<ZipEntryInfo>> filterEntries(list<hash<ZipEntryInfo>> entries, hash<auto> opts) {
+        *list<string> include_patterns = opts.include;
+        *list<string> exclude_patterns = opts.exclude;
+        *string include_regex = opts."include-regex";
+        *string exclude_regex = opts."exclude-regex";
+
+        if (!include_patterns && !exclude_patterns && !include_regex && !exclude_regex) {
+            return entries;
+        }
+
+        # Pre-compile glob patterns to regex
+        *list<string> include_regexes;
+        if (include_patterns) {
+            include_regexes = map glob_to_regex($1), include_patterns;
+        }
+        *list<string> exclude_regexes;
+        if (exclude_patterns) {
+            exclude_regexes = map glob_to_regex($1), exclude_patterns;
+        }
+
+        list<hash<ZipEntryInfo>> result = ();
+        foreach hash<ZipEntryInfo> entry in (entries) {
+            string name = entry.name;
+
+            if (include_regexes || include_regex) {
+                bool included = False;
+                if (include_regexes) {
+                    foreach string pat_regex in (include_regexes) {
+                        if (regex(name, pat_regex)) {
+                            included = True;
+                            break;
+                        }
+                    }
+                }
+                if (!included && include_regex) {
+                    included = regex(name, include_regex);
+                }
+                if (!included) {
+                    continue;
+                }
+            }
+
+            if (exclude_regexes) {
+                bool excluded = False;
+                foreach string pat_regex in (exclude_regexes) {
+                    if (regex(name, pat_regex)) {
+                        excluded = True;
+                        break;
+                    }
+                }
+                if (excluded) {
+                    continue;
+                }
+            }
+            if (exclude_regex && regex(name, exclude_regex)) {
+                continue;
+            }
+
+            result += entry;
+        }
+        return result;
+    }
+
+    private static string formatPermissions(hash<ZipEntryInfo> entry) {
+        if (entry.permissions < 0) {
+            return "----------";
+        }
+        int p = entry.permissions;
+        string result = "";
+        if (entry.is_symlink) {
+            result = "l";
+        } else if (entry.is_directory) {
+            result = "d";
+        } else {
+            result = "-";
+        }
+        result += (p & 0400) ? "r" : "-";
+        result += (p & 0200) ? "w" : "-";
+        result += (p & 0100) ? "x" : "-";
+        result += (p & 040) ? "r" : "-";
+        result += (p & 020) ? "w" : "-";
+        result += (p & 010) ? "x" : "-";
+        result += (p & 04) ? "r" : "-";
+        result += (p & 02) ? "w" : "-";
+        result += (p & 01) ? "x" : "-";
+        return result;
+    }
+
+    private static string formatBytes(int bytes) {
+        if (bytes < 1024) {
+            return sprintf("%d B", bytes);
+        }
+        if (bytes < 1024 * 1024) {
+            return sprintf("%.1f KB", bytes / 1024.0);
+        }
+        if (bytes < 1024 * 1024 * 1024) {
+            return sprintf("%.1f MB", bytes / (1024.0 * 1024.0));
+        }
+        return sprintf("%.1f GB", bytes / (1024.0 * 1024.0 * 1024.0));
+    }
+}

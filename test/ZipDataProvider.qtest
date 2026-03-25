@@ -61,6 +61,14 @@ public class ZipDataProviderTest inherits QUnit::Test {
         addTestCase("Compress data action tests", \compressDataActionTest());
         addTestCase("Decompress data action tests", \decompressDataActionTest());
         addTestCase("Location input tests", \locationInputTest());
+        addTestCase("Filter extract tests", \filterExtractTest());
+        addTestCase("Filter list tests", \filterListTest());
+        addTestCase("Filter decompress tests", \filterDecompressTest());
+        addTestCase("Filter info tests", \filterInfoTest());
+        addTestCase("Extract options tests", \extractOptionsTest());
+        addTestCase("Add path action tests", \addPathActionTest());
+        addTestCase("Verify action tests", \verifyActionTest());
+        addTestCase("Replace action tests", \replaceActionTest());
 
         set_return_value(main());
     }
@@ -973,6 +981,389 @@ public class ZipDataProviderTest inherits QUnit::Test {
             ZipFile zip(outputPath, "r");
             assertEq("Compressed data", zip.readText("compressed.txt"),
                 "compress output_location content matches");
+            zip.close();
+        }
+    }
+
+    #! Helper to create a test archive with mixed file types
+    private binary createFilterTestArchive() {
+        ZipFile zip();
+        zip.addText("readme.txt", "README");
+        zip.addText("data/report.csv", "a,b,c");
+        zip.addText("data/report.log", "log data");
+        zip.addText("src/main.cpp", "int main() {}");
+        zip.addText("src/util.cpp", "void util() {}");
+        zip.addText("temp_notes.txt", "temp notes");
+        zip.addDirectory("empty/");
+        return zip.toData();
+    }
+
+    filterExtractTest() {
+        ZipDataProvider factory();
+        binary archive_data = createFilterTestArchive();
+
+        # Test include_patterns
+        {
+            string extractDir = testDir + "/filter_include";
+            mkdir(extractDir);
+
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "destination": extractDir,
+                "include_patterns": ("*.txt",),
+            });
+
+            assertEq(True, response.success, "filter include: success");
+            assertEq(True, response.entry_count > 0, "filter include: entries extracted");
+            assertEq(True, response.skipped_count > 0, "filter include: entries skipped");
+            assertEq(True, is_file(extractDir + "/readme.txt"), "filter include: readme.txt extracted");
+            assertEq(True, is_file(extractDir + "/temp_notes.txt"), "filter include: temp_notes.txt extracted");
+            assertEq(False, is_file(extractDir + "/src/main.cpp"), "filter include: main.cpp not extracted");
+            assertEq(False, is_file(extractDir + "/data/report.csv"), "filter include: report.csv not extracted");
+        }
+
+        # Test exclude_patterns
+        {
+            string extractDir = testDir + "/filter_exclude";
+            mkdir(extractDir);
+
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "destination": extractDir,
+                "exclude_patterns": ("*.log", "temp_*"),
+            });
+
+            assertEq(True, response.success, "filter exclude: success");
+            assertEq(True, response.skipped_count > 0, "filter exclude: entries skipped");
+            assertEq(True, is_file(extractDir + "/readme.txt"), "filter exclude: readme.txt extracted");
+            assertEq(False, is_file(extractDir + "/data/report.log"), "filter exclude: .log not extracted");
+            assertEq(False, is_file(extractDir + "/temp_notes.txt"), "filter exclude: temp_* not extracted");
+        }
+
+        # Test include_regex
+        {
+            string extractDir = testDir + "/filter_inc_regex";
+            mkdir(extractDir);
+
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "destination": extractDir,
+                "include_regex": "^src/",
+            });
+
+            assertEq(True, response.success, "filter include_regex: success");
+            assertEq(True, is_file(extractDir + "/src/main.cpp"), "filter include_regex: main.cpp extracted");
+            assertEq(True, is_file(extractDir + "/src/util.cpp"), "filter include_regex: util.cpp extracted");
+            assertEq(False, is_file(extractDir + "/readme.txt"), "filter include_regex: readme.txt not extracted");
+        }
+
+        # Test combined include + exclude
+        {
+            string extractDir = testDir + "/filter_combined";
+            mkdir(extractDir);
+
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            dp.doRequest({
+                "data": archive_data,
+                "destination": extractDir,
+                "include_patterns": ("*.txt",),
+                "exclude_patterns": ("temp_*",),
+            });
+
+            assertEq(True, is_file(extractDir + "/readme.txt"),
+                "filter combined: readme.txt included");
+            assertEq(False, is_file(extractDir + "/temp_notes.txt"),
+                "filter combined: temp_notes.txt excluded by blacklist");
+        }
+
+        # Test filters that match nothing
+        {
+            string extractDir = testDir + "/filter_nomatch";
+            mkdir(extractDir);
+
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "destination": extractDir,
+                "include_patterns": ("*.xyz",),
+            });
+
+            assertEq(0, response.entry_count, "filter nomatch: 0 entries extracted");
+        }
+    }
+
+    filterListTest() {
+        ZipDataProvider factory();
+        binary archive_data = createFilterTestArchive();
+
+        # Test list with include_patterns
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("list");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "include_patterns": ("*.cpp",),
+            });
+
+            assertEq(2, response.count, "list filter: 2 cpp files");
+            foreach hash<auto> entry in (response.entries) {
+                assertEq(True, entry.name =~ /\.cpp$/, "list filter: entry is .cpp");
+            }
+        }
+
+        # Test list with exclude_regex
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("list");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "exclude_regex": "\\.(log|csv)$",
+            });
+
+            foreach hash<auto> entry in (response.entries) {
+                assertEq(False, entry.name =~ /\.(log|csv)$/, "list exclude_regex: no log/csv entries");
+            }
+        }
+
+        # Test list with no filters (backward compat)
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("list");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+            });
+
+            assertEq(True, response.count >= 7, "list no filter: all entries returned");
+        }
+    }
+
+    filterDecompressTest() {
+        ZipDataProvider factory();
+        binary archive_data = createFilterTestArchive();
+
+        # Test decompress with include_patterns
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("decompress");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "include_patterns": ("*.txt",),
+            });
+
+            assertEq(2, response.entry_count, "decompress filter: 2 txt entries");
+            assertEq(True, exists response.entries."readme.txt", "decompress filter: has readme.txt");
+            assertEq(True, exists response.entries."temp_notes.txt", "decompress filter: has temp_notes.txt");
+            assertEq(False, exists response.entries."src/main.cpp", "decompress filter: no main.cpp");
+        }
+
+        # Test decompress with exclude_patterns + entry_names combined
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("data").getChildProviderEx("decompress");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "entry_names": ("readme.txt", "temp_notes.txt", "src/main.cpp"),
+                "exclude_patterns": ("temp_*",),
+            });
+
+            assertEq(2, response.entry_count, "decompress combined: 2 entries");
+            assertEq(True, exists response.entries."readme.txt", "decompress combined: has readme.txt");
+            assertEq(True, exists response.entries."src/main.cpp", "decompress combined: has main.cpp");
+            assertEq(False, exists response.entries."temp_notes.txt",
+                "decompress combined: temp_notes.txt excluded");
+        }
+    }
+
+    filterInfoTest() {
+        ZipDataProvider factory();
+        binary archive_data = createFilterTestArchive();
+
+        # Test info with filter
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("info");
+            hash<auto> all_info = dp.doRequest({
+                "data": archive_data,
+            });
+
+            hash<auto> filtered_info = dp.doRequest({
+                "data": archive_data,
+                "include_patterns": ("*.txt",),
+            });
+
+            assertEq(True, filtered_info.entry_count < all_info.entry_count,
+                "info filter: fewer entries");
+            assertEq(True, filtered_info.total_size < all_info.total_size,
+                "info filter: smaller total size");
+        }
+    }
+
+    extractOptionsTest() {
+        ZipDataProvider factory();
+
+        # Create archive with paths
+        ZipFile zip();
+        zip.addDirectory("src/");
+        zip.addText("src/main.cpp", "int main() {}");
+        zip.addText("src/util.cpp", "void util() {}");
+        binary archive_data = zip.toData();
+
+        # Test strip_prefix
+        {
+            string extractDir = testDir + "/dp_strip_prefix";
+            mkdir(extractDir);
+
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "destination": extractDir,
+                "strip_prefix": "src/",
+            });
+
+            assertEq(True, response.success, "strip_prefix: success");
+            assertEq(True, is_file(extractDir + "/main.cpp"), "strip_prefix: main.cpp at root");
+            assertEq(True, is_file(extractDir + "/util.cpp"), "strip_prefix: util.cpp at root");
+        }
+
+        # Test preserve_paths=False
+        {
+            string extractDir = testDir + "/dp_flat";
+            mkdir(extractDir);
+
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("extract");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "destination": extractDir,
+                "preserve_paths": False,
+            });
+
+            assertEq(True, response.success, "preserve_paths=False: success");
+            assertEq(True, is_file(extractDir + "/main.cpp"), "preserve_paths=False: main.cpp flat");
+        }
+    }
+
+    addPathActionTest() {
+        ZipDataProvider factory();
+
+        # Create source directory
+        string srcDir = testDir + "/dp_addpath_src";
+        mkdir(srcDir);
+        {
+            File f();
+            f.open2(srcDir + "/hello.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("Hello from addPath");
+        }
+
+        string zipPath = testDir + "/dp_addpath.zip";
+
+        # First create an empty archive
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("existing.txt", "existing");
+            zip.close();
+        }
+
+        # Test add-path action
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("add-path");
+            hash<auto> response = dp.doRequest({
+                "archive_path": zipPath,
+                "source_path": srcDir,
+                "root_path": dirname(srcDir),
+            });
+
+            assertEq(True, response.success, "add-path: success");
+        }
+
+        # Verify archive contents
+        {
+            ZipFile zip(zipPath, "r");
+            list<hash<ZipEntryInfo>> entries = zip.entries();
+            assertEq(True, entries.size() >= 2, "add-path: archive has entries");
+
+            bool found = False;
+            foreach hash<ZipEntryInfo> entry in (entries) {
+                if (entry.name =~ /hello\.txt$/) {
+                    found = True;
+                    binary data = zip.read(entry.name);
+                    assertEq("Hello from addPath", data.toString(), "add-path: content matches");
+                }
+            }
+            assertEq(True, found, "add-path: hello.txt in archive");
+            zip.close();
+        }
+    }
+
+    verifyActionTest() {
+        ZipDataProvider factory();
+
+        # Create test archive
+        ZipFile zip();
+        zip.addText("valid1.txt", "content 1");
+        zip.addText("valid2.txt", "content 2");
+        binary archive_data = zip.toData();
+
+        # Test verify via data provider
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("verify");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+            });
+
+            assertEq(True, response.valid, "verify dp: all valid");
+            assertEq(2, response.verified_count, "verify dp: 2 entries verified");
+            assertEq(0, response.failed_count, "verify dp: 0 failures");
+            assertEq(2, response.results.size(), "verify dp: 2 results");
+            assertEq(True, response.results[0].valid, "verify dp: first entry valid");
+        }
+
+        # Test verify with filter
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("verify");
+            hash<auto> response = dp.doRequest({
+                "data": archive_data,
+                "include_patterns": ("*1*",),
+            });
+
+            assertEq(1, response.verified_count, "verify dp filtered: 1 entry");
+            assertEq(True, response.valid, "verify dp filtered: valid");
+        }
+    }
+
+    replaceActionTest() {
+        ZipDataProvider factory();
+
+        # Create test archive
+        string zipPath = testDir + "/dp_replace_test.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("keep.txt", "keep");
+            zip.addText("replace.txt", "old");
+            zip.addText("remove.txt", "remove");
+            zip.close();
+        }
+
+        # Test replace via data provider
+        {
+            AbstractDataProvider dp = factory.getChildProviderEx("archive").getChildProviderEx("replace");
+            hash<auto> response = dp.doRequest({
+                "archive_path": zipPath,
+                "replacements": {"replace.txt": binary("new content")},
+                "delete_names": ("remove.txt",),
+            });
+
+            assertEq(True, response.success, "replace dp: success");
+            assertEq(1, response.replaced_count, "replace dp: 1 replaced");
+            assertEq(1, response.deleted_count, "replace dp: 1 deleted");
+            assertEq(1, response.copied_count, "replace dp: 1 copied");
+        }
+
+        # Verify the result
+        {
+            ZipFile zip(zipPath, "r");
+            assertEq(2, zip.count(), "replace dp result: 2 entries");
+            assertEq("keep", zip.readText("keep.txt"), "replace dp result: keep.txt intact");
+            assertEq("new content", zip.readText("replace.txt"),
+                "replace dp result: replace.txt updated");
+            assertEq(False, zip.hasEntry("remove.txt"),
+                "replace dp result: remove.txt gone");
             zip.close();
         }
     }

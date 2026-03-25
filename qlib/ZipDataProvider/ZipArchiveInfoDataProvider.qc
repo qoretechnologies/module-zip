@@ -77,14 +77,20 @@ public class ZipArchiveInfoDataProvider inherits AbstractDataProvider {
 
         ZipFile zip;
         if (request.input_path) {
-            zip = new ZipFile(request.input_path, "r");
+            zip = new ZipFile(request.input_path, "r", request.recover);
         } else if (archive_data) {
-            zip = new ZipFile(archive_data);
+            zip = new ZipFile(archive_data, request.recover);
         } else {
             throw "ZIP-ERROR", "one of 'input_path', 'data', or 'location' must be provided";
         }
 
         list<hash<ZipEntryInfo>> entries = zip.entries();
+
+        # Apply filters if any
+        entries = filter_entries(entries, cast<*list<string>>(request.include_patterns),
+            cast<*list<string>>(request.exclude_patterns),
+            request.include_regex, request.exclude_regex);
+
         int total_size = 0;
         int compressed_size = 0;
         foreach hash<ZipEntryInfo> entry in (entries) {

@@ -1,7 +1,7 @@
 # -*- mode: qore; indent-tabs-mode: nil -*-
-#! Qore ZipAddFilesDataProvider class definition
+#! Qore ZipAddPathDataProvider class definition
 
-/** ZipAddFilesDataProvider.qc Copyright (C) 2026 Qore Technologies, s.r.o.
+/** ZipAddPathDataProvider.qc Copyright (C) 2026 Qore Technologies, s.r.o.
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
@@ -24,22 +24,22 @@
 
 #! Contains all public definitions in the ZipDataProvider module
 public namespace ZipDataProvider {
-#! Add files data provider
-public class ZipAddFilesDataProvider inherits AbstractDataProvider {
+#! Add path data provider
+public class ZipAddPathDataProvider inherits AbstractDataProvider {
     public {
         #! Provider info
         const ProviderInfo = <DataProviderInfo>{
-            "name": "add",
-            "desc": "Add files to an existing ZIP archive",
-            "type": "ZipAddFilesDataProvider",
+            "name": "add-path",
+            "desc": "Recursively add a file or directory to a ZIP archive",
+            "type": "ZipAddPathDataProvider",
             "supports_request": True,
         };
 
         #! Request type
-        static ZipAddFilesRequestDataType RequestType();
+        static ZipAddPathRequestDataType RequestType();
 
         #! Response type
-        static ZipAddFilesResponseDataType ResponseType();
+        static ZipAddPathResponseDataType ResponseType();
     }
 
     private {
@@ -68,34 +68,27 @@ public class ZipAddFilesDataProvider inherits AbstractDataProvider {
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
         hash<auto> request = req;
-        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: adding %d entries to %y", request.entries.size(),
-            request.archive_path));
+        @debug(log(LoggerLevel::DEBUG, "doRequestImpl: adding path %y to archive %y",
+            request.source_path, request.archive_path));
 
         ZipFile zip(request.archive_path, "a");
 
-        int entries_added = 0;
-        foreach hash<auto> entry in (request.entries) {
-            hash<ZipAddOptions> add_opts();
-            if (request.password) {
-                add_opts.password = request.password;
-            }
-            if (request.encryption_method) {
-                add_opts.encryption_method = request.encryption_method;
-            }
-
-            if (entry.data) {
-                zip.add(entry.name, entry.data, add_opts);
-            } else if (entry.path) {
-                zip.addFile(entry.name ?? basename(entry.path), entry.path, add_opts);
-            }
-            ++entries_added;
+        hash<ZipAddOptions> add_opts();
+        if (request.compression_method) {
+            add_opts.compression_method = request.compression_method;
+        }
+        if (request.password) {
+            add_opts.password = request.password;
+        }
+        if (request.encryption_method) {
+            add_opts.encryption_method = request.encryption_method;
         }
 
+        zip.addPath(request.source_path, request.root_path, add_opts);
         zip.close();
 
         return {
             "success": True,
-            "entries_added": entries_added,
         };
     }
 }
