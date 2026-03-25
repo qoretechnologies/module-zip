@@ -32,6 +32,7 @@
 #include <string>
 #include <atomic>
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
 #include <sstream>
 
