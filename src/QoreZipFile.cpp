@@ -918,6 +918,12 @@ void QoreZipFile::addDirectory(const char* name, ExceptionSink* xsink) {
     }
 }
 
+// Helper struct for diff() entry tracking
+struct ZipDiffEntryRef {
+    size_t index;
+    int64 crc32;
+};
+
 // Callback data for overwrite and entry callbacks
 struct QoreExtractCallbackData {
     bool overwrite;
@@ -1793,11 +1799,7 @@ QoreHashNode* QoreZipFile::diff(const char* archive1, const char* archive2, Exce
     }
 
     // Build maps: name -> (index, crc32) for each archive
-    struct EntryRef {
-        size_t index;
-        int64 crc32;
-    };
-    std::unordered_map<std::string, EntryRef> map1, map2;
+    std::unordered_map<std::string, ZipDiffEntryRef> map1, map2;
 
     for (size_t i = 0; i < list1->size(); ++i) {
         QoreValue ev = list1->retrieveEntry(i);
