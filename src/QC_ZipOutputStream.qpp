@@ -44,8 +44,6 @@ zip.close();
     @note This class is not thread-safe. Concurrent access from multiple threads requires external synchronization.
     @note You must call close() when done writing to finalize the entry in the archive.
 
-    @since %zip 1.0
-
     @see ZipFile::openWrite()
 */
 qclass ZipOutputStream [arg=ZipOutputStream* zos; ns=Qore::Zip; vparent=OutputStream];

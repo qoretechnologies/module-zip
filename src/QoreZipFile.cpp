@@ -637,6 +637,15 @@ BinaryNode* QoreZipFile::read(const char* name, ExceptionSink* xsink) {
         return nullptr;
     }
 
+    // Pre-check: encrypted entries need a password. Without it, minizip-ng falls through to the
+    // decompressor with raw ciphertext and produces cryptic MZ_DATA_ERRORs or (for STORE entries)
+    // silently returns ciphertext — raise a clear error before any I/O.
+    if ((file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) && password.empty()) {
+        xsink->raiseException("ZIP-PASSWORD-ERROR",
+            "entry '%s' is encrypted but no password was provided", name);
+        return nullptr;
+    }
+
     if (!password.empty()) {
         mz_zip_reader_set_password(reader, password.c_str());
     }
@@ -711,7 +720,10 @@ void QoreZipFile::parseAddOptions(const QoreHashNode* opts, int16_t& compression
     compression_method = MZ_COMPRESS_METHOD_DEFLATE;
     compression_level = MZ_COMPRESS_LEVEL_DEFAULT;
     modified_time = 0;
-    encryption_method = -1;  // -1 = not set (use default AES-256 when password provided)
+    // -1 = not set; when a password is provided without an explicit method, applyEncryption() picks
+    // ZIP_EM_TRAD_PKWARE so archives open in Windows Explorer's built-in ZIP handler by default.
+    // Callers who need stronger encryption must explicitly request ZIP_EM_AES_{128,192,256}.
+    encryption_method = -1;
 
     if (!opts) {
         return;
@@ -746,6 +758,139 @@ void QoreZipFile::parseAddOptions(const QoreHashNode* opts, int16_t& compression
     if (!v.isNothing()) {
         encryption_method = (int)v.getAsBigInt();
     }
+}
+
+void QoreZipFile::applyEncryption(void* writer, const std::string& pwd, int encryption_method,
+                                   mz_zip_file* file_info) {
+    if (pwd.empty() || encryption_method == ZIP_EM_NONE) {
+        // No password or encryption explicitly disabled — clear any prior writer encryption state.
+        mz_zip_writer_set_password(writer, nullptr);
+        mz_zip_writer_set_aes(writer, 0);
+        if (file_info) {
+            file_info->aes_version = 0;
+            file_info->aes_strength = 0;
+        }
+        return;
+    }
+
+    mz_zip_writer_set_password(writer, pwd.c_str());
+
+    // Default (encryption_method == -1) is PKWARE ZipCrypto for maximum Windows compatibility.
+    // Windows Explorer's built-in ZIP support does not decrypt AES; users must explicitly opt in.
+    if (encryption_method == -1 || encryption_method == ZIP_EM_TRAD_PKWARE) {
+        mz_zip_writer_set_aes(writer, 0);
+        if (file_info) {
+            file_info->aes_version = 0;
+            file_info->aes_strength = 0;
+        }
+        return;
+    }
+
+    mz_zip_writer_set_aes(writer, 1);
+    if (file_info) {
+        file_info->aes_version = MZ_AES_VERSION;
+        if (encryption_method == ZIP_EM_AES_128) {
+            file_info->aes_strength = MZ_AES_STRENGTH_128;
+        } else if (encryption_method == ZIP_EM_AES_192) {
+            file_info->aes_strength = MZ_AES_STRENGTH_192;
+        } else {
+            // ZIP_EM_AES_256 or any other AES value — default to strongest
+            file_info->aes_strength = MZ_AES_STRENGTH_256;
+        }
+    }
+}
+
+void QoreZipFile::raiseMzError(ExceptionSink* xsink, int32_t err, const char* context,
+                                const char* entry_name, const char* destPath, bool entry_encrypted) {
+    // MZ_PASSWORD_ERROR is raised by AES decryption when the password is wrong.
+    // MZ_CRC_ERROR is raised by PKWARE ZipCrypto when the password is wrong (CRC check fails at
+    // end-of-stream because the decrypted bytes didn't match the original CRC).
+    const char* err_class = "ZIP-ERROR";
+    const char* reason = nullptr;
+    if (err == MZ_PASSWORD_ERROR || (err == MZ_CRC_ERROR && entry_encrypted)) {
+        err_class = "ZIP-PASSWORD-ERROR";
+        reason = "wrong password";
+    }
+
+    if (entry_name && destPath) {
+        if (reason) {
+            xsink->raiseException(err_class, "failed to %s entry '%s' to '%s': %s (minizip error %d)",
+                context, entry_name, destPath, reason, err);
+        } else {
+            xsink->raiseException(err_class, "failed to %s entry '%s' to '%s': minizip error %d",
+                context, entry_name, destPath, err);
+        }
+    } else if (entry_name) {
+        if (reason) {
+            xsink->raiseException(err_class, "failed to %s entry '%s': %s (minizip error %d)",
+                context, entry_name, reason, err);
+        } else {
+            xsink->raiseException(err_class, "failed to %s entry '%s': minizip error %d",
+                context, entry_name, err);
+        }
+    } else if (destPath) {
+        if (reason) {
+            xsink->raiseException(err_class, "failed to %s to '%s': %s (minizip error %d)",
+                context, destPath, reason, err);
+        } else {
+            xsink->raiseException(err_class, "failed to %s to '%s': minizip error %d",
+                context, destPath, err);
+        }
+    } else {
+        if (reason) {
+            xsink->raiseException(err_class, "failed to %s: %s (minizip error %d)",
+                context, reason, err);
+        } else {
+            xsink->raiseException(err_class, "failed to %s: minizip error %d", context, err);
+        }
+    }
+}
+
+bool QoreZipFile::checkPasswordAvailableUnlocked(const std::string& pwd, const QoreListNode* names,
+                                                  ExceptionSink* xsink) {
+    if (!pwd.empty()) {
+        return true;
+    }
+
+    // Build requested-name set for targeted extracts (empty = scan all entries)
+    std::unordered_set<std::string> wanted;
+    if (names) {
+        ConstListIterator li(names);
+        while (li.next()) {
+            QoreValue v = li.getValue();
+            if (v.getType() == NT_STRING) {
+                wanted.insert(v.get<const QoreStringNode>()->c_str());
+            }
+        }
+    }
+
+    int32_t err = mz_zip_reader_goto_first_entry(reader);
+    int iter = 0;
+    while (err == MZ_OK) {
+        // Central-directory iteration is fast, but a large archive can still have tens of
+        // thousands of entries — honor cooperative cancellation every 100 iterations.
+        if ((++iter % 100 == 0) && qore_check_cancel(xsink, "scanning archive for encrypted entries")) {
+            mz_zip_reader_goto_first_entry(reader);
+            return false;
+        }
+        mz_zip_file* info = nullptr;
+        if (mz_zip_reader_entry_get_info(reader, &info) != MZ_OK || !info) {
+            break;
+        }
+        if (info->flag & MZ_ZIP_FLAG_ENCRYPTED) {
+            if (wanted.empty() || wanted.count(info->filename)) {
+                xsink->raiseException("ZIP-PASSWORD-ERROR",
+                    "entry '%s' is encrypted but no password was provided", info->filename);
+                // Rewind so later iteration starts clean
+                mz_zip_reader_goto_first_entry(reader);
+                return false;
+            }
+        }
+        err = mz_zip_reader_goto_next_entry(reader);
+    }
+    // Rewind
+    mz_zip_reader_goto_first_entry(reader);
+    return true;
 }
 
 void QoreZipFile::add(const char* name, const BinaryNode* data, const QoreHashNode* opts, ExceptionSink* xsink) {
@@ -783,32 +928,7 @@ void QoreZipFile::addUnlocked(const char* name, const BinaryNode* data, const Qo
         file_info.comment_size = (uint16_t)comment.size();
     }
 
-    if (!entry_password.empty()) {
-        mz_zip_writer_set_password(writer, entry_password.c_str());
-
-        // Determine encryption method
-        if (encryption_method == ZIP_EM_NONE) {
-            // Explicitly no encryption
-            mz_zip_writer_set_aes(writer, 0);
-        } else if (encryption_method == ZIP_EM_TRAD_PKWARE) {
-            mz_zip_writer_set_aes(writer, 0);
-        } else {
-            // AES encryption (default or explicit)
-            mz_zip_writer_set_aes(writer, 1);
-            file_info.aes_version = MZ_AES_VERSION;
-            // Set AES strength for entry
-            if (encryption_method == ZIP_EM_AES_128) {
-                file_info.aes_strength = MZ_AES_STRENGTH_128;
-            } else if (encryption_method == ZIP_EM_AES_192) {
-                file_info.aes_strength = MZ_AES_STRENGTH_192;
-            }
-            // AES-256 is the default (set by minizip-ng when aes_strength is 0)
-        }
-    } else {
-        // No password for this entry — clear writer encryption state from any previous entry
-        mz_zip_writer_set_password(writer, nullptr);
-        mz_zip_writer_set_aes(writer, 0);
-    }
+    applyEncryption(writer, entry_password, encryption_method, &file_info);
 
     mz_zip_writer_set_compress_method(writer, compression_method);
     mz_zip_writer_set_compress_level(writer, compression_level);
@@ -864,14 +984,8 @@ void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHash
     parseAddOptions(opts, compression_method, compression_level, entry_password, comment, modified_time,
                      encryption_method, xsink);
 
-    if (!entry_password.empty()) {
-        mz_zip_writer_set_password(writer, entry_password.c_str());
-        if (encryption_method == ZIP_EM_TRAD_PKWARE) {
-            mz_zip_writer_set_aes(writer, 0);
-        } else if (encryption_method != ZIP_EM_NONE) {
-            mz_zip_writer_set_aes(writer, 1);
-        }
-    }
+    // Writer-level only — mz_zip_writer_add_file builds its own mz_zip_file internally
+    applyEncryption(writer, entry_password, encryption_method, nullptr);
 
     mz_zip_writer_set_compress_method(writer, compression_method);
     mz_zip_writer_set_compress_level(writer, compression_level);
@@ -929,12 +1043,24 @@ struct QoreExtractCallbackData {
     bool overwrite;
     ResolvedCallReferenceNode* entry_callback;
     ExceptionSink* xsink;
+    // Entries skipped because they exist on disk and overwrite was false — populated by the overwrite cb.
+    // minizip-ng's save_file masks MZ_EXIST_ERROR from the overwrite cb and returns MZ_OK, so the caller
+    // can only learn that files were skipped by reading this list.
+    std::vector<std::string> skipped;
 };
 
 // Static overwrite callback for minizip-ng
 static int32_t zip_overwrite_cb(void* handle, void* userdata, mz_zip_file* file_info, const char* path) {
     auto* data = static_cast<QoreExtractCallbackData*>(userdata);
-    return data->overwrite ? MZ_OK : MZ_EXIST_ERROR;
+    if (!data->overwrite) {
+        if (file_info && file_info->filename) {
+            data->skipped.emplace_back(file_info->filename);
+        } else if (path) {
+            data->skipped.emplace_back(path);
+        }
+        return MZ_EXIST_ERROR;
+    }
+    return MZ_OK;
 }
 
 static int32_t zip_entry_cb(void* handle, void* userdata, mz_zip_file* file_info, const char* path) {
@@ -1110,11 +1236,18 @@ QoreListNode* QoreZipFile::verify(const QoreHashNode* opts, ExceptionSink* xsink
     }
 
     // Apply password if provided
+    std::string verify_pwd;
     if (opts) {
         QoreValue v = opts->getKeyValue("password");
         if (!v.isNothing() && v.getType() == NT_STRING) {
-            mz_zip_reader_set_password(reader, v.get<const QoreStringNode>()->c_str());
+            verify_pwd = v.get<const QoreStringNode>()->c_str();
+            mz_zip_reader_set_password(reader, verify_pwd.c_str());
         }
+    }
+
+    // Pre-check: encrypted entries without a password can't be verified — raise before reading.
+    if (!checkPasswordAvailableUnlocked(verify_pwd, nullptr, xsink)) {
+        return nullptr;
     }
 
     ReferenceHolder<QoreListNode> results(new QoreListNode(hashdeclZipVerifyResult->getTypeInfo(true)), xsink);
@@ -1198,22 +1331,22 @@ QoreListNode* QoreZipFile::verify(const QoreHashNode* opts, ExceptionSink* xsink
     return results.release();
 }
 
-void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, ExceptionSink* xsink) {
+QoreHashNode* QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, ExceptionSink* xsink) {
     QoreAutoRWReadLocker lock(rwlock);
 
     if (!checkOpenUnlocked(xsink, false)) {
-        return;
+        return nullptr;
     }
 
     // Check filesystem sandbox access before writing to destination
     QoreSandboxManagerHelper smh;
     if (smh && !smh->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
-        return;
+        return nullptr;
     }
 
     // Check for interrupt before extraction
     if (qore_check_cancel(xsink, "extracting ZIP archive")) {
-        return;
+        return nullptr;
     }
 
     // Parse options
@@ -1223,15 +1356,25 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
     parseExtractOptions(opts, pwd, overwrite, preserve_paths, allow_symlinks, strip_prefix, add_prefix,
                          entry_callback, xsink);
 
+    // Pre-check: any encrypted entry without a password → clear error, no I/O.
+    // Without this, minizip-ng opens the destination file and only fails later when the decompressor
+    // chokes on ciphertext, leaving a 0-byte file on disk.
+    if (!checkPasswordAvailableUnlocked(pwd, nullptr, xsink)) {
+        return nullptr;
+    }
+
     if (!pwd.empty()) {
         mz_zip_reader_set_password(reader, pwd.c_str());
     }
 
     // Set up callbacks (stack-local data — thread safe)
-    QoreExtractCallbackData cb_data{overwrite, entry_callback, xsink};
+    QoreExtractCallbackData cb_data{overwrite, entry_callback, xsink, {}};
     setupCallbacks(cb_data);
 
     bool need_manual_loop = !preserve_paths || !strip_prefix.empty() || !add_prefix.empty();
+
+    // Names actually extracted (i.e. not skipped due to existing files)
+    ReferenceHolder<QoreListNode> extracted(new QoreListNode(stringTypeInfo), xsink);
 
     int32_t err;
     if (need_manual_loop) {
@@ -1270,6 +1413,7 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
                 }
             }
 
+            size_t skipped_before = cb_data.skipped.size();
             std::string out_path;
             int32_t save_err = extractCurrentEntry(destPath, file_info->filename, preserve_paths, strip_prefix,
                                                     add_prefix, out_path, xsink);
@@ -1277,9 +1421,24 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
                 break;
             }
 
-            if (save_err != MZ_OK && save_err != MZ_EXIST_ERROR) {
-                xsink->raiseException("ZIP-ERROR", "failed to extract entry '%s' to '%s': error %d",
-                                      file_info->filename, out_path.c_str(), save_err);
+            if (save_err == MZ_OK) {
+                // Directory-entry returns empty out_path; only record real file extractions
+                if (!out_path.empty() && cb_data.skipped.size() == skipped_before) {
+                    size_t len = strlen(file_info->filename);
+                    bool is_dir = (len > 0 && file_info->filename[len - 1] == '/');
+                    if (!is_dir) {
+                        extracted->push(new QoreStringNode(out_path), xsink);
+                    }
+                }
+            } else {
+                bool enc = (file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) != 0;
+                // Clean up any 0-byte file left on disk — minizip-ng creates the destination before
+                // crypto fails, so a wrong password can leave a garbage empty file behind.
+                struct stat st;
+                if (!out_path.empty() && stat(out_path.c_str(), &st) == 0 && st.st_size == 0) {
+                    unlink(out_path.c_str());
+                }
+                raiseMzError(xsink, save_err, "extract", file_info->filename, out_path.c_str(), enc);
                 break;
             }
 
@@ -1298,7 +1457,7 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
             if (err == MZ_OK && file_info) {
                 if (!validateExtractPath(file_info->filename, destPath, xsink)) {
                     clearCallbacks();
-                    return;
+                    return nullptr;
                 }
                 // Check symlinks in the save_all path too
                 if (isSymlinkEntry()) {
@@ -1314,11 +1473,11 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
                     std::string target = getSymlinkTarget(xsink);
                     if (*xsink) {
                         clearCallbacks();
-                        return;
+                        return nullptr;
                     }
                     if (!target.empty() && !validateSymlink(file_info->filename, target.c_str(), destPath, xsink)) {
                         clearCallbacks();
-                        return;
+                        return nullptr;
                     }
                 }
             }
@@ -1345,12 +1504,24 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
                     continue;
                 }
 
+                size_t skipped_before = cb_data.skipped.size();
                 std::string out_path = std::string(destPath) + "/" + file_info->filename;
                 int32_t save_err = mz_zip_reader_entry_save_file(reader, out_path.c_str());
-                if (save_err != MZ_OK && save_err != MZ_EXIST_ERROR) {
-                    xsink->raiseException("ZIP-ERROR", "failed to extract entry '%s': error %d",
-                                          file_info->filename, save_err);
+                if (save_err != MZ_OK) {
+                    bool enc = (file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) != 0;
+                    struct stat st;
+                    if (stat(out_path.c_str(), &st) == 0 && st.st_size == 0) {
+                        unlink(out_path.c_str());
+                    }
+                    raiseMzError(xsink, save_err, "extract", file_info->filename, out_path.c_str(), enc);
                     break;
+                }
+                if (cb_data.skipped.size() == skipped_before) {
+                    size_t len = strlen(file_info->filename);
+                    bool is_dir = (len > 0 && file_info->filename[len - 1] == '/');
+                    if (!is_dir) {
+                        extracted->push(new QoreStringNode(out_path), xsink);
+                    }
                 }
 
                 err = mz_zip_reader_goto_next_entry(reader);
@@ -1360,16 +1531,91 @@ void QoreZipFile::extractAll(const char* destPath, const QoreHashNode* opts, Exc
                 err = MZ_OK;
             }
         } else {
+            // save_all path: reports success even when some files are skipped, because minizip-ng's
+            // mz_zip_reader_entry_save_file returns MZ_OK whenever the overwrite_cb denies overwrite.
+            // Our overwrite_cb records names into cb_data.skipped, so we can still report accurately.
             err = mz_zip_reader_save_all(reader, destPath);
+
+            // Rebuild the extracted list by iterating entries and subtracting skipped names
+            if (err == MZ_OK) {
+                std::unordered_set<std::string> skipped_set(cb_data.skipped.begin(), cb_data.skipped.end());
+                int32_t iter = mz_zip_reader_goto_first_entry(reader);
+                int count = 0;
+                while (iter == MZ_OK) {
+                    if ((++count % 100 == 0)
+                        && qore_check_cancel(xsink, "building extraction result")) {
+                        break;
+                    }
+                    mz_zip_file* fi = nullptr;
+                    if (mz_zip_reader_entry_get_info(reader, &fi) != MZ_OK || !fi) {
+                        break;
+                    }
+                    size_t nlen = strlen(fi->filename);
+                    bool is_dir = (nlen > 0 && fi->filename[nlen - 1] == '/');
+                    if (!is_dir && !skipped_set.count(fi->filename)) {
+                        std::string full = std::string(destPath) + "/" + fi->filename;
+                        extracted->push(new QoreStringNode(full), xsink);
+                    }
+                    iter = mz_zip_reader_goto_next_entry(reader);
+                }
+            }
         }
     }
 
     // Clean up callbacks
     clearCallbacks();
 
-    if (!*xsink && err != MZ_OK) {
-        xsink->raiseException("ZIP-ERROR", "failed to extract archive to '%s': error %d", destPath, err);
+    if (*xsink) {
+        return nullptr;
     }
+
+    if (err != MZ_OK) {
+        // Best-effort cleanup: minizip-ng's save_all creates the destination file for each entry
+        // before attempting decryption/decompression; a wrong password (or other crypto failure)
+        // then leaves a 0-byte file on disk. Walk the archive and unlink any 0-byte file that
+        // maps to a non-directory entry and wasn't in the skip set — that is a file we just
+        // tried to write.
+        std::unordered_set<std::string> skipped_set(cb_data.skipped.begin(), cb_data.skipped.end());
+        bool any_encrypted = false;
+        if (mz_zip_reader_goto_first_entry(reader) == MZ_OK) {
+            do {
+                mz_zip_file* fi = nullptr;
+                if (mz_zip_reader_entry_get_info(reader, &fi) != MZ_OK || !fi) {
+                    break;
+                }
+                if (fi->flag & MZ_ZIP_FLAG_ENCRYPTED) {
+                    any_encrypted = true;
+                }
+                size_t nlen = strlen(fi->filename);
+                bool is_dir = (nlen > 0 && fi->filename[nlen - 1] == '/');
+                if (!is_dir && !skipped_set.count(fi->filename)) {
+                    std::string full = std::string(destPath) + "/" + fi->filename;
+                    struct stat st;
+                    if (stat(full.c_str(), &st) == 0 && st.st_size == 0) {
+                        unlink(full.c_str());
+                    }
+                }
+            } while (mz_zip_reader_goto_next_entry(reader) == MZ_OK);
+        }
+        raiseMzError(xsink, err, "extract archive", nullptr, destPath, any_encrypted);
+        return nullptr;
+    }
+
+    // Build the skipped list (full paths for parity with extracted)
+    ReferenceHolder<QoreListNode> skipped_list(new QoreListNode(stringTypeInfo), xsink);
+    for (const auto& name : cb_data.skipped) {
+        std::string full = std::string(destPath) + "/" + name;
+        skipped_list->push(new QoreStringNode(full), xsink);
+    }
+
+    ReferenceHolder<QoreHashNode> result(new QoreHashNode(hashdeclZipExtractResult, xsink), xsink);
+    int64 extracted_count = extracted->size();
+    int64 skipped_count = skipped_list->size();
+    result->setKeyValue("extracted", extracted.release(), xsink);
+    result->setKeyValue("skipped", skipped_list.release(), xsink);
+    result->setKeyValue("extracted_count", extracted_count, xsink);
+    result->setKeyValue("skipped_count", skipped_count, xsink);
+    return result.release();
 }
 
 QoreListNode* QoreZipFile::extractEntries(const char* destPath, const QoreListNode* entryNames,
@@ -1398,6 +1644,11 @@ QoreListNode* QoreZipFile::extractEntries(const char* destPath, const QoreListNo
     parseExtractOptions(opts, pwd, overwrite, preserve_paths, allow_symlinks, strip_prefix, add_prefix,
                          entry_callback, xsink);
 
+    // Pre-check: any encrypted requested entry without a password → clear error, no I/O.
+    if (!checkPasswordAvailableUnlocked(pwd, entryNames, xsink)) {
+        return nullptr;
+    }
+
     if (!pwd.empty()) {
         mz_zip_reader_set_password(reader, pwd.c_str());
     }
@@ -1419,7 +1670,7 @@ QoreListNode* QoreZipFile::extractEntries(const char* destPath, const QoreListNo
     }
 
     // Set up callbacks (stack-local data — thread safe)
-    QoreExtractCallbackData cb_data{overwrite, entry_callback, xsink};
+    QoreExtractCallbackData cb_data{overwrite, entry_callback, xsink, {}};
     setupCallbacks(cb_data);
 
     ReferenceHolder<QoreListNode> extracted(new QoreListNode(stringTypeInfo), xsink);
@@ -1463,6 +1714,7 @@ QoreListNode* QoreZipFile::extractEntries(const char* destPath, const QoreListNo
             }
         }
 
+        size_t skipped_before = cb_data.skipped.size();
         std::string out_path;
         int32_t save_err = extractCurrentEntry(destPath, file_info->filename, preserve_paths, strip_prefix,
                                                 add_prefix, out_path, xsink);
@@ -1471,16 +1723,24 @@ QoreListNode* QoreZipFile::extractEntries(const char* destPath, const QoreListNo
         }
 
         if (save_err == MZ_OK) {
-            // Check if it's not a directory
-            size_t len = strlen(file_info->filename);
-            bool is_dir = (len > 0 && file_info->filename[len - 1] == '/');
-            if (!is_dir) {
-                extracted->push(new QoreStringNode(out_path), xsink);
+            // Only record as extracted if the overwrite callback did NOT deny this write.
+            // minizip-ng's save_file returns MZ_OK even when overwrite is denied, so relying on
+            // save_err alone would add skipped files to the extracted list.
+            if (cb_data.skipped.size() == skipped_before) {
+                size_t len = strlen(file_info->filename);
+                bool is_dir = (len > 0 && file_info->filename[len - 1] == '/');
+                if (!is_dir) {
+                    extracted->push(new QoreStringNode(out_path), xsink);
+                }
             }
-        } else if (save_err != MZ_EXIST_ERROR) {
-            // MZ_EXIST_ERROR means overwrite was denied; that's OK, skip it
-            xsink->raiseException("ZIP-ERROR", "failed to extract entry '%s' to '%s': error %d",
-                                  file_info->filename, out_path.c_str(), save_err);
+        } else {
+            bool enc = (file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) != 0;
+            // Clean up any 0-byte file left on disk from a failed decryption attempt.
+            struct stat st;
+            if (!out_path.empty() && stat(out_path.c_str(), &st) == 0 && st.st_size == 0) {
+                unlink(out_path.c_str());
+            }
+            raiseMzError(xsink, save_err, "extract", file_info->filename, out_path.c_str(), enc);
             break;
         }
 
@@ -1527,14 +1787,8 @@ void QoreZipFile::addPath(const char* path, const char* root_path, const QoreHas
     parseAddOptions(opts, compression_method, compression_level, entry_password, comment, modified_time,
                      encryption_method, xsink);
 
-    if (!entry_password.empty()) {
-        mz_zip_writer_set_password(writer, entry_password.c_str());
-        if (encryption_method == ZIP_EM_TRAD_PKWARE) {
-            mz_zip_writer_set_aes(writer, 0);
-        } else if (encryption_method != ZIP_EM_NONE) {
-            mz_zip_writer_set_aes(writer, 1);
-        }
-    }
+    // Writer-level only — mz_zip_writer_add_path builds its own per-file mz_zip_file internally
+    applyEncryption(writer, entry_password, encryption_method, nullptr);
 
     mz_zip_writer_set_compress_method(writer, compression_method);
     mz_zip_writer_set_compress_level(writer, compression_level);
@@ -1574,13 +1828,26 @@ void QoreZipFile::extractEntry(const char* name, const char* destPath, Exception
         return;
     }
 
+    mz_zip_file* file_info = nullptr;
+    if (mz_zip_reader_entry_get_info(reader, &file_info) == MZ_OK && file_info
+        && (file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) && password.empty()) {
+        xsink->raiseException("ZIP-PASSWORD-ERROR",
+            "entry '%s' is encrypted but no password was provided", name);
+        return;
+    }
+
     if (!password.empty()) {
         mz_zip_reader_set_password(reader, password.c_str());
     }
 
     err = mz_zip_reader_entry_save_file(reader, destPath);
     if (err != MZ_OK) {
-        xsink->raiseException("ZIP-ERROR", "failed to extract entry '%s' to '%s': error %d", name, destPath, err);
+        bool enc = file_info && (file_info->flag & MZ_ZIP_FLAG_ENCRYPTED) != 0;
+        struct stat st;
+        if (stat(destPath, &st) == 0 && st.st_size == 0) {
+            unlink(destPath);
+        }
+        raiseMzError(xsink, err, "extract", name, destPath, enc);
     }
 }
 
@@ -1871,7 +2138,7 @@ QoreHashNode* QoreZipFile::diff(const char* archive1, const char* archive2, Exce
 
 QoreHashNode* QoreZipFile::recompress(const char* archive_path, int16_t compression_method,
                                        int16_t compression_level, const char* pwd,
-                                       ExceptionSink* xsink) {
+                                       int encryption_method, ExceptionSink* xsink) {
     QoreSandboxManagerHelper smh;
     if (smh && !smh->checkFilesystemAccess(archive_path, QSEC_READ | QSEC_WRITE, xsink)) {
         return nullptr;
@@ -1913,10 +2180,8 @@ QoreHashNode* QoreZipFile::recompress(const char* archive_path, int16_t compress
     mz_zip_writer_set_compress_method(dst_writer, compression_method);
     mz_zip_writer_set_compress_level(dst_writer, compression_level);
 
-    if (pwd && *pwd) {
-        mz_zip_writer_set_password(dst_writer, pwd);
-        mz_zip_writer_set_aes(dst_writer, 1);
-    }
+    std::string pwd_str = (pwd && *pwd) ? pwd : std::string();
+    applyEncryption(dst_writer, pwd_str, encryption_method, nullptr);
 
     err = mz_zip_writer_open_file(dst_writer, temp_path.c_str(), 0, 0);
     if (err != MZ_OK) {
@@ -2002,9 +2267,10 @@ QoreHashNode* QoreZipFile::recompress(const char* archive_path, int16_t compress
                 new_info.comment_size = file_info->comment_size;
             }
 
-            if (pwd && *pwd) {
-                new_info.aes_version = MZ_AES_VERSION;
-            }
+            // applyEncryption configures writer-level password/aes AND populates the per-entry
+            // aes_version/aes_strength when AES is selected. Called once per entry so the fields are
+            // set correctly on new_info (minizip-ng's writer uses them when aes=1 on the writer).
+            applyEncryption(dst_writer, pwd_str, encryption_method, &new_info);
 
             int32_t add_err = mz_zip_writer_add_buffer(dst_writer, (void*)data->getPtr(),
                                                         (int32_t)data->size(), &new_info);
@@ -2169,14 +2435,7 @@ QoreObject* QoreZipFile::openOutputStream(const char* name, const QoreHashNode* 
     parseAddOptions(opts, compression_method, compression_level, entry_password, comment, modified_time,
                      encryption_method, xsink);
 
-    if (!entry_password.empty()) {
-        mz_zip_writer_set_password(writer, entry_password.c_str());
-        if (encryption_method == ZIP_EM_TRAD_PKWARE) {
-            mz_zip_writer_set_aes(writer, 0);
-        } else if (encryption_method != ZIP_EM_NONE) {
-            mz_zip_writer_set_aes(writer, 1);
-        }
-    }
+    applyEncryption(writer, entry_password, encryption_method, nullptr);
 
     // Increment active stream count
     ++active_streams;

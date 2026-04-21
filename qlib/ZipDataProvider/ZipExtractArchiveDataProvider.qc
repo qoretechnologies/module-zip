@@ -145,22 +145,17 @@ public class ZipExtractArchiveDataProvider inherits AbstractDataProvider {
             };
         }
 
-        # No filters: extract all
-        list<string> extracted_files = ();
-        foreach hash<ZipEntryInfo> entry in (all_entries) {
-            if (!entry.is_directory) {
-                extracted_files += request.destination + "/" + entry.name;
-            }
-        }
-
-        zip.extractAll(request.destination, extract_opts);
+        # No filters: extract all. Use the ZipExtractResult to report accurate counts, not the
+        # archive listing — skipped files must not be counted as extracted.
+        hash<ZipExtractResult> result = zip.extractAll(request.destination, extract_opts);
         zip.close();
 
         return {
             "success": True,
-            "entry_count": all_entries.size(),
+            "entry_count": result.extracted_count,
             "destination": request.destination,
-            "extracted_files": extracted_files,
+            "extracted_files": result.extracted,
+            "skipped_files": result.skipped,
         };
     }
 }

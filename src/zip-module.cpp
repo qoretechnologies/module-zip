@@ -54,6 +54,7 @@ const TypedHashDecl* hashdeclZipAddOptions = nullptr;
 const TypedHashDecl* hashdeclZipVerifyResult = nullptr;
 const TypedHashDecl* hashdeclZipDiffResult = nullptr;
 const TypedHashDecl* hashdeclZipExtractOptions = nullptr;
+const TypedHashDecl* hashdeclZipExtractResult = nullptr;
 
 QoreNamespace ZipNs("Qore::Zip");
 
@@ -64,6 +65,7 @@ static void zip_module_init(QoreModuleInitContext& ctx, ExceptionSink& xsink) {
     hashdeclZipVerifyResult = init_hashdecl_ZipVerifyResult(ZipNs);
     hashdeclZipDiffResult = init_hashdecl_ZipDiffResult(ZipNs);
     hashdeclZipExtractOptions = init_hashdecl_ZipExtractOptions(ZipNs);
+    hashdeclZipExtractResult = init_hashdecl_ZipExtractResult(ZipNs);
 
     // Initialize classes - stream classes must be initialized before ZipFile
     // because ZipFile references them as return types

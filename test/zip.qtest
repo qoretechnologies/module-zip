@@ -70,6 +70,10 @@ public class ZipTest inherits QUnit::Test {
         addTestCase("Replace/delete tests", \replaceDeleteTest());
         addTestCase("Enhanced entry info tests", \enhancedEntryInfoTest());
         addTestCase("Encryption method tests", \encryptionMethodTest());
+        addTestCase("Missing password tests", \missingPasswordTest());
+        addTestCase("extractAll result tests", \extractResultTest());
+        addTestCase("extractEntries skip-return tests", \extractEntriesSkipReturnTest());
+        addTestCase("Recompress encryption tests", \recompressEncryptionTest());
         addTestCase("setPassword tests", \setPasswordTest());
         addTestCase("Diff tests", \diffTest());
         addTestCase("Recompress tests", \recompressTest());
@@ -848,12 +852,14 @@ public class ZipTest inherits QUnit::Test {
         string password = "TestPassword123!";
         string content = "This is secret encrypted content that should be protected";
 
-        # Create encrypted archive (AES-256 is default when password is set)
+        # Create encrypted archive — explicitly request AES-256 so the "wrong password" path below
+        # exercises the AES code path (PKWARE's wrong-password detection is different).
         string zipPath = testDir + "/aes_encrypted.zip";
         {
             ZipFile zip(zipPath, "w");
             zip.addText("secret.txt", content, NOTHING, <ZipAddOptions>{
                 "password": password,
+                "encryption_method": ZIP_EM_AES_256,
             });
             zip.close();
         }
@@ -880,7 +886,8 @@ public class ZipTest inherits QUnit::Test {
             assertEq(content, extractedContent, "decrypted content matches original");
         }
 
-        # Test extractAll with wrong password
+        # Test extractAll with wrong password → ZIP-PASSWORD-ERROR, and the 0-byte garbage
+        # that minizip-ng would otherwise leave behind is cleaned up.
         {
             string extractDir = testDir + "/wrong_password_extract";
             mkdir(extractDir);
@@ -891,10 +898,15 @@ public class ZipTest inherits QUnit::Test {
                 zip.extractAll(extractDir, <ZipExtractOptions>{"password": "WrongPassword"});
             } catch (hash<ExceptionInfo> ex) {
                 caught = True;
-                assertEq("ZIP-ERROR", ex.err, "wrong password throws ZIP-ERROR");
+                assertEq("ZIP-PASSWORD-ERROR", ex.err, "wrong password throws ZIP-PASSWORD-ERROR");
+                assertEq(True, ex.desc =~ /wrong password/,
+                    "error message explains 'wrong password', not just minizip error code");
             }
             zip.close();
             assertEq(True, caught, "wrong password throws exception");
+            # Regression: module used to leave a 0-byte secret.txt on disk from the aborted extract
+            assertEq(False, is_file(extractDir + "/secret.txt"),
+                "no 0-byte garbage left on wrong-password failure");
         }
 
         # Test in-memory encryption and decryption
@@ -1713,7 +1725,10 @@ public class ZipTest inherits QUnit::Test {
             readZip.close();
         }
 
-        # Test default (no encryption_method = AES-256)
+        # Test default (no encryption_method = PKWARE for Windows interop)
+        # Default is traditional PKWARE ZipCrypto because it is what Windows Explorer's built-in
+        # ZIP handler, macOS Finder, and most common tools support out of the box. Users must
+        # explicitly request AES when they need strong encryption.
         {
             ZipFile zip();
             zip.addText("default.txt", "default data", NOTHING,
@@ -1722,9 +1737,335 @@ public class ZipTest inherits QUnit::Test {
 
             ZipFile readZip(archive_data);
             list<hash<ZipEntryInfo>> entries = readZip.entries();
-            assertEq(ZIP_EM_AES_256, entries[0].encryption_method,
-                "default encryption is AES-256");
+            assertEq(ZIP_EM_TRAD_PKWARE, entries[0].encryption_method,
+                "default encryption is PKWARE (interop-first)");
             readZip.close();
+        }
+
+        # ZIP_EM_NONE: password provided but encryption explicitly disabled → entry is stored plain
+        {
+            ZipFile zip();
+            zip.addText("plain.txt", "plain data", NOTHING,
+                <ZipAddOptions>{"password": "ignored", "encryption_method": ZIP_EM_NONE});
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            hash<ZipEntryInfo> e = readZip.getEntry("plain.txt");
+            assertEq(False, e.is_encrypted, "ZIP_EM_NONE disables encryption even with password");
+            assertEq(0, e.encryption_method, "no encryption method set when disabled");
+            # Must be readable without supplying a password
+            assertEq("plain data", readZip.readText("plain.txt"), "plain entry readable with no pwd");
+            readZip.close();
+        }
+
+        # AES-128 and AES-192 round-trip via in-memory add()
+        string payload = strmul("x", 100);
+        foreach hash<auto> tc in ((
+            {"em": ZIP_EM_AES_128, "name": "aes-128"},
+            {"em": ZIP_EM_AES_192, "name": "aes-192"},
+        )) {
+            ZipFile zip();
+            zip.addText("data.txt", payload, NOTHING,
+                <ZipAddOptions>{"password": "p", "encryption_method": tc.em});
+            binary archive_data = zip.toData();
+
+            ZipFile readZip(archive_data);
+            hash<ZipEntryInfo> e = readZip.getEntry("data.txt");
+            assertEq(tc.em, e.encryption_method, tc.name + " encryption method round-trips");
+            readZip.setPassword("p");
+            assertEq(payload, readZip.readText("data.txt"), tc.name + " content round-trips");
+            readZip.close();
+        }
+
+        # addFile() with PKWARE → interop-friendly file-based archive
+        {
+            string srcPath = testDir + "/pkware_src.txt";
+            File f();
+            f.open2(srcPath, O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("pkware file content");
+            f.close();
+
+            string zipPath = testDir + "/pkware_file.zip";
+            ZipFile zip(zipPath, "w");
+            zip.addFile("src.txt", srcPath, <ZipAddOptions>{"password": "pw"});
+            zip.close();
+
+            ZipFile readZip(zipPath, "r");
+            hash<ZipEntryInfo> e = readZip.getEntry("src.txt");
+            assertEq(ZIP_EM_TRAD_PKWARE, e.encryption_method,
+                "addFile uses PKWARE default for interop");
+            readZip.close();
+        }
+    }
+
+    # Missing-password handling: extract/read/verify/extractEntry/extractEntries all raise
+    # ZIP-PASSWORD-ERROR *before* opening the destination file. Previously minizip-ng would create
+    # the file and then fail with a cryptic decompressor error, leaving 0-byte garbage.
+    missingPasswordTest() {
+        string zipPath = testDir + "/missing_pwd.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("plain.txt", "plain content");
+            zip.addText("secret.txt", "secret content", NOTHING,
+                <ZipAddOptions>{"password": "pw"});
+            zip.close();
+        }
+
+        # extractAll without password → ZIP-PASSWORD-ERROR, no files created
+        {
+            string extractDir = testDir + "/missing_pwd_extract";
+            mkdir(extractDir);
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            try {
+                zip.extractAll(extractDir);
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-PASSWORD-ERROR", ex.err,
+                    "extractAll without password raises ZIP-PASSWORD-ERROR");
+                assertEq(True, ex.desc =~ /secret\.txt/,
+                    "error names the encrypted entry");
+            }
+            zip.close();
+            assertEq(True, caught, "extractAll without password threw");
+            # Critical invariant: the pre-check must run before any I/O — no partial files left.
+            assertEq(False, is_file(extractDir + "/secret.txt"),
+                "no 0-byte secret.txt written before failure");
+            assertEq(False, is_file(extractDir + "/plain.txt"),
+                "plain.txt not extracted either (whole operation aborts cleanly)");
+        }
+
+        # extractEntry of encrypted entry without password → ZIP-PASSWORD-ERROR, no file
+        {
+            string outPath = testDir + "/missing_pwd_entry.out";
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            try {
+                zip.extractEntry("secret.txt", outPath);
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-PASSWORD-ERROR", ex.err, "extractEntry raises ZIP-PASSWORD-ERROR");
+            }
+            zip.close();
+            assertEq(True, caught, "extractEntry without password threw");
+            assertEq(False, is_file(outPath), "no output file left on disk");
+        }
+
+        # extractEntries of encrypted entry without password → ZIP-PASSWORD-ERROR, no file
+        {
+            string extractDir = testDir + "/missing_pwd_entries";
+            mkdir(extractDir);
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            try {
+                zip.extractEntries(extractDir, ("secret.txt",));
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-PASSWORD-ERROR", ex.err, "extractEntries raises ZIP-PASSWORD-ERROR");
+            }
+            zip.close();
+            assertEq(True, caught, "extractEntries without password threw");
+            assertEq(False, is_file(extractDir + "/secret.txt"), "no 0-byte file written");
+        }
+
+        # extractEntries of ONLY plain entries on a mixed archive → succeeds (doesn't false-positive
+        # on encrypted entries we aren't asking for)
+        {
+            string extractDir = testDir + "/missing_pwd_plainonly";
+            mkdir(extractDir);
+            ZipFile zip(zipPath, "r");
+            list<string> out = zip.extractEntries(extractDir, ("plain.txt",));
+            zip.close();
+            assertEq(1, out.size(), "plain-only extraction skips encrypted-entry check");
+            assertEq("plain content",
+                ReadOnlyFile::readTextFile(extractDir + "/plain.txt"),
+                "plain content extracted");
+        }
+
+        # read() of encrypted entry without password → ZIP-PASSWORD-ERROR
+        {
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            try {
+                zip.readText("secret.txt");
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-PASSWORD-ERROR", ex.err, "read raises ZIP-PASSWORD-ERROR");
+            }
+            zip.close();
+            assertEq(True, caught, "readText without password threw");
+        }
+
+        # verify() on encrypted archive without password → ZIP-PASSWORD-ERROR (can't integrity-check)
+        {
+            bool caught = False;
+            ZipFile zip(zipPath, "r");
+            try {
+                zip.verify();
+            } catch (hash<ExceptionInfo> ex) {
+                caught = True;
+                assertEq("ZIP-PASSWORD-ERROR", ex.err, "verify raises ZIP-PASSWORD-ERROR");
+            }
+            zip.close();
+            assertEq(True, caught, "verify without password threw");
+        }
+    }
+
+    # ZipExtractResult: extractAll returns a hash describing extracted vs. skipped entries.
+    # Also covers the bug where overwrite-denied files used to be reported as "extracted".
+    extractResultTest() {
+        string zipPath = testDir + "/extract_result.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("a.txt", "A");
+            zip.addText("b.txt", "B");
+            zip.addText("c.txt", "C");
+            zip.close();
+        }
+
+        # Fresh dir → everything extracted, nothing skipped
+        {
+            string extractDir = testDir + "/extract_result_fresh";
+            mkdir(extractDir);
+            ZipFile zip(zipPath, "r");
+            hash<ZipExtractResult> r = zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(3, r.extracted_count, "all 3 extracted");
+            assertEq(0, r.skipped_count, "none skipped on fresh dir");
+            assertEq(3, r.extracted.size(), "extracted list matches count");
+            assertEq((), r.skipped, "skipped list is empty");
+        }
+
+        # Pre-existing b.txt + no overwrite → b.txt in skipped, a/c in extracted
+        {
+            string extractDir = testDir + "/extract_result_conflict";
+            mkdir(extractDir);
+            File f();
+            f.open2(extractDir + "/b.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("old B");
+            f.close();
+
+            ZipFile zip(zipPath, "r");
+            hash<ZipExtractResult> r = zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(2, r.extracted_count, "2 extracted (a, c)");
+            assertEq(1, r.skipped_count, "1 skipped (b)");
+            assertEq(True, r.skipped[0] =~ /b\.txt/, "skipped path is b.txt");
+            # Skipped file content must be preserved
+            assertEq("old B", ReadOnlyFile::readTextFile(extractDir + "/b.txt"),
+                "skipped file keeps original content");
+        }
+
+        # Pre-existing b.txt + overwrite=True → all extracted, nothing skipped, old content replaced
+        {
+            string extractDir = testDir + "/extract_result_overwrite";
+            mkdir(extractDir);
+            File f();
+            f.open2(extractDir + "/b.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.write("old B");
+            f.close();
+
+            ZipFile zip(zipPath, "r");
+            hash<ZipExtractResult> r = zip.extractAll(extractDir,
+                <ZipExtractOptions>{"overwrite": True});
+            zip.close();
+
+            assertEq(3, r.extracted_count, "all 3 extracted with overwrite=True");
+            assertEq(0, r.skipped_count, "none skipped with overwrite=True");
+            assertEq("B", ReadOnlyFile::readTextFile(extractDir + "/b.txt"),
+                "b.txt replaced with new content");
+        }
+
+        # 0-byte existing file → still counted as skipped (regression: matches the qzip bug report
+        # where the user's 0-byte leftovers were silently left in place)
+        {
+            string extractDir = testDir + "/extract_result_zerobyte";
+            mkdir(extractDir);
+            File f();
+            f.open2(extractDir + "/a.txt", O_CREAT | O_WRONLY | O_TRUNC);
+            f.close();  # 0-byte
+
+            ZipFile zip(zipPath, "r");
+            hash<ZipExtractResult> r = zip.extractAll(extractDir);
+            zip.close();
+
+            assertEq(1, r.skipped_count, "0-byte existing file is skipped like any other");
+            assertEq(0, hstat(extractDir + "/a.txt").size, "0-byte file unchanged");
+        }
+    }
+
+    # Regression: extractEntries used to push overwrite-denied files into the returned "extracted"
+    # list because minizip-ng returns MZ_OK when the overwrite callback denies a write.
+    extractEntriesSkipReturnTest() {
+        string zipPath = testDir + "/ee_skip.zip";
+        {
+            ZipFile zip(zipPath, "w");
+            zip.addText("x.txt", "new-X");
+            zip.addText("y.txt", "new-Y");
+            zip.close();
+        }
+
+        string extractDir = testDir + "/ee_skip_dir";
+        mkdir(extractDir);
+        File f();
+        f.open2(extractDir + "/x.txt", O_CREAT | O_WRONLY | O_TRUNC);
+        f.write("old-X");
+        f.close();
+
+        ZipFile zip(zipPath, "r");
+        list<string> out = zip.extractEntries(extractDir, ("x.txt", "y.txt"));
+        zip.close();
+
+        assertEq(1, out.size(),
+            "extractEntries returns only entries actually written (x was skipped)");
+        assertEq(True, out[0] =~ /y\.txt/, "returned entry is y.txt, not x.txt");
+        assertEq("old-X", ReadOnlyFile::readTextFile(extractDir + "/x.txt"),
+            "x.txt content preserved (skip honored)");
+        assertEq("new-Y", ReadOnlyFile::readTextFile(extractDir + "/y.txt"),
+            "y.txt was extracted");
+    }
+
+    # recompress now supports choosing the encryption method when rewriting an encrypted archive.
+    recompressEncryptionTest() {
+        # Create AES-256 source, recompress with PKWARE output → content intact, method changed
+        string src = testDir + "/rc_aes.zip";
+        {
+            ZipFile zip(src, "w");
+            zip.addText("a.txt", "recompress me", NOTHING,
+                <ZipAddOptions>{"password": "p", "encryption_method": ZIP_EM_AES_256});
+            zip.close();
+        }
+
+        ZipFile::recompress(src, ZIP_CM_DEFLATE, 6, "p", ZIP_EM_TRAD_PKWARE);
+
+        {
+            ZipFile zip(src, "r");
+            hash<ZipEntryInfo> e = zip.getEntry("a.txt");
+            assertEq(ZIP_EM_TRAD_PKWARE, e.encryption_method,
+                "recompress rewrote as PKWARE per explicit encryption_method");
+            zip.setPassword("p");
+            assertEq("recompress me", zip.readText("a.txt"),
+                "recompressed content decryptable with original password");
+            zip.close();
+        }
+
+        # No explicit encryption_method + password → PKWARE default (matches add())
+        string src2 = testDir + "/rc_default.zip";
+        {
+            ZipFile zip(src2, "w");
+            zip.addText("a.txt", "data", NOTHING,
+                <ZipAddOptions>{"password": "p", "encryption_method": ZIP_EM_AES_256});
+            zip.close();
+        }
+        ZipFile::recompress(src2, ZIP_CM_DEFLATE, 6, "p");
+        {
+            ZipFile zip(src2, "r");
+            hash<ZipEntryInfo> e = zip.getEntry("a.txt");
+            assertEq(ZIP_EM_TRAD_PKWARE, e.encryption_method,
+                "recompress default encryption method is PKWARE (interop-first)");
+            zip.close();
         }
     }
 

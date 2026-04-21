@@ -92,7 +92,7 @@ const ZIP_EM_AES_256 = 0x0103;
 ///@}
 
 //! Information about a ZIP archive entry
-/** @since %zip 1.0
+/**
 */
 hashdecl Qore::Zip::ZipEntryInfo {
     //! The name/path of the entry within the archive
@@ -120,31 +120,27 @@ hashdecl Qore::Zip::ZipEntryInfo {
     bool is_encrypted;
 
     //! The encryption method used (one of @ref zip_encryption_methods), or 0 if not encrypted
-    /** @since %zip 1.1
+    /**
     */
     int encryption_method;
 
     //! True if this entry is a symbolic link
-    /** @since %zip 1.1
+    /**
     */
     bool is_symlink;
 
     //! Unix file permissions (e.g., 0644, 0755), or -1 if not available
     /** Only set for entries created on Unix or macOS systems.
-
-        @since %zip 1.1
     */
     int permissions;
 
     //! The operating system that created this entry
     /** Common values: 0 = DOS/Windows, 3 = Unix, 10 = Windows NTFS, 19 = macOS
-
-        @since %zip 1.1
     */
     int created_by_system;
 
     //! Symlink target path (only set for symlink entries)
-    /** @since %zip 1.1
+    /**
     */
     *string link_target;
 
@@ -153,7 +149,7 @@ hashdecl Qore::Zip::ZipEntryInfo {
 }
 
 //! Options for adding entries to a ZIP archive
-/** @since %zip 1.0
+/**
 */
 hashdecl Qore::Zip::ZipAddOptions {
     //! Compression level (0-9, where 0=store, 9=maximum)
@@ -162,7 +158,12 @@ hashdecl Qore::Zip::ZipAddOptions {
     //! Compression method (one of @ref zip_compression_methods)
     *int compression_method;
 
-    //! Password for encryption (enables AES-256 by default)
+    //! Password for encryption
+    /** When set, the entry is encrypted using traditional PKWARE (ZipCrypto) encryption by default.
+        This matches the behavior of Windows Explorer's built-in ZIP handler, 7-Zip, and most other
+        ZIP tools out of the box. Request stronger encryption explicitly via \c encryption_method;
+        see below for security/compatibility tradeoffs.
+    */
     *string password;
 
     //! Optional comment for the entry
@@ -172,20 +173,25 @@ hashdecl Qore::Zip::ZipAddOptions {
     *date modified;
 
     //! Encryption method (one of @ref zip_encryption_methods)
-    /** If not set, defaults to AES-256 when a password is provided.
-        Use \c ZIP_EM_TRAD_PKWARE for legacy PKWARE encryption, or
-        \c ZIP_EM_NONE to disable encryption even with a password.
+    /** If not set, defaults to \c ZIP_EM_TRAD_PKWARE when a password is provided. This chooses
+        maximum interoperability — archives created with the default open in Windows Explorer,
+        macOS Finder, and all common ZIP utilities. Traditional PKWARE (ZipCrypto) encryption is
+        cryptographically weak and vulnerable to known-plaintext attacks; use AES when the data
+        is sensitive and you control which tool the recipient uses.
+
+        Use \c ZIP_EM_AES_256 (or \c ZIP_EM_AES_128 / \c ZIP_EM_AES_192) for strong encryption,
+        \c ZIP_EM_TRAD_PKWARE to pick PKWARE explicitly, or \c ZIP_EM_NONE to disable encryption
+        even when a password is present.
 
         @note AES-128 and AES-192 are only supported for in-memory data entries
-        (via add() or data provider). The addFile() method always uses AES-256.
-
-        @since %zip 1.1
+        (via add() or data provider). The addFile() method always uses AES-256 when AES is
+        selected.
     */
     *int encryption_method;
 }
 
 //! Result of verifying a single archive entry
-/** @since %zip 1.1
+/**
 */
 hashdecl Qore::Zip::ZipVerifyResult {
     //! The name/path of the entry
@@ -199,7 +205,7 @@ hashdecl Qore::Zip::ZipVerifyResult {
 }
 
 //! Result of comparing two ZIP archives
-/** @since %zip 1.1
+/**
 */
 hashdecl Qore::Zip::ZipDiffResult {
     //! Entries present only in the second archive
@@ -230,7 +236,7 @@ hashdecl Qore::Zip::ZipDiffResult {
 }
 
 //! Options for extracting entries from a ZIP archive
-/** @since %zip 1.0
+/**
 */
 hashdecl Qore::Zip::ZipExtractOptions {
     //! Password for decryption (required for encrypted entries)
@@ -264,8 +270,6 @@ hashdecl Qore::Zip::ZipExtractOptions {
         destination directory. By default, symlink entries are silently skipped
         during extraction. Set to \c True to allow symlink extraction (targets
         are still validated to stay within the destination directory).
-
-        @since %zip 1.1
     */
     *bool allow_symlinks;
 
@@ -276,10 +280,28 @@ hashdecl Qore::Zip::ZipExtractOptions {
         @code{.py}
         zip.extractAll("/dest", {"entry_callback": sub (string name) { printf("Extracting: %s\n", name); }});
         @endcode
-
-        @since %zip 1.1
     */
     *code<nothing(string)> entry_callback;
+}
+
+//! Result of an extractAll() call
+/**
+*/
+hashdecl Qore::Zip::ZipExtractResult {
+    //! Full destination paths of entries that were actually written to disk
+    list<string> extracted;
+
+    //! Full destination paths of entries that were skipped because the target already existed
+    /** Populated only when \c overwrite is False in the extract options; always empty when
+        \c overwrite is True.
+    */
+    list<string> skipped;
+
+    //! Count of entries actually extracted (equivalent to \c extracted.size())
+    int extracted_count;
+
+    //! Count of entries skipped because the destination already existed (equivalent to \c skipped.size())
+    int skipped_count;
 }
 
 //! The ZipFile class provides functionality for creating, reading, and modifying ZIP archives
@@ -318,8 +340,6 @@ zip.close();
     ZIP64 extensions are handled automatically. Archives with more than 65,535 entries, files
     larger than 4 GB, or total archive sizes exceeding 4 GB are supported transparently without
     any special configuration.
-
-    @since %zip 1.0
 */
 qclass ZipFile [arg=QoreZipFile* zf; ns=Qore::Zip];
 
@@ -524,8 +544,6 @@ foreach hash<ZipVerifyResult> r in (results) {
     }
 }
     @endcode
-
-    @since %zip 1.1
 */
 list<hash<ZipVerifyResult>> ZipFile::verify(*hash<ZipExtractOptions> opts) {
     return zf->verify(opts, xsink);
@@ -535,10 +553,15 @@ list<hash<ZipVerifyResult>> ZipFile::verify(*hash<ZipExtractOptions> opts) {
 /** @param destPath the destination directory path
     @param opts optional @ref Qore::Zip::ZipExtractOptions for extraction settings
 
+    @return a @ref Qore::Zip::ZipExtractResult hash describing which entries were actually extracted
+        and which were skipped because the destination file already existed (only when \c overwrite
+        is False)
+
     @throw ZIP-ERROR error extracting archive
+    @throw ZIP-PASSWORD-ERROR one or more entries are encrypted but no password was supplied
 */
-nothing ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) [dom=FILESYSTEM] {
-    zf->extractAll(destPath->c_str(), opts, xsink);
+hash<ZipExtractResult> ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) [dom=FILESYSTEM] {
+    return zf->extractAll(destPath->c_str(), opts, xsink);
 }
 
 //! Extracts specific entries to a destination directory
@@ -556,8 +579,6 @@ nothing ZipFile::extractAll(string destPath, *hash<ZipExtractOptions> opts) [dom
 ZipFile zip("archive.zip", "r");
 list<string> files = zip.extractEntries("/dest", ("readme.txt", "src/main.cpp"));
     @endcode
-
-    @since %zip 1.1
 */
 list<string> ZipFile::extractEntries(string destPath, list<string> entryNames, *hash<ZipExtractOptions> opts) [dom=FILESYSTEM] {
     return zf->extractEntries(destPath->c_str(), entryNames, opts, xsink);
@@ -587,8 +608,6 @@ ZipFile zip("archive.zip", "w");
 zip.addPath("/path/to/directory", "/path/to");
 zip.close();
     @endcode
-
-    @since %zip 1.1
 */
 nothing ZipFile::addPath(string path, *string root_path, *hash<ZipAddOptions> opts) [dom=FILESYSTEM] {
     zf->addPath(path->c_str(), root_path ? root_path->c_str() : nullptr, opts, xsink);
@@ -615,8 +634,6 @@ ZipFile::replaceEntries("archive.zip",
     {"config.json": <bead>},
     ("temp.log",));
     @endcode
-
-    @since %zip 1.1
 */
 static hash<auto> ZipFile::replaceEntries(string archive_path, *hash<auto> replacements,
     *list<string> delete_names) [dom=FILESYSTEM] {
@@ -641,8 +658,6 @@ hash<ZipDiffResult> diff = ZipFile::diff("old.zip", "new.zip");
 printf("Added: %d, Deleted: %d, Modified: %d, Unchanged: %d\n",
     diff.added_count, diff.deleted_count, diff.modified_count, diff.unchanged_count);
     @endcode
-
-    @since %zip 1.1
 */
 static hash<ZipDiffResult> ZipFile::diff(string archive1, string archive2) [dom=FILESYSTEM] {
     return QoreZipFile::diff(archive1->c_str(), archive2->c_str(), xsink);
@@ -655,7 +670,11 @@ static hash<ZipDiffResult> ZipFile::diff(string archive1, string archive2) [dom=
     @param archive_path path to the archive to recompress
     @param compression_method the new compression method (one of @ref zip_compression_methods)
     @param compression_level optional compression level (0-9)
-    @param password optional password for encrypted archives
+    @param password optional password for encrypted archives (used to read the source and,
+        if supplied, to re-encrypt the output)
+    @param encryption_method optional encryption method (one of @ref zip_encryption_methods) to use
+        when writing the new archive; defaults to \c ZIP_EM_TRAD_PKWARE when a password is supplied,
+        matching the behavior of the add methods
 
     @return a hash with \c success (bool), \c entry_count, \c original_size, and
         \c new_size fields
@@ -666,15 +685,18 @@ static hash<ZipDiffResult> ZipFile::diff(string archive1, string archive2) [dom=
     @code{.py}
 # Convert from deflate to zstd
 ZipFile::recompress("archive.zip", ZIP_CM_ZSTD, 3);
-    @endcode
 
-    @since %zip 1.1
+# Recompress an AES-256 archive with a new password in PKWARE format for Windows compat
+ZipFile::recompress("secrets.zip", ZIP_CM_DEFLATE, 6, "secret", ZIP_EM_TRAD_PKWARE);
+    @endcode
 */
 static hash<auto> ZipFile::recompress(string archive_path, int compression_method,
-    *int compression_level, *string password) [dom=FILESYSTEM] {
+    *int compression_level, *string password, *int encryption_method) [dom=FILESYSTEM] {
     return QoreZipFile::recompress(archive_path->c_str(), (int16_t)compression_method,
         compression_level ? (int16_t)compression_level : MZ_COMPRESS_LEVEL_DEFAULT,
-        password ? password->c_str() : nullptr, xsink);
+        password ? password->c_str() : nullptr,
+        encryption_method ? (int)encryption_method : -1,
+        xsink);
 }
 
 //! Adds a symbolic link entry to the archive
@@ -684,8 +706,6 @@ static hash<auto> ZipFile::recompress(string archive_path, int compression_metho
     @throw ZIP-ERROR error adding entry or archive not open for writing
 
     @note This is primarily intended for testing symlink security validation.
-
-    @since %zip 1.1
 */
 nothing ZipFile::addSymlink(string name, string target) {
     zf->addSymlink(name->c_str(), target->c_str(), xsink);
@@ -712,8 +732,6 @@ ZipFile zip(encrypted_data);
 zip.setPassword("secret");
 string content = zip.readText("file.txt");
     @endcode
-
-    @since %zip 1.1
 */
 nothing ZipFile::setPassword(*string password) {
     zf->setPassword(password ? password->c_str() : nullptr);

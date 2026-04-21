@@ -9,7 +9,8 @@
     - Creating, reading, and modifying ZIP archives
     - Multiple compression methods: deflate, bzip2, lzma, zstd, xz
     - ZIP64 support for large files (>4GB) and many entries (>65,535)
-    - AES encryption (128/192/256-bit)
+    - Traditional PKWARE (ZipCrypto) encryption by default for maximum interoperability
+    - Optional AES encryption (128/192/256-bit) for strong security
     - Streaming API for large file operations
     - Data provider module for integration with Qore's data provider framework
 
@@ -69,9 +70,13 @@ string content = readZip.readText("data.json");
     @subsection zipencrypt Password-Protected Archives
 
     @code{.py}
-# Create encrypted archive
+# Create an encrypted archive. The default encryption method when a password is supplied is
+# traditional PKWARE (ZipCrypto), which every common ZIP tool can open out of the box. Use
+# ZIP_EM_AES_256 when the data is sensitive and you control which tool the recipient will use.
 ZipFile zip("secure.zip", "w");
-zip.addText("secret.txt", "Confidential data", NOTHING, {"password": "secret123"});
+zip.addText("secret.txt", "Confidential data", NOTHING, {"password": "secret123"});  # PKWARE
+zip.addText("topsecret.txt", "Very sensitive", NOTHING,
+    {"password": "secret123", "encryption_method": ZIP_EM_AES_256});                   # AES-256
 zip.close();
     @endcode
 
@@ -100,13 +105,22 @@ zip.close();
     The module supports multiple encryption methods:
 
     |!Constant|!Description
-    |@ref Qore::Zip::ZIP_EM_NONE|No encryption
-    |@ref Qore::Zip::ZIP_EM_TRAD_PKWARE|Traditional PKWARE encryption (weak, not recommended)
+    |@ref Qore::Zip::ZIP_EM_NONE|No encryption (disables encryption even when a password is set)
+    |@ref Qore::Zip::ZIP_EM_TRAD_PKWARE|Traditional PKWARE (ZipCrypto) — default; readable by every common ZIP tool
     |@ref Qore::Zip::ZIP_EM_AES_128|AES-128 encryption
     |@ref Qore::Zip::ZIP_EM_AES_192|AES-192 encryption
-    |@ref Qore::Zip::ZIP_EM_AES_256|AES-256 encryption (recommended)
+    |@ref Qore::Zip::ZIP_EM_AES_256|AES-256 encryption (strongest)
 
-    When a password is provided in @ref Qore::Zip::ZipAddOptions, AES-256 encryption is used by default.
+    When a password is provided in @ref Qore::Zip::ZipAddOptions without an explicit
+    \c encryption_method, the module uses traditional PKWARE (ZipCrypto) encryption. This is the
+    format Windows Explorer's built-in ZIP handler, macOS Finder, and most common tools open
+    without any extra software. PKWARE is cryptographically weak and vulnerable to known-plaintext
+    attacks; choose one of the AES methods explicitly when the data is sensitive and the recipient
+    has a modern ZIP tool (7-Zip, WinRAR, Info-ZIP 6.1+, etc.).
+
+    Extracting an encrypted entry without supplying a password raises \c ZIP-PASSWORD-ERROR
+    before any destination file is created, and extracting with an incorrect password raises
+    \c ZIP-PASSWORD-ERROR with a "wrong password" message; no 0-byte garbage is left on disk.
 
     @section zipdataprovider Data Provider API
 
@@ -143,14 +157,24 @@ result = dp.doRequest({
 
     @section ziperrors Error Handling
 
-    All ZIP operations throw exceptions of type \c "ZIP-ERROR" when errors occur:
+    ZIP operations throw exceptions of type \c "ZIP-ERROR" for generic failures,
+    \c "ZIP-PASSWORD-ERROR" when an encrypted entry needs a password or a supplied password is
+    wrong, and \c "ZIP-SECURITY-ERROR" for path-traversal attempts or unsafe symlink targets:
 
     @code{.py}
 try {
-    ZipFile zip("nonexistent.zip", "r");
+    ZipFile zip("archive.zip", "r");
+    zip.extractAll("/dest", {"password": "maybe-wrong"});
 } catch (hash<ExceptionInfo> ex) {
-    if (ex.err == "ZIP-ERROR") {
-        printf("ZIP error: %s\n", ex.desc);
+    switch (ex.err) {
+        case "ZIP-PASSWORD-ERROR":
+            printf("Password problem: %s\n", ex.desc);
+            break;
+        case "ZIP-SECURITY-ERROR":
+            printf("Archive is unsafe: %s\n", ex.desc);
+            break;
+        default:
+            printf("ZIP error: %s\n", ex.desc);
     }
 }
     @endcode
@@ -161,9 +185,19 @@ try {
     - Initial release
     - Full ZIP64 support
     - Multiple compression methods (deflate, bzip2, lzma, zstd, xz)
-    - AES encryption support
+    - Encryption: traditional PKWARE (ZipCrypto) by default for maximum interoperability with
+      Windows Explorer, macOS Finder, and other common ZIP tools; optional AES-128/192/256 for
+      strong encryption
+    - \c ZIP-PASSWORD-ERROR raised cleanly when a password is required or incorrect, with no
+      0-byte garbage left on disk
+    - @ref Qore::Zip::ZipFile::extractAll() returns a @ref Qore::Zip::ZipExtractResult hash
+      describing which entries were written and which were skipped because the destination
+      already existed
+    - @ref Qore::Zip::ZipFile::recompress() accepts an optional \c encryption_method
     - In-memory archive operations
+    - Streaming API (@ref Qore::Zip::ZipInputStream / @ref Qore::Zip::ZipOutputStream)
     - Data provider module
+    - @c qzip CLI with 11 commands and an \c -e / \c --encryption flag
 
     @section ziplicense License
 

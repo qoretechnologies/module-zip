@@ -45,6 +45,7 @@ DLLLOCAL TypedHashDecl* init_hashdecl_ZipAddOptions(QoreNamespace& ns);
 DLLLOCAL TypedHashDecl* init_hashdecl_ZipVerifyResult(QoreNamespace& ns);
 DLLLOCAL TypedHashDecl* init_hashdecl_ZipDiffResult(QoreNamespace& ns);
 DLLLOCAL TypedHashDecl* init_hashdecl_ZipExtractOptions(QoreNamespace& ns);
+DLLLOCAL TypedHashDecl* init_hashdecl_ZipExtractResult(QoreNamespace& ns);
 
 // Compression methods
 #define ZIP_CM_STORE        MZ_COMPRESS_METHOD_STORE
@@ -73,6 +74,7 @@ extern const TypedHashDecl* hashdeclZipAddOptions;
 extern const TypedHashDecl* hashdeclZipVerifyResult;
 extern const TypedHashDecl* hashdeclZipDiffResult;
 extern const TypedHashDecl* hashdeclZipExtractOptions;
+extern const TypedHashDecl* hashdeclZipExtractResult;
 
 // Namespace
 extern QoreNamespace ZipNs;

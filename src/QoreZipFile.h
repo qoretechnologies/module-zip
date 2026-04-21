@@ -128,7 +128,10 @@ public:
     DLLLOCAL QoreListNode* verify(const QoreHashNode* opts, ExceptionSink* xsink);
 
     //! Extract all entries to directory
-    DLLLOCAL void extractAll(const char* destPath, const QoreHashNode* opts, ExceptionSink* xsink);
+    /** Returns a ZipExtractResult hash with the names actually extracted and any entries that were
+        skipped because they already existed and overwrite was false.
+    */
+    DLLLOCAL QoreHashNode* extractAll(const char* destPath, const QoreHashNode* opts, ExceptionSink* xsink);
 
     //! Extract specific entries to directory; returns list of extracted file paths
     DLLLOCAL QoreListNode* extractEntries(const char* destPath, const QoreListNode* entryNames,
@@ -151,9 +154,13 @@ public:
     DLLLOCAL static QoreHashNode* diff(const char* archive1, const char* archive2, ExceptionSink* xsink);
 
     //! Re-compress an archive with a different compression method
+    /** encryption_method follows the same semantics as in ZipAddOptions: -1 = unset (defaults to PKWARE
+        when pwd is supplied), ZIP_EM_NONE disables encryption, ZIP_EM_TRAD_PKWARE picks PKWARE explicitly,
+        ZIP_EM_AES_{128,192,256} requests AES.
+    */
     DLLLOCAL static QoreHashNode* recompress(const char* archive_path, int16_t compression_method,
                                               int16_t compression_level, const char* pwd,
-                                              ExceptionSink* xsink);
+                                              int encryption_method, ExceptionSink* xsink);
 
     //! Set password for reading encrypted entries
     DLLLOCAL void setPassword(const char* pwd);
@@ -200,6 +207,35 @@ private:
     DLLLOCAL void parseAddOptions(const QoreHashNode* opts, int16_t& compression_method, int16_t& compression_level,
                                   std::string& entry_password, std::string& comment, int64& modified_time,
                                   int& encryption_method, ExceptionSink* xsink);
+
+    //! Apply password and encryption method to a writer
+    /** Centralizes the logic for setting password + AES/PKWARE state on the writer and, when using AES,
+        populating aes_version / aes_strength in the mz_zip_file header. If file_info is nullptr,
+        only writer-level state is set (for stream-style APIs).
+
+        Default encryption when a password is supplied and no explicit method is given is PKWARE
+        (ZipCrypto) for maximum interoperability — notably, Windows Explorer's built-in ZIP handler
+        does not support WinZip AES encryption.
+    */
+    DLLLOCAL static void applyEncryption(void* writer, const std::string& pwd, int encryption_method,
+                                          mz_zip_file* file_info);
+
+    //! Raise ZIP-PASSWORD-ERROR if any of the listed entries is encrypted but password is empty
+    /** When names is nullptr, scans the entire archive. Rewinds the reader on completion so
+        subsequent iteration starts fresh.
+    */
+    DLLLOCAL bool checkPasswordAvailableUnlocked(const std::string& pwd, const QoreListNode* names,
+                                                  ExceptionSink* xsink);
+
+    //! Translate a minizip-ng error code into a Qore exception, picking a user-friendly err class
+    /** Maps MZ_PASSWORD_ERROR / MZ_CRC_ERROR on encrypted archives to ZIP-PASSWORD-ERROR
+        ("wrong password"); everything else becomes ZIP-ERROR with the raw error number so
+        operators can still look it up. \a context is the human-readable operation ("extract",
+        "verify entry", …). \a entry_name may be nullptr when no specific entry applies.
+    */
+    DLLLOCAL static void raiseMzError(ExceptionSink* xsink, int32_t err, const char* context,
+                                       const char* entry_name, const char* destPath,
+                                       bool entry_encrypted);
 
     //! Check archive is open and in correct mode (must be called with lock held)
     DLLLOCAL bool checkOpenUnlocked(ExceptionSink* xsink, bool forWrite = false);

@@ -10,7 +10,7 @@ a data provider module (`ZipDataProvider`) with 13 actions, and a command-line t
 
 - **Archive operations**: create, read, extract, verify, diff, replace/delete entries, recompress
 - **Compression**: store, deflate, bzip2, lzma, zstd, xz with configurable levels
-- **Encryption**: AES-128/192/256 and PKWARE traditional with selectable method
+- **Encryption**: PKWARE traditional (default, maximum interop) and AES-128/192/256 (opt-in, strong)
 - **Filtering**: glob and regex whitelist/blacklist for selective extraction
 - **Path remapping**: strip_prefix, add_prefix, preserve_paths, flat extraction
 - **Symlink security**: symlinks blocked by default, validated extraction with `allow_symlinks`
@@ -88,11 +88,22 @@ zip.close();
 
 ### Encryption
 
-```qore
-# AES-256 (default)
-zip.addText("secret.txt", "data", NOTHING, {"password": "secret"});
+When a password is supplied without an explicit `encryption_method`, the module defaults to
+**traditional PKWARE (ZipCrypto)**. This is the format every common ZIP tool can open out of the
+box — Windows Explorer's built-in ZIP handler, macOS Finder, Info-ZIP `unzip`, etc. Traditional
+PKWARE is, however, cryptographically weak (vulnerable to known-plaintext attacks); choose AES
+explicitly when the data is sensitive and you control which tool the recipient will use. AES
+archives need 7-Zip, WinRAR, or another AES-aware tool on Windows; macOS Finder cannot open them.
 
-# PKWARE traditional
+```qore
+# Default: PKWARE traditional (ZipCrypto) — opens in Windows Explorer and all common tools
+zip.addText("data.txt", "data", NOTHING, {"password": "secret"});
+
+# Strong AES-256 encryption — requires 7-Zip / WinRAR / etc. on Windows
+zip.addText("secret.txt", "data", NOTHING,
+    {"password": "secret", "encryption_method": ZIP_EM_AES_256});
+
+# Explicit PKWARE (same as the default when a password is set)
 zip.addText("legacy.txt", "data", NOTHING,
     {"password": "secret", "encryption_method": ZIP_EM_TRAD_PKWARE});
 
@@ -101,6 +112,10 @@ ZipFile zip(encrypted_data);
 zip.setPassword("secret");
 string content = zip.readText("secret.txt");
 ```
+
+Extracting an encrypted entry without a password raises `ZIP-PASSWORD-ERROR` before any I/O; an
+invalid password raises `ZIP-PASSWORD-ERROR` with a "wrong password" message. Extraction never
+leaves 0-byte garbage files on disk when decryption fails.
 
 ### Verifying Integrity
 

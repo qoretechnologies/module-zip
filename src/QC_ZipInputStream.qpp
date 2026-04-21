@@ -42,8 +42,6 @@ while (*binary data = is.read(65536)) {
 
     @note This class is not thread-safe. Concurrent access from multiple threads requires external synchronization.
 
-    @since %zip 1.0
-
     @see ZipFile::openRead()
 */
 qclass ZipInputStream [arg=ZipInputStream* zis; ns=Qore::Zip; vparent=InputStream];

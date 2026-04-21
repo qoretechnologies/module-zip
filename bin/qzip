@@ -59,6 +59,24 @@ class QZip {
             "password": "p,password=s",
         };
 
+        #! Valid encryption method names (in order of help-text listing).
+        #! Default when a password is set but no method is chosen is \c pkware (ZipCrypto) — this
+        #! matches Windows Explorer's built-in ZIP handler and most common tools. Use \c aes-256
+        #! for strong encryption when the recipient has 7-Zip/WinRAR/etc.
+        const EncryptionMethods = {
+            "pkware": ZIP_EM_TRAD_PKWARE,
+            "aes-128": ZIP_EM_AES_128,
+            "aes-192": ZIP_EM_AES_192,
+            "aes-256": ZIP_EM_AES_256,
+        };
+
+        const EncryptionNames = {
+            ZIP_EM_TRAD_PKWARE: "pkware",
+            ZIP_EM_AES_128: "aes-128",
+            ZIP_EM_AES_192: "aes-192",
+            ZIP_EM_AES_256: "aes-256",
+        };
+
         const ListOpts = CommonOpts + {
             "include": "i,include=s@",
             "exclude": "x,exclude=s@",
@@ -84,10 +102,12 @@ class QZip {
         const CreateOpts = CommonOpts + {
             "compression": "c,compression=s",
             "level": "l,level=i",
+            "encryption": "e,encryption=s",
         };
 
         const AddOpts = CommonOpts + {
             "compression": "c,compression=s",
+            "encryption": "e,encryption=s",
         };
 
         const DiffOpts = {
@@ -99,6 +119,7 @@ class QZip {
         const AddPathOpts = CommonOpts + {
             "root": "r,root=s",
             "compression": "c,compression=s",
+            "encryption": "e,encryption=s",
         };
 
         const VerifyOpts = CommonOpts + {
@@ -226,6 +247,21 @@ class QZip {
             return opts;
         }
         return opts;
+    }
+
+    # Resolve an encryption-method CLI name to a ZIP_EM_* constant. Returns NOTHING when \a name is
+    # empty, so the caller can leave the encryption_method key unset and inherit the module default
+    # (PKWARE when a password is provided, no encryption otherwise).
+    private *int resolveEncryption(*string name) {
+        if (!exists name) {
+            return;
+        }
+        *int em = EncryptionMethods{name};
+        if (!exists em) {
+            throw "QZIP-ERROR", sprintf("unknown encryption method '%s'; valid: %y",
+                name, keys EncryptionMethods);
+        }
+        return em;
     }
 
     # ── list ──────────────────────────────────────────────────
@@ -393,13 +429,15 @@ class QZip {
         bool has_filters = opts.include || opts.exclude || opts."include-regex" || opts."exclude-regex";
 
         list<string> extracted_files;
+        list<string> skipped_files;
         if (has_filters) {
             list<hash<ZipEntryInfo>> filtered = filterEntries(all_entries, opts);
             list<string> names = map $1.name, filtered;
             extracted_files = zip.extractEntries(dest, names, extract_opts);
         } else {
-            zip.extractAll(dest, extract_opts);
-            extracted_files = map dest + "/" + $1.name, all_entries, !$1.is_directory;
+            hash<ZipExtractResult> result = zip.extractAll(dest, extract_opts);
+            extracted_files = result.extracted;
+            skipped_files = result.skipped;
         }
 
         zip.close();
@@ -409,6 +447,18 @@ class QZip {
             c.success("OK"),
             c.number(sprintf("%d", count)) + " file" + (count != 1 ? "s" : ""),
             c.cyan(dest));
+
+        if (skipped_files) {
+            stderr.printf("%s %s skipped (already exist); pass %s to overwrite:\n",
+                c.warning("!"),
+                c.number(sprintf("%d", skipped_files.size())) + " file"
+                    + (skipped_files.size() != 1 ? "s" : ""),
+                c.key("-o, --overwrite"));
+            foreach string f in (skipped_files) {
+                stderr.printf("  %s %s\n", c.warning("!"), f);
+            }
+            exit(2);
+        }
     }
 
     # ── create ────────────────────────────────────────────────
@@ -422,6 +472,9 @@ class QZip {
                     "lzma, zstd, xz)"},
                 {"flags": "-l, --level <n>", "desc": "Compression level (0-9)"},
                 {"flags": "-p, --password <pw>", "desc": "Encrypt entries with password"},
+                {"flags": "-e, --encryption <m>", "desc": "Encryption method (pkware [default], "
+                    "aes-128, aes-192, aes-256); pkware is readable by Windows Explorer and most "
+                    "tools but is cryptographically weak. aes-* requires 7-Zip/WinRAR on Windows."},
             ));
             exit(0);
         }
@@ -450,6 +503,12 @@ class QZip {
         }
         if (opts.password) {
             add_opts.password = opts.password;
+            *int em = resolveEncryption(opts.encryption);
+            if (exists em) {
+                add_opts.encryption_method = em;
+            }
+        } else if (exists opts.encryption) {
+            stderr.printf("  %s --encryption has no effect without --password\n", c.warning("!"));
         }
 
         int count = 0;
@@ -629,6 +688,8 @@ class QZip {
                 {"flags": "-c, --compression <m>", "desc": "Compression method (store, deflate, bzip2, "
                     "lzma, zstd, xz)"},
                 {"flags": "-p, --password <pw>", "desc": "Encrypt new entries with password"},
+                {"flags": "-e, --encryption <m>", "desc": "Encryption method (pkware [default], "
+                    "aes-128, aes-192, aes-256)"},
             ));
             exit(0);
         }
@@ -654,6 +715,12 @@ class QZip {
         }
         if (opts.password) {
             add_opts.password = opts.password;
+            *int em = resolveEncryption(opts.encryption);
+            if (exists em) {
+                add_opts.encryption_method = em;
+            }
+        } else if (exists opts.encryption) {
+            stderr.printf("  %s --encryption has no effect without --password\n", c.warning("!"));
         }
 
         int count = 0;
@@ -684,6 +751,8 @@ class QZip {
                 {"flags": "-c, --compression <m>", "desc": "Compression method (store, deflate, bzip2, "
                     "lzma, zstd, xz)"},
                 {"flags": "-p, --password <pw>", "desc": "Encrypt new entries with password"},
+                {"flags": "-e, --encryption <m>", "desc": "Encryption method (pkware [default], "
+                    "aes-128, aes-192, aes-256)"},
             ));
             exit(0);
         }
@@ -709,6 +778,12 @@ class QZip {
         }
         if (opts.password) {
             add_opts.password = opts.password;
+            *int em = resolveEncryption(opts.encryption);
+            if (exists em) {
+                add_opts.encryption_method = em;
+            }
+        } else if (exists opts.encryption) {
+            stderr.printf("  %s --encryption has no effect without --password\n", c.warning("!"));
         }
 
         string root = opts.root ?? dirname(source_path);
@@ -802,6 +877,8 @@ class QZip {
                     "lzma, zstd, xz)"},
                 {"flags": "-l, --level <n>", "desc": "Compression level (0-9)"},
                 {"flags": "-p, --password <pw>", "desc": "Password for encrypted archives"},
+                {"flags": "-e, --encryption <m>", "desc": "Encryption method to write (pkware "
+                    "[default], aes-128, aes-192, aes-256); ignored when --password is not set"},
             ));
             exit(0);
         }
@@ -819,7 +896,8 @@ class QZip {
                 method_name, keys CompressionMethods);
         }
 
-        hash<auto> result = ZipFile::recompress(archive_path, cm, opts.level, opts.password);
+        *int em = resolveEncryption(opts.encryption);
+        hash<auto> result = ZipFile::recompress(archive_path, cm, opts.level, opts.password, em);
 
         printf("%s recompressed %s to %s (%s entries, %s -> %s)\n",
             c.success("OK"),
