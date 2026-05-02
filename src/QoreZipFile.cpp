@@ -741,12 +741,14 @@ void QoreZipFile::parseAddOptions(const QoreHashNode* opts, int16_t& compression
 
     v = opts->getKeyValue("password");
     if (!v.isNothing() && v.getType() == NT_STRING) {
-        entry_password = v.get<const QoreStringNode>()->c_str();
+        QoreStringValueHelper str(v);
+        entry_password.assign(str->c_str(), str->size());
     }
 
     v = opts->getKeyValue("comment");
     if (!v.isNothing() && v.getType() == NT_STRING) {
-        comment = v.get<const QoreStringNode>()->c_str();
+        QoreStringValueHelper str(v);
+        comment.assign(str->c_str(), str->size());
     }
 
     v = opts->getKeyValue("modified");
@@ -859,7 +861,8 @@ bool QoreZipFile::checkPasswordAvailableUnlocked(const std::string& pwd, const Q
         while (li.next()) {
             QoreValue v = li.getValue();
             if (v.getType() == NT_STRING) {
-                wanted.insert(v.get<const QoreStringNode>()->c_str());
+                QoreStringValueHelper str(v);
+                wanted.emplace(str->c_str(), str->size());
             }
         }
     }
@@ -1092,7 +1095,8 @@ void QoreZipFile::parseExtractOptions(const QoreHashNode* opts, std::string& pwd
 
     QoreValue v = opts->getKeyValue("password");
     if (!v.isNothing() && v.getType() == NT_STRING) {
-        pwd = v.get<const QoreStringNode>()->c_str();
+        QoreStringValueHelper str(v);
+        pwd.assign(str->c_str(), str->size());
     }
 
     v = opts->getKeyValue("overwrite");
@@ -1112,12 +1116,14 @@ void QoreZipFile::parseExtractOptions(const QoreHashNode* opts, std::string& pwd
 
     v = opts->getKeyValue("strip_prefix");
     if (!v.isNothing() && v.getType() == NT_STRING) {
-        strip_prefix = v.get<const QoreStringNode>()->c_str();
+        QoreStringValueHelper str(v);
+        strip_prefix.assign(str->c_str(), str->size());
     }
 
     v = opts->getKeyValue("add_prefix");
     if (!v.isNothing() && v.getType() == NT_STRING) {
-        add_prefix = v.get<const QoreStringNode>()->c_str();
+        QoreStringValueHelper str(v);
+        add_prefix.assign(str->c_str(), str->size());
     }
 
     v = opts->getKeyValue("entry_callback");
@@ -1240,7 +1246,8 @@ QoreListNode* QoreZipFile::verify(const QoreHashNode* opts, ExceptionSink* xsink
     if (opts) {
         QoreValue v = opts->getKeyValue("password");
         if (!v.isNothing() && v.getType() == NT_STRING) {
-            verify_pwd = v.get<const QoreStringNode>()->c_str();
+            QoreStringValueHelper str(v);
+            verify_pwd.assign(str->c_str(), str->size());
             mz_zip_reader_set_password(reader, verify_pwd.c_str());
         }
     }
@@ -1660,7 +1667,8 @@ QoreListNode* QoreZipFile::extractEntries(const char* destPath, const QoreListNo
         while (li.next()) {
             QoreValue v = li.getValue();
             if (v.getType() == NT_STRING) {
-                name_set.insert(v.get<const QoreStringNode>()->c_str());
+                QoreStringValueHelper str(v);
+                name_set.emplace(str->c_str(), str->size());
             }
         }
         // If the list was provided but empty, return empty result immediately
@@ -1876,7 +1884,8 @@ QoreHashNode* QoreZipFile::replaceEntries(const char* archive_path, const QoreHa
         while (li.next()) {
             QoreValue v = li.getValue();
             if (v.getType() == NT_STRING) {
-                delete_set.insert(v.get<const QoreStringNode>()->c_str());
+                QoreStringValueHelper str(v);
+                delete_set.emplace(str->c_str(), str->size());
             }
         }
     }
@@ -2074,7 +2083,8 @@ QoreHashNode* QoreZipFile::diff(const char* archive1, const char* archive2, Exce
             const QoreHashNode* h = ev.get<const QoreHashNode>();
             QoreValue nv = h->getKeyValue("name");
             if (nv.getType() == NT_STRING) {
-                map1[nv.get<const QoreStringNode>()->c_str()] = {i, h->getKeyValue("crc32").getAsBigInt()};
+                QoreStringValueHelper name(nv);
+                map1[name->c_str()] = {i, h->getKeyValue("crc32").getAsBigInt()};
             }
         }
     }
@@ -2085,7 +2095,8 @@ QoreHashNode* QoreZipFile::diff(const char* archive1, const char* archive2, Exce
             const QoreHashNode* h = ev.get<const QoreHashNode>();
             QoreValue nv = h->getKeyValue("name");
             if (nv.getType() == NT_STRING) {
-                map2[nv.get<const QoreStringNode>()->c_str()] = {i, h->getKeyValue("crc32").getAsBigInt()};
+                QoreStringValueHelper name(nv);
+                map2[name->c_str()] = {i, h->getKeyValue("crc32").getAsBigInt()};
             }
         }
     }
