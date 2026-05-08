@@ -2372,7 +2372,13 @@ void QoreZipFile::setComment(const char* comment, ExceptionSink* xsink) {
         return;
     }
 
-    mz_zip_writer_set_comment(writer, comment);
+    if (comment) {
+        archive_comment = comment;
+        mz_zip_writer_set_comment(writer, archive_comment.c_str());
+    } else {
+        archive_comment.clear();
+        mz_zip_writer_set_comment(writer, nullptr);
+    }
 }
 
 // QoreZipEntry implementation

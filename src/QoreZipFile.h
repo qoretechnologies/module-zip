@@ -194,6 +194,7 @@ private:
     void* writer;                        //!< mz_zip_writer handle
     void* mem_stream;                    //!< memory stream for in-memory archives
     std::string password;
+    std::string archive_comment;         //!< Archive comment storage for minizip writer lifetime
     bool in_memory;
     bool closed;
     bool recover;                    //!< Recovery mode for corrupted archives
