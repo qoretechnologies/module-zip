@@ -58,21 +58,40 @@ set(MZ_DECOMPRESS_ONLY OFF CACHE BOOL "Build both compression and decompression"
 set(MZ_BUILD_TESTS OFF CACHE BOOL "Disable minizip-ng tests" FORCE)
 set(MZ_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable minizip-ng unit tests" FORCE)
 set(MZ_BUILD_FUZZ_TESTS OFF CACHE BOOL "Disable minizip-ng fuzz tests" FORCE)
+# Pin sanitizer to OFF: minizip-ng v4.2 only accepts OFF/memory/address/undefined/thread
+# (the earlier "AUTO" value was removed), and we don't want submodule sanitizer state to
+# leak into the module build.
+set(MZ_SANITIZER OFF CACHE STRING "Disable minizip-ng sanitizers" FORCE)
 
 # Apply patches to minizip-ng before building
 # OpenSSL 3.2+ removed ENGINE API - apply compatibility patch
 if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
+    # Dry-run first: patch --dry-run returns 0 when the patch would apply, 1 when
+    # already applied, >1 on error. Only invoke the real apply on a 0, otherwise
+    # patch writes a .rej alongside the source on every configure.
     execute_process(
-        COMMAND patch -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+        COMMAND patch -p1 --dry-run --forward --silent -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/src/minizip-ng"
-        RESULT_VARIABLE PATCH_RESULT
+        RESULT_VARIABLE PATCH_DRY_RESULT
         OUTPUT_QUIET
         ERROR_QUIET
     )
-    # Result 0 = success, 1 = already applied (treated as success), >1 = error (e.g., 2 for patch failure)
-    if(PATCH_RESULT GREATER 1)
-        message(WARNING "Failed to apply OpenSSL 3.2 compatibility patch (patch exit code: ${PATCH_RESULT})")
+    if(PATCH_DRY_RESULT EQUAL 0)
+        execute_process(
+            COMMAND patch -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/src/minizip-ng"
+            RESULT_VARIABLE PATCH_RESULT
+            OUTPUT_QUIET
+            ERROR_QUIET
+        )
+        if(NOT PATCH_RESULT EQUAL 0)
+            message(WARNING "Failed to apply OpenSSL 3.2 compatibility patch (patch exit code: ${PATCH_RESULT})")
+        endif()
+    elseif(PATCH_DRY_RESULT GREATER 1)
+        message(WARNING "OpenSSL 3.2 compatibility patch dry-run failed (exit code: ${PATCH_DRY_RESULT})")
     endif()
+    # Clean up any stale reject file from earlier runs that pre-date the dry-run check.
+    file(REMOVE "${CMAKE_SOURCE_DIR}/src/minizip-ng/mz_crypt_openssl.c.rej")
 endif()
 
 # Add minizip-ng subdirectory
