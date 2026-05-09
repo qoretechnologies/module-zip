@@ -97,6 +97,23 @@ endif()
 # Add minizip-ng subdirectory
 add_subdirectory(src/minizip-ng)
 
+# Some distros (e.g. Debian/Ubuntu aarch64) ship libzstd.a without -fPIC, but
+# minizip-ng links zstd::libzstd_static when built as a static archive. Linking
+# that non-PIC .a into our shared .qmod fails with R_AARCH64_ADR_PREL_PG_HI21.
+# Swap to the shared zstd target — every other compression dep is shared anyway.
+# INTERFACE_LINK_LIBRARIES wraps each dep in $<LINK_ONLY:...>, so substring
+# replace (rather than list TRANSFORM) is what reaches inside the genex.
+if(zstd_FOUND AND TARGET zstd::libzstd_shared AND TARGET minizip-ng)
+    foreach(_mz_prop LINK_LIBRARIES INTERFACE_LINK_LIBRARIES)
+        get_target_property(_mz_val minizip-ng ${_mz_prop})
+        if(_mz_val)
+            string(REPLACE "zstd::libzstd_static" "zstd::libzstd_shared"
+                   _mz_val "${_mz_val}")
+            set_target_properties(minizip-ng PROPERTIES ${_mz_prop} "${_mz_val}")
+        endif()
+    endforeach()
+endif()
+
 set(QPP_SRC
     src/QC_ZipFile.qpp
     src/QC_ZipEntry.qpp
