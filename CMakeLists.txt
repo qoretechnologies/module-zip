@@ -63,15 +63,29 @@ set(MZ_BUILD_FUZZ_TESTS OFF CACHE BOOL "Disable minizip-ng fuzz tests" FORCE)
 # leak into the module build.
 set(MZ_SANITIZER OFF CACHE STRING "Disable minizip-ng sanitizers" FORCE)
 
-# Apply patches to minizip-ng before building
-# OpenSSL 3.2+ removed ENGINE API - apply compatibility patch
+# minizip-ng is consumed as a git submodule, but modern OpenSSL (3.x built without
+# the legacy ENGINE API - e.g. Fedora's OpenSSL 3.5, where <openssl/engine.h> no
+# longer exists) needs a small compatibility patch that upstream has not adopted
+# (as of 4.2.1 and current develop, mz_crypt_openssl.c still includes engine.h
+# unconditionally). Patching the submodule working tree in place leaves it dirty,
+# which breaks `git pull --rebase` and `git submodule update` in persistent
+# checkouts. Instead, copy the submodule into the build tree and patch the COPY,
+# leaving the checked-out submodule pristine.
+set(MINIZIP_SRC_DIR "${CMAKE_BINARY_DIR}/minizip-ng")
+file(COPY "${CMAKE_SOURCE_DIR}/src/minizip-ng" DESTINATION "${CMAKE_BINARY_DIR}"
+     PATTERN ".git" EXCLUDE)
+
+# Apply patches to the build-tree copy of minizip-ng before building.
+# OpenSSL 3.2+ removed the ENGINE API - apply compatibility patch.
 if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
     # Dry-run first: patch --dry-run returns 0 when the patch would apply, 1 when
     # already applied, >1 on error. Only invoke the real apply on a 0, otherwise
-    # patch writes a .rej alongside the source on every configure.
+    # patch writes a .rej alongside the source on every configure. (file(COPY)
+    # refreshes the copy each configure, so "already applied" is normally only
+    # seen when the destination file was not re-copied.)
     execute_process(
         COMMAND patch -p1 --dry-run --forward --silent -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
-        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/src/minizip-ng"
+        WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
         RESULT_VARIABLE PATCH_DRY_RESULT
         OUTPUT_QUIET
         ERROR_QUIET
@@ -79,7 +93,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
     if(PATCH_DRY_RESULT EQUAL 0)
         execute_process(
             COMMAND patch -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/src/minizip-ng"
+            WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
             RESULT_VARIABLE PATCH_RESULT
             OUTPUT_QUIET
             ERROR_QUIET
@@ -90,12 +104,10 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
     elseif(PATCH_DRY_RESULT GREATER 1)
         message(WARNING "OpenSSL 3.2 compatibility patch dry-run failed (exit code: ${PATCH_DRY_RESULT})")
     endif()
-    # Clean up any stale reject file from earlier runs that pre-date the dry-run check.
-    file(REMOVE "${CMAKE_SOURCE_DIR}/src/minizip-ng/mz_crypt_openssl.c.rej")
 endif()
 
-# Add minizip-ng subdirectory
-add_subdirectory(src/minizip-ng)
+# Add minizip-ng subdirectory (the patched build-tree copy, never the submodule)
+add_subdirectory("${MINIZIP_SRC_DIR}" "${CMAKE_BINARY_DIR}/minizip-ng-build")
 
 # Some distros (e.g. Debian/Ubuntu aarch64) ship libzstd.a without -fPIC, but
 # minizip-ng links zstd::libzstd_static when built as a static archive. Linking
@@ -148,7 +160,7 @@ set(QORE_DOX_TMPL_SRC
 add_library(${module_name} MODULE ${CPP_SRC} ${QPP_SOURCES})
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(${CMAKE_SOURCE_DIR}/src/minizip-ng)
+include_directories(${MINIZIP_SRC_DIR})
 include_directories(${ZLIB_INCLUDE_DIRS})
 target_include_directories(${module_name} PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>)
 
