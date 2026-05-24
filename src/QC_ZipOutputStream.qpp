@@ -70,7 +70,7 @@ ZipOutputStream::destructor() {
 
     @see close()
 */
-nothing ZipOutputStream::write(binary data) {
+nothing ZipOutputStream::write(binary data) [flags=NAMED_ARGS] {
     zos->writeHelper(data, xsink);
 }
 

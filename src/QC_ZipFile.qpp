@@ -350,7 +350,7 @@ qclass ZipFile [arg=QoreZipFile* zf; ns=Qore::Zip];
 
     @throw ZIP-ERROR error opening the archive
 */
-ZipFile::constructor(string path, string mode = "r", *bool recover) [dom=FILESYSTEM] {
+ZipFile::constructor(string path, string mode = "r", *bool recover) [dom=FILESYSTEM;flags=NAMED_ARGS] {
     ZipMode zm = ZIP_MODE_READ;
     if (mode->empty() || mode->c_str()[0] == 'r') {
         zm = ZIP_MODE_READ;
@@ -376,7 +376,7 @@ ZipFile::constructor(string path, string mode = "r", *bool recover) [dom=FILESYS
 
     @throw ZIP-ERROR error parsing the archive data
 */
-ZipFile::constructor(binary data, *bool recover) {
+ZipFile::constructor(binary data, *bool recover) [flags=NAMED_ARGS] {
     ReferenceHolder<QoreZipFile> holder(new QoreZipFile(data, xsink, (bool)recover), xsink);
     if (*xsink) {
         return;
@@ -444,7 +444,7 @@ int ZipFile::count() {
 
     @throw ZIP-ERROR error reading archive
 */
-bool ZipFile::hasEntry(string name) {
+bool ZipFile::hasEntry(string name) [flags=NAMED_ARGS] {
     return zf->hasEntry(name->c_str(), xsink);
 }
 
@@ -455,7 +455,7 @@ bool ZipFile::hasEntry(string name) {
 
     @throw ZIP-ERROR error reading entry or entry not found
 */
-binary ZipFile::read(string name) {
+binary ZipFile::read(string name) [flags=NAMED_ARGS] {
     return zf->read(name->c_str(), xsink);
 }
 
@@ -467,7 +467,7 @@ binary ZipFile::read(string name) {
 
     @throw ZIP-ERROR error reading entry or entry not found
 */
-string ZipFile::readText(string name, *string encoding) {
+string ZipFile::readText(string name, *string encoding) [flags=NAMED_ARGS] {
     return zf->readText(name->c_str(), encoding ? encoding->c_str() : nullptr, xsink);
 }
 
@@ -478,7 +478,7 @@ string ZipFile::readText(string name, *string encoding) {
 
     @throw ZIP-ERROR error reading entry or entry not found
 */
-hash<ZipEntryInfo> ZipFile::getEntry(string name) {
+hash<ZipEntryInfo> ZipFile::getEntry(string name) [flags=NAMED_ARGS] {
     return zf->getEntry(name->c_str(), xsink);
 }
 
@@ -521,7 +521,7 @@ nothing ZipFile::addFile(string name, string filepath, *hash<ZipAddOptions> opts
 
     @throw ZIP-ERROR error adding directory or archive not open for writing
 */
-nothing ZipFile::addDirectory(string name) {
+nothing ZipFile::addDirectory(string name) [flags=NAMED_ARGS] {
     zf->addDirectory(name->c_str(), xsink);
 }
 
@@ -636,7 +636,7 @@ ZipFile::replaceEntries("archive.zip",
     @endcode
 */
 static hash<auto> ZipFile::replaceEntries(string archive_path, *hash<auto> replacements,
-    *list<string> delete_names) [dom=FILESYSTEM] {
+    *list<string> delete_names) [dom=FILESYSTEM;flags=NAMED_ARGS] {
     return QoreZipFile::replaceEntries(archive_path->c_str(), replacements, delete_names, xsink);
 }
 
@@ -691,7 +691,7 @@ ZipFile::recompress("secrets.zip", ZIP_CM_DEFLATE, 6, "secret", ZIP_EM_TRAD_PKWA
     @endcode
 */
 static hash<auto> ZipFile::recompress(string archive_path, int compression_method,
-    *int compression_level, *string password, *int encryption_method) [dom=FILESYSTEM] {
+    *int compression_level, *string password, *int encryption_method) [dom=FILESYSTEM;flags=NAMED_ARGS] {
     return QoreZipFile::recompress(archive_path->c_str(), (int16_t)compression_method,
         compression_level ? (int16_t)compression_level : MZ_COMPRESS_LEVEL_DEFAULT,
         password ? password->c_str() : nullptr,
@@ -707,7 +707,7 @@ static hash<auto> ZipFile::recompress(string archive_path, int compression_metho
 
     @note This is primarily intended for testing symlink security validation.
 */
-nothing ZipFile::addSymlink(string name, string target) {
+nothing ZipFile::addSymlink(string name, string target) [flags=NAMED_ARGS] {
     zf->addSymlink(name->c_str(), target->c_str(), xsink);
 }
 
@@ -718,7 +718,7 @@ nothing ZipFile::addSymlink(string name, string target) {
 
     @note This operation may require rewriting the archive
 */
-nothing ZipFile::delete(string name) [dom=FILESYSTEM] {
+nothing ZipFile::delete(string name) [dom=FILESYSTEM;flags=NAMED_ARGS] {
     zf->deleteEntry(name->c_str(), xsink);
 }
 
@@ -733,7 +733,7 @@ zip.setPassword("secret");
 string content = zip.readText("file.txt");
     @endcode
 */
-nothing ZipFile::setPassword(*string password) {
+nothing ZipFile::setPassword(*string password) [flags=NAMED_ARGS] {
     zf->setPassword(password ? password->c_str() : nullptr);
 }
 
@@ -758,7 +758,7 @@ nothing ZipFile::setPassword(*string password) {
 
     @throw ZIP-ERROR error setting comment or archive not open for writing
 */
-nothing ZipFile::setComment(string comment) {
+nothing ZipFile::setComment(string comment) [flags=NAMED_ARGS] {
     zf->setComment(comment->c_str(), xsink);
 }
 
@@ -780,7 +780,7 @@ while (*binary data = is.read(65536)) {
 
     @see ZipInputStream
 */
-ZipInputStream ZipFile::openRead(string name) {
+ZipInputStream ZipFile::openRead(string name) [flags=NAMED_ARGS] {
     return zf->openInputStream(name->c_str(), xsink);
 }
 
