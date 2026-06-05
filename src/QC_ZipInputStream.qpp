@@ -69,7 +69,7 @@ ZipInputStream::destructor() {
 
     @see peek()
 */
-*binary ZipInputStream::read(int limit) {
+*binary ZipInputStream::read(int limit) [flags=NAMED_ARGS] {
     return zis->readHelper(limit, xsink);
 }
 
