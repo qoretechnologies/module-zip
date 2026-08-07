@@ -45,6 +45,7 @@ module ZipDataProvider {
         # Register the data provider application
         DataProviderActionCatalog::registerApp(<DataProviderAppInfo>{
             "name": ZipDataProvider::AppName,
+            "presentation_source_locale": "en",
             "display_name": "Zip Archive",
             "short_desc": "Zip archive operations",
             "desc": "Create, extract, and manage Zip archives with compression support",
