@@ -1,0 +1,1405 @@
+{
+  "schema_version": 1,
+  "locales": {
+    "uk": {
+      "messages": {
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.desc": {
+          "source": "Compress binary data or files into an in-memory zip archive",
+          "message": "Стиснення двійкових даних або файлів у zip-архів у пам'яті"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.display_name": {
+          "source": "Compress Data",
+          "message": "Стиснути дані"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "Без стиснення (тільки збереження)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Store"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "Стиснення LZMA"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "Стиснення BZip2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Стиснення Deflate (стандартне, найбільш сумісне)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "Стиснення XZ/LZMA2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Стиснення Zstandard (швидке, високий ступінь)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method to use for all entries.",
+          "message": "Метод стиснення для всіх записів."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "Метод стиснення"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "Алгоритм стиснення"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.desc": {
+          "source": "List of entries to compress. Each entry should have 'name' and 'data' (binary data).",
+          "message": "Список записів для стиснення. Кожен запис повинен мати 'name' та 'data' (двійкові дані)."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "Записи"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to compress",
+          "message": "Список записів для стиснення"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Без шифрування"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Немає"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Традиційне шифрування PKWARE (слабке, не рекомендовано)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "Традиційне PKWARE"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Шифрування AES-128"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Шифрування AES-192"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Шифрування AES-256 (рекомендовано)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Метод шифрування, який використовується, якщо вказано пароль. За замовчуванням AES-256."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Метод шифрування"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Алгоритм шифрування"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the compressed archive will be written. If not specified, the archive data is returned in the response.",
+          "message": "URL-адреса розташування FileLocationHandler, куди буде записано стиснений архів. Якщо не вказано, дані архіву повертаються у відповіді."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "Розташування виводу"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "URL-адреса вихідного розташування"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "Пароль для шифрування AES-256. Якщо вказано, усі записи буде зашифровано."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Пароль шифрування"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.short_desc": {
+          "source": "Compress data to zip format",
+          "message": "Стиснути дані у формат zip"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.desc": {
+          "source": "Create a new zip archive from files, directories, or binary data",
+          "message": "Створити новий zip-архів із файлів, каталогів або двійкових даних"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.display_name": {
+          "source": "Create Archive",
+          "message": "Створити архів"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.desc": {
+          "source": "Optional comment to embed in the archive metadata.",
+          "message": "Необов'язковий коментар для додавання в метадані архіву."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.display_name": {
+          "source": "Archive Comment",
+          "message": "Коментар до архіву"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.short_desc": {
+          "source": "Optional archive comment",
+          "message": "Необов'язковий коментар до архіву"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "Без стиснення (тільки збереження)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Store"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "Стиснення LZMA"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "Стиснення BZip2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Стиснення Deflate (стандартне, найбільш сумісне)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "Стиснення XZ/LZMA2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Стиснення Zstandard (швидке, високий ступінь)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Default compression method for all entries. Can be overridden per entry.",
+          "message": "Метод стиснення за замовчуванням для всіх записів. Може бути перевизначений для кожного запису окремо."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "Метод стиснення"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Default compression algorithm",
+          "message": "Алгоритм стиснення за замовчуванням"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from). Optional 'compression_method' per entry overrides the default.",
+          "message": "Список записів для додавання. Кожен запис повинен мати 'name' та або 'data' (двійкові дані), або 'path' (шлях у файловій системі для зчитування). Необов'язковий параметр 'compression_method' для запису перевизначає значення за замовчуванням."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "Записи"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add to the archive",
+          "message": "Список записів для додавання до архіву"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Без шифрування"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Немає"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Традиційне шифрування PKWARE (слабке, не рекомендовано)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "Традиційне PKWARE"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Шифрування AES-128"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Шифрування AES-192"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Шифрування AES-256 (рекомендовано)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Метод шифрування, який використовується, якщо вказано пароль. За замовчуванням AES-256."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Метод шифрування"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Алгоритм шифрування"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the archive will be written (alternative to output_path).",
+          "message": "URL-адреса розташування FileLocationHandler, куди буде записано архів (альтернатива output_path)."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "Розташування виводу"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "URL-адреса вихідного розташування"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Output file path where the archive will be written. If not specified, the archive data is returned as binary data in the response.",
+          "message": "Шлях до вихідного файлу, куди буде записано архів. Якщо не вказано, дані архіву повертаються як двійкові дані у відповіді."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "Вихідний шлях"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Output file path for the archive",
+          "message": "Шлях до вихідного файлу для архіву"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "Пароль для шифрування AES-256. Якщо вказано, усі записи буде зашифровано."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Пароль шифрування"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.short_desc": {
+          "source": "Create a new zip archive",
+          "message": "Створити новий zip-архів"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.desc": {
+          "source": "Add new files or update existing files in a zip archive",
+          "message": "Додати нові файли або оновити наявні файли в zip-архіві"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.display_name": {
+          "source": "Add Files to Archive",
+          "message": "Додати файли до архіву"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "Шлях у файловій системі до ZIP-архіву, до якого додаються файли."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Шлях до архіву"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from).",
+          "message": "Список записів для додавання. Кожен запис повинен мати 'name' та або 'data' (двійкові дані), або 'path' (шлях у файловій системі для зчитування)."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "Записи"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add",
+          "message": "Список записів для додавання"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Без шифрування"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Немає"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Традиційне шифрування PKWARE (слабке, не рекомендовано)"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "Традиційне PKWARE"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Шифрування AES-128"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Шифрування AES-192"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Шифрування AES-256 (рекомендовано)"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Метод шифрування, який використовується, якщо вказано пароль. За замовчуванням AES-256."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Метод шифрування"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Алгоритм шифрування"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "Пароль для шифрування нових записів за допомогою AES-256."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password for new entries",
+          "message": "Пароль шифрування для нових записів"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.short_desc": {
+          "source": "Add files to an existing archive",
+          "message": "Додати файли до наявного архіву"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.desc": {
+          "source": "Recursively add a file or directory from the filesystem to an existing zip archive",
+          "message": "Рекурсивно додати файл або каталог із файлової системи до наявного zip-архіву"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.display_name": {
+          "source": "Add Path to Archive",
+          "message": "Додати шлях до архіву"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "Без стиснення (тільки збереження)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Store"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "Стиснення LZMA"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "Стиснення BZip2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Стиснення Deflate (стандартне, найбільш сумісне)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "Стиснення XZ/LZMA2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Стиснення Zstandard (швидке, високий ступінь)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method for all entries.",
+          "message": "Метод стиснення для всіх записів."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "Метод стиснення"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "Алгоритм стиснення"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "Шлях у файловій системі до ZIP-архіву, до якого додаються файли."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Шлях до архіву"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Без шифрування"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Немає"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Традиційне шифрування PKWARE (слабке, не рекомендовано)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "Традиційне PKWARE"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Шифрування AES-128"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Шифрування AES-192"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Шифрування AES-256 (рекомендовано)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Метод шифрування, який використовується, якщо вказано пароль. За замовчуванням AES-256."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Метод шифрування"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Алгоритм шифрування"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.desc": {
+          "source": "Filesystem path to a file or directory to add recursively to the archive.",
+          "message": "Шлях у файловій системі до файлу або каталогу для рекурсивного додавання до архіву."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.display_name": {
+          "source": "Source Path",
+          "message": "Вихідний шлях"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.short_desc": {
+          "source": "File or directory to add",
+          "message": "Файл або каталог для додавання"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "Пароль для шифрування нових записів за допомогою AES-256."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Пароль шифрування"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.desc": {
+          "source": "Base path for computing relative entry names in the archive. For example, if source_path='/a/b/c' and root_path='/a', entries will be stored as 'b/c/...'.",
+          "message": "Базовий шлях для обчислення відносних назв записів в архіві. Наприклад, якщо source_path='/a/b/c', а root_path='/a', записи зберігатимуться як 'b/c/...'."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.display_name": {
+          "source": "Root Path",
+          "message": "Кореневий шлях"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.short_desc": {
+          "source": "Base path for relative entry names",
+          "message": "Базовий шлях для відносних назв записів"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.short_desc": {
+          "source": "Recursively add a file or directory",
+          "message": "Рекурсивно додати файл або каталог"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.desc": {
+          "source": "Get metadata and statistics about a zip archive",
+          "message": "Отримати метадані та статистику про zip-архів"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.display_name": {
+          "source": "Get Archive Info",
+          "message": "Отримати інформацію про архів"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Двійкові дані, що містять ZIP-архів."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Дані архіву"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Бінарні дані архіву"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Список glob-шаблонів для виключення (чорний список). Записи, що відповідають будь-якому шаблону, буде пропущено. Виключення застосовується після включення (чорний список переважає над білим)."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Шаблони виключення"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob-шаблони чорного списку"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Шаблон регулярного виразу для виключення записів (чорний список). Записи, чиї назви відповідають регулярному виразу, буде пропущено."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Регулярний вираз виключення"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Шаблон регулярного виразу чорного списку"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Список glob-шаблонів для включення (білий список). Буде включено лише записи, що відповідають принаймні одному шаблону. Використовуйте `*` для відповідності будь-яким символам і `?` для відповідності одному символу."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Шаблони включення"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob-шаблони білого списку"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Шаблон регулярного виразу для включення записів (білий список). Буде включено лише записи, чиї назви відповідають регулярному виразу."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Регулярний вираз включення"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Шаблон регулярного виразу білого списку"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to get information about.",
+          "message": "Шлях у файловій системі до ZIP-архіву, про який потрібно отримати інформацію."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Вхідний шлях"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "URL-адреса розташування FileLocationHandler для архіву (альтернатива input_path або data)."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Розташування"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL-адреса розташування архіву"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.short_desc": {
+          "source": "Get zip archive metadata",
+          "message": "Отримати метадані zip-архіву"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.desc": {
+          "source": "Decompress an in-memory zip archive and return file contents",
+          "message": "Розпакувати zip-архів у пам'яті та повернути вміст файлів"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.display_name": {
+          "source": "Decompress Data",
+          "message": "Розпакувати дані"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to data or archive_path).",
+          "message": "URL-адреса розташування FileLocationHandler для архіву (альтернатива data або archive_path)."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "Розташування архіву"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL-адреса розташування архіву"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to decompress (alternative to data).",
+          "message": "Шлях у файловій системі до архіву ZIP для розпакування (альтернатива data)."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Шлях до архіву"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive to decompress.",
+          "message": "Двійкові дані, що містять архів ZIP для розпакування."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.display_name": {
+          "source": "Compressed Data",
+          "message": "Стиснені дані"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.short_desc": {
+          "source": "Compressed archive data",
+          "message": "Стиснені дані архіву"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.desc": {
+          "source": "Optional list of specific entry names to extract. If not specified, all entries are extracted.",
+          "message": "Необов’язковий список конкретних назв елементів для видобування. Якщо не вказано, видобуваються всі елементи."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.display_name": {
+          "source": "Entry Names",
+          "message": "Назви елементів"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.short_desc": {
+          "source": "Specific entries to extract",
+          "message": "Конкретні елементи для видобування"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Список glob-шаблонів для виключення (чорний список). Записи, що відповідають будь-якому шаблону, буде пропущено. Виключення застосовується після включення (чорний список переважає над білим)."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Шаблони виключення"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob-шаблони чорного списку"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Шаблон регулярного виразу для виключення записів (чорний список). Записи, чиї назви відповідають регулярному виразу, буде пропущено."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Регулярний вираз виключення"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Шаблон регулярного виразу чорного списку"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Список glob-шаблонів для включення (білий список). Буде включено лише записи, що відповідають принаймні одному шаблону. Використовуйте `*` для відповідності будь-яким символам і `?` для відповідності одному символу."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Шаблони включення"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob-шаблони білого списку"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Шаблон регулярного виразу для включення записів (білий список). Буде включено лише записи, чиї назви відповідають регулярному виразу."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Регулярний вираз включення"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Шаблон регулярного виразу білого списку"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "Пароль для розшифрування зашифрованих елементів."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Пароль розшифрування"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.short_desc": {
+          "source": "Decompress zip data",
+          "message": "Розпакувати дані zip"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.desc": {
+          "source": "Extract contents of a zip archive to a destination directory with optional filtering (glob/regex whitelist/blacklist) and path remapping",
+          "message": "Видобути вміст архіву zip до цільового каталогу з необов’язковою фільтрацією (білий/чорний список glob/regex) та перепризначенням шляхів"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.display_name": {
+          "source": "Extract Archive",
+          "message": "Розархівувати архів"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.desc": {
+          "source": "If set, this prefix is prepended to all entry names during extraction. For example, with `add_prefix` = `output/`, the entry `main.cpp` becomes `output/main.cpp`.",
+          "message": "Якщо встановлено, цей префікс додається до всіх назв елементів під час видобування. Наприклад, якщо `add_prefix` = `output/`, елемент `main.cpp` стає `output/main.cpp`."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.display_name": {
+          "source": "Add Prefix",
+          "message": "Додати префікс"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.short_desc": {
+          "source": "Add prefix to entry paths",
+          "message": "Додати префікс до шляхів елементів"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.desc": {
+          "source": "If `True`, allow symlink entries to be extracted. Symlinks are a security risk as they can point outside the destination directory. Default is `False` (symlinks are silently skipped). When enabled, symlink targets are still validated to stay within the destination directory.",
+          "message": "Якщо `True`, дозволити видобування елементів, що є символьними посиланнями. Символьні посилання становлять загрозу безпеці, оскільки можуть вказувати за межі цільового каталогу. За замовчуванням `False` (символьні посилання пропускаються без сповіщення). Якщо ввімкнено, цілі символьних посилань все одно перевіряються, щоб залишатися в межах цільового каталогу."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.display_name": {
+          "source": "Allow Symlinks",
+          "message": "Дозволити символьні посилання"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.short_desc": {
+          "source": "Allow symlink extraction",
+          "message": "Дозволити видобування символьних посилань"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Двійкові дані, що містять ZIP-архів."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Дані архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Бінарні дані архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.desc": {
+          "source": "Filesystem path to the destination directory where files will be extracted.",
+          "message": "Шлях у файловій системі до цільового каталогу, куди будуть видобуті файли."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.display_name": {
+          "source": "Destination Directory",
+          "message": "Цільовий каталог"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.short_desc": {
+          "source": "Directory to extract files to",
+          "message": "Каталог для видобування файлів"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Список glob-шаблонів для виключення (чорний список). Записи, що відповідають будь-якому шаблону, буде пропущено. Виключення застосовується після включення (чорний список переважає над білим)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Шаблони виключення"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob-шаблони чорного списку"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Шаблон регулярного виразу для виключення записів (чорний список). Записи, чиї назви відповідають регулярному виразу, буде пропущено."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Регулярний вираз виключення"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Шаблон регулярного виразу чорного списку"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Список glob-шаблонів для включення (білий список). Буде включено лише записи, що відповідають принаймні одному шаблону. Використовуйте `*` для відповідності будь-яким символам і `?` для відповідності одному символу."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Шаблони включення"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob-шаблони білого списку"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Шаблон регулярного виразу для включення записів (білий список). Буде включено лише записи, чиї назви відповідають регулярному виразу."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Регулярний вираз включення"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Шаблон регулярного виразу білого списку"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to extract.",
+          "message": "Шлях у файловій системі до архіву ZIP для видобування."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Вхідний шлях"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.desc": {
+          "source": "If `True`, overwrite existing files during extraction. Default is `False` (skip existing files).",
+          "message": "Якщо `True`, перезаписувати наявні файли під час видобування. За замовчуванням `False` (пропускати наявні файли)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.display_name": {
+          "source": "Overwrite",
+          "message": "Перезаписати"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.short_desc": {
+          "source": "Overwrite existing files",
+          "message": "Перезаписати наявні файли"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "URL-адреса розташування FileLocationHandler для архіву (альтернатива input_path або data)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Розташування"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL-адреса розташування архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.desc": {
+          "source": "If set, entries whose names start with this prefix will have it removed. For example, with `strip_prefix` = `src/`, the entry `src/main.cpp` becomes `main.cpp`.",
+          "message": "Якщо встановлено, для елементів, назви яких починаються з цього префікса, його буде видалено. Наприклад, якщо `strip_prefix` = `src/`, елемент `src/main.cpp` стає `main.cpp`."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.display_name": {
+          "source": "Strip Prefix",
+          "message": "Видалити префікс"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.short_desc": {
+          "source": "Strip prefix from entry paths",
+          "message": "Видалити префікс зі шляхів елементів"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "Пароль для розшифрування зашифрованих елементів."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Пароль розшифрування"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.desc": {
+          "source": "If `True` (default), preserve directory paths during extraction. If `False`, all entries are extracted as flat files in the destination directory.",
+          "message": "Якщо `True` (за замовчуванням), зберігати шляхи каталогів під час видобування. Якщо `False`, усі елементи видобуваються як плоскі файли в цільовий каталог."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.display_name": {
+          "source": "Preserve Paths",
+          "message": "Зберігати шляхи"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.short_desc": {
+          "source": "Preserve directory structure",
+          "message": "Зберігати структуру каталогів"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.short_desc": {
+          "source": "Extract a zip archive",
+          "message": "Видобути архів zip"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.desc": {
+          "source": "Extract a single file from a zip archive to memory or disk",
+          "message": "Видобути окремий файл з архіву zip у пам'ять або на диск"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.display_name": {
+          "source": "Extract Single File",
+          "message": "Вилучити один файл"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Двійкові дані, що містять ZIP-архів."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.display_name": {
+          "source": "Archive Data",
+          "message": "Дані архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.short_desc": {
+          "source": "Binary archive data",
+          "message": "Бінарні дані архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to archive_path or archive_data).",
+          "message": "URL розташування FileLocationHandler для архіву (альтернатива archive_path або archive_data)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "Розташування архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL-адреса розташування архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive.",
+          "message": "Шлях у файловій системі до архіву ZIP."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Шлях до архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.desc": {
+          "source": "The name/path of the entry within the archive to extract.",
+          "message": "Назва/шлях елемента в архіві для видобування."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.display_name": {
+          "source": "Entry Name",
+          "message": "Назва елемента"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.short_desc": {
+          "source": "Name of the entry to extract",
+          "message": "Назва елемента для видобування"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the extracted file should be written (alternative to output_path).",
+          "message": "URL розташування FileLocationHandler, куди слід записати видобутий файл (альтернатива output_path)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "Розташування виводу"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "URL-адреса вихідного розташування"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Filesystem path where the extracted file should be written. If not specified, the file data is returned in the response.",
+          "message": "Шлях у файловій системі, куди слід записати видобутий файл. Якщо не вказано, дані файлу повертаються у відповіді."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "Вихідний шлях"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Path to write the extracted file",
+          "message": "Шлях для запису видобутого файлу"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting the entry if it is encrypted.",
+          "message": "Пароль для розшифрування елемента, якщо він зашифрований."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Пароль розшифрування"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.short_desc": {
+          "source": "Extract one file from archive",
+          "message": "Видобути один файл з архіву"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.desc": {
+          "source": "Get a list of all entries in a zip archive with metadata",
+          "message": "Отримати список усіх елементів в архіві zip з метаданими"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.display_name": {
+          "source": "List Archive Contents",
+          "message": "Показати вміст архіву"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Двійкові дані, що містять ZIP-архів."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Дані архіву"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Бінарні дані архіву"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Список glob-шаблонів для виключення (чорний список). Записи, що відповідають будь-якому шаблону, буде пропущено. Виключення застосовується після включення (чорний список переважає над білим)."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Шаблони виключення"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob-шаблони чорного списку"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Шаблон регулярного виразу для виключення записів (чорний список). Записи, чиї назви відповідають регулярному виразу, буде пропущено."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Регулярний вираз виключення"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Шаблон регулярного виразу чорного списку"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Список glob-шаблонів для включення (білий список). Буде включено лише записи, що відповідають принаймні одному шаблону. Використовуйте `*` для відповідності будь-яким символам і `?` для відповідності одному символу."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Шаблони включення"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob-шаблони білого списку"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Шаблон регулярного виразу для включення записів (білий список). Буде включено лише записи, чиї назви відповідають регулярному виразу."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Регулярний вираз включення"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Шаблон регулярного виразу білого списку"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to list.",
+          "message": "Шлях у файловій системі до архіву ZIP для перегляду списку."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Вхідний шлях"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "URL-адреса розташування FileLocationHandler для архіву (альтернатива input_path або data)."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Розташування"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL-адреса розташування архіву"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.short_desc": {
+          "source": "List files in a zip archive",
+          "message": "Список файлів в архіві zip"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.desc": {
+          "source": "Replace or delete entries in a ZIP archive. Unchanged entries are copied efficiently without re-compression",
+          "message": "Замінити або видалити елементи в архіві ZIP. Незмінені елементи ефективно копіюються без повторного стиснення"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.display_name": {
+          "source": "Replace/Delete Entries",
+          "message": "Замінити/видалити елементи"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to modify.",
+          "message": "Шлях у файловій системі до архіву ZIP для модифікації."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Шлях до архіву"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.desc": {
+          "source": "List of entry names to remove from the archive.",
+          "message": "Список назв елементів для видалення з архіву."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.display_name": {
+          "source": "Delete Entries",
+          "message": "Видалити елементи"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.short_desc": {
+          "source": "Entry names to delete",
+          "message": "Назви елементів для видалення"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for encrypted entries.",
+          "message": "Пароль для зашифрованих елементів."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Пароль шифрування"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.desc": {
+          "source": "Hash mapping entry names to replacement data. Values can be binary data or a hash with a `data` key containing binary data.",
+          "message": "Хеш, що зіставляє назви елементів із даними для заміни. Значеннями можуть бути двійкові дані або хеш із ключем `data`, що містить двійкові дані."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.display_name": {
+          "source": "Replacements",
+          "message": "Заміни"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.short_desc": {
+          "source": "Entries to replace",
+          "message": "Елементи для заміни"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.short_desc": {
+          "source": "Replace or delete archive entries",
+          "message": "Замінити або видалити елементи архіву"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.desc": {
+          "source": "Verify the integrity of a ZIP archive by checking CRC checksums for all entries without extracting",
+          "message": "Перевірити цілісність архіву ZIP шляхом перевірки контрольних сум CRC для всіх елементів без видобування"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.display_name": {
+          "source": "Verify Archive",
+          "message": "Перевірити архів"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Двійкові дані, що містять ZIP-архів."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Дані архіву"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Бінарні дані архіву"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist).",
+          "message": "Список шаблонів glob для виключення (чорний список)."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Шаблони виключення"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob-шаблони чорного списку"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries.",
+          "message": "Шаблон регулярного виразу для виключення елементів."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Регулярний вираз виключення"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Шаблон регулярного виразу чорного списку"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist).",
+          "message": "Список шаблонів glob для включення (білий список)."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Шаблони включення"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob-шаблони білого списку"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries.",
+          "message": "Шаблон регулярного виразу для включення елементів."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Регулярний вираз включення"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Шаблон регулярного виразу білого списку"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to verify.",
+          "message": "Шлях у файловій системі до архіву ZIP для перевірки."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Вхідний шлях"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Шлях до файлу архіву"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive.",
+          "message": "URL розташування FileLocationHandler для архіву."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Розташування"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL-адреса розташування архіву"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "Пароль для розшифрування зашифрованих елементів."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Пароль"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Пароль розшифрування"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.desc": {
+          "source": "If `True`, enable recovery mode to read archives with corrupted central directories by reading local file headers.",
+          "message": "Якщо `True`, увімкнути режим відновлення для читання архівів із пошкодженими центральними каталогами шляхом зчитування локальних заголовків файлів."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.display_name": {
+          "source": "Recovery Mode",
+          "message": "Режим відновлення"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.short_desc": {
+          "source": "Enable recovery for corrupted archives",
+          "message": "Увімкнути відновлення пошкоджених архівів"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.short_desc": {
+          "source": "Verify archive integrity",
+          "message": "Перевірити цілісність архіву"
+        },
+        "app.Wmlw.desc": {
+          "source": "Create, extract, and manage Zip archives with compression support",
+          "message": "Створення, видобування та керування архівами Zip із підтримкою стиснення"
+        },
+        "app.Wmlw.display_name": {
+          "source": "Zip Archive",
+          "message": "Архів Zip"
+        },
+        "app.Wmlw.short_desc": {
+          "source": "Zip archive operations",
+          "message": "Операції з архівами Zip"
+        }
+      }
+    }
+  }
+}

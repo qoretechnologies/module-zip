@@ -1,0 +1,1405 @@
+{
+  "schema_version": 1,
+  "locales": {
+    "es": {
+      "messages": {
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.desc": {
+          "source": "Compress binary data or files into an in-memory zip archive",
+          "message": "Comprime datos binarios o archivos en un archivo zip en memoria"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.display_name": {
+          "source": "Compress Data",
+          "message": "Comprimir datos"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "Sin compresión (solo almacenar)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Almacenar"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "Compresión LZMA"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "Compresión BZip2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Compresión Deflate (estándar, la más compatible)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "Compresión XZ/LZMA2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Compresión Zstandard (rápida, alta relación)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method to use for all entries.",
+          "message": "Método de compresión a utilizar para todas las entradas."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "Método de compresión"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "Algoritmo de compresión"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.desc": {
+          "source": "List of entries to compress. Each entry should have 'name' and 'data' (binary data).",
+          "message": "Lista de entradas a comprimir. Cada entrada debe tener 'name' y 'data' (datos binarios)."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "Entradas"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to compress",
+          "message": "Lista de entradas a comprimir"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Sin cifrado"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Ninguno"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Cifrado tradicional PKWARE (débil, no recomendado)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "PKWARE tradicional"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Cifrado AES-128"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Cifrado AES-192"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Cifrado AES-256 (recomendado)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Método de cifrado a utilizar cuando se proporciona una contraseña. El valor predeterminado es AES-256."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Método de cifrado"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Algoritmo de cifrado"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the compressed archive will be written. If not specified, the archive data is returned in the response.",
+          "message": "Una URL de ubicación de FileLocationHandler donde se escribirá el archivo comprimido. Si no se especifica, los datos del archivo se devuelven en la respuesta."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "Ubicación de salida"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "URL de ubicación de salida"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "Contraseña para el cifrado AES-256. Si se proporciona, se cifrarán todas las entradas."
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Contraseña de cifrado"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.short_desc": {
+          "source": "Compress data to zip format",
+          "message": "Comprimir datos a formato zip"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.desc": {
+          "source": "Create a new zip archive from files, directories, or binary data",
+          "message": "Crear un nuevo archivo zip a partir de archivos, directorios o datos binarios"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.display_name": {
+          "source": "Create Archive",
+          "message": "Crear archivo"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.desc": {
+          "source": "Optional comment to embed in the archive metadata.",
+          "message": "Comentario opcional para incrustar en los metadatos del archivo."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.display_name": {
+          "source": "Archive Comment",
+          "message": "Comentario del archivo"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.short_desc": {
+          "source": "Optional archive comment",
+          "message": "Comentario opcional del archivo"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "Sin compresión (solo almacenar)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Almacenar"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "Compresión LZMA"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "Compresión BZip2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Compresión Deflate (estándar, la más compatible)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "Compresión XZ/LZMA2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Compresión Zstandard (rápida, alta relación)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Default compression method for all entries. Can be overridden per entry.",
+          "message": "Método de compresión predeterminado para todas las entradas. Se puede anular por entrada."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "Método de compresión"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Default compression algorithm",
+          "message": "Algoritmo de compresión predeterminado"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from). Optional 'compression_method' per entry overrides the default.",
+          "message": "Lista de entradas a añadir. Cada entrada debe tener 'name' y bien 'data' (datos binarios) o 'path' (ruta del sistema de archivos desde donde leer). El campo opcional 'compression_method' por entrada anula el valor predeterminado."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "Entradas"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add to the archive",
+          "message": "Lista de entradas a añadir al archivo"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Sin cifrado"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Ninguno"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Cifrado tradicional PKWARE (débil, no recomendado)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "PKWARE tradicional"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Cifrado AES-128"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Cifrado AES-192"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Cifrado AES-256 (recomendado)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Método de cifrado a utilizar cuando se proporciona una contraseña. El valor predeterminado es AES-256."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Método de cifrado"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Algoritmo de cifrado"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the archive will be written (alternative to output_path).",
+          "message": "Una URL de ubicación de FileLocationHandler donde se escribirá el archivo (alternativa a output_path)."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "Ubicación de salida"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "URL de ubicación de salida"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Output file path where the archive will be written. If not specified, the archive data is returned as binary data in the response.",
+          "message": "Ruta del archivo de salida donde se escribirá el archivo. Si no se especifica, los datos del archivo se devuelven como datos binarios en la respuesta."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "Ruta de salida"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Output file path for the archive",
+          "message": "Ruta del archivo de salida para el archivo"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "Contraseña para el cifrado AES-256. Si se proporciona, se cifrarán todas las entradas."
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Contraseña de cifrado"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.short_desc": {
+          "source": "Create a new zip archive",
+          "message": "Crear un nuevo archivo zip"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.desc": {
+          "source": "Add new files or update existing files in a zip archive",
+          "message": "Añadir archivos nuevos o actualizar archivos existentes en un archivo zip"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.display_name": {
+          "source": "Add Files to Archive",
+          "message": "Agregar archivos al archivo"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "Ruta del sistema de archivos al archivo ZIP al que añadir archivos."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Ruta del archivo"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from).",
+          "message": "Lista de entradas a añadir. Cada entrada debe tener 'name' y bien 'data' (datos binarios) o 'path' (ruta del sistema de archivos desde donde leer)."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "Entradas"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add",
+          "message": "Lista de entradas a añadir"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Sin cifrado"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Ninguno"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Cifrado tradicional PKWARE (débil, no recomendado)"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "PKWARE tradicional"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Cifrado AES-128"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Cifrado AES-192"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Cifrado AES-256 (recomendado)"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Método de cifrado a utilizar cuando se proporciona una contraseña. El valor predeterminado es AES-256."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Método de cifrado"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Algoritmo de cifrado"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "Contraseña para el cifrado AES-256 de las nuevas entradas."
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password for new entries",
+          "message": "Contraseña de cifrado para nuevas entradas"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.short_desc": {
+          "source": "Add files to an existing archive",
+          "message": "Agregar archivos a un archivo existente"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.desc": {
+          "source": "Recursively add a file or directory from the filesystem to an existing zip archive",
+          "message": "Añadir recursivamente un archivo o directorio del sistema de archivos a un archivo zip existente"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.display_name": {
+          "source": "Add Path to Archive",
+          "message": "Añadir ruta al archivo"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "Sin compresión (solo almacenar)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Almacenar"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "Compresión LZMA"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "Compresión BZip2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Compresión Deflate (estándar, la más compatible)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "Compresión XZ/LZMA2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Compresión Zstandard (rápida, alta relación)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method for all entries.",
+          "message": "Método de compresión para todas las entradas."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "Método de compresión"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "Algoritmo de compresión"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "Ruta del sistema de archivos al archivo ZIP al que añadir archivos."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Ruta del archivo"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "Sin cifrado"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "Ninguno"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "Cifrado tradicional PKWARE (débil, no recomendado)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "PKWARE tradicional"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "Cifrado AES-128"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "Cifrado AES-192"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "Cifrado AES-256 (recomendado)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "Método de cifrado a utilizar cuando se proporciona una contraseña. El valor predeterminado es AES-256."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "Método de cifrado"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "Algoritmo de cifrado"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.desc": {
+          "source": "Filesystem path to a file or directory to add recursively to the archive.",
+          "message": "Ruta del sistema de archivos a un archivo o directorio que se añadirá recursivamente al archivo."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.display_name": {
+          "source": "Source Path",
+          "message": "Ruta de origen"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.short_desc": {
+          "source": "File or directory to add",
+          "message": "Archivo o directorio a añadir"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "Contraseña para el cifrado AES-256 de las nuevas entradas."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Contraseña de cifrado"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.desc": {
+          "source": "Base path for computing relative entry names in the archive. For example, if source_path='/a/b/c' and root_path='/a', entries will be stored as 'b/c/...'.",
+          "message": "Ruta base para calcular los nombres relativos de las entradas en el archivo. Por ejemplo, si source_path='/a/b/c' y root_path='/a', las entradas se almacenarán como 'b/c/...'."
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.display_name": {
+          "source": "Root Path",
+          "message": "Ruta raíz"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.short_desc": {
+          "source": "Base path for relative entry names",
+          "message": "Ruta base para nombres de entrada relativos"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.short_desc": {
+          "source": "Recursively add a file or directory",
+          "message": "Añadir recursivamente un archivo o directorio"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.desc": {
+          "source": "Get metadata and statistics about a zip archive",
+          "message": "Obtener metadatos y estadísticas sobre un archivo zip"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.display_name": {
+          "source": "Get Archive Info",
+          "message": "Obtener información del archivo"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Datos binarios que contienen el archivo ZIP."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Datos del archivo"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Datos binarios del archivo"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Lista de patrones glob a excluir (lista negra). Se omitirán las entradas que coincidan con cualquier patrón. La exclusión se aplica después de la inclusión (la lista negra anula la lista blanca)."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Patrones de exclusión"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Patrones glob de lista negra"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Patrón de expresión regular para excluir entradas (lista negra). Se omitirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Expresión regular de exclusión"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Patrón regex de lista negra"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Lista de patrones glob a incluir (lista blanca). Solo se incluirán las entradas que coincidan con al menos un patrón. Utilice `*` para coincidir con cualquier carácter y `?` para coincidir con un solo carácter."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Patrones de inclusión"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Patrones glob de lista blanca"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Patrón de expresión regular para incluir entradas (lista blanca). Solo se incluirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Expresión regular de inclusión"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Patrón regex de lista blanca"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to get information about.",
+          "message": "Ruta del sistema de archivos al archivo ZIP del que obtener información."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Ruta de entrada"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "Una URL de ubicación de FileLocationHandler para el archivo (alternativa a input_path o data)."
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Ubicación"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL de ubicación del archivo"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.short_desc": {
+          "source": "Get zip archive metadata",
+          "message": "Obtener metadatos del archivo zip"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.desc": {
+          "source": "Decompress an in-memory zip archive and return file contents",
+          "message": "Descomprimir un archivo zip en memoria y devolver el contenido de los archivos"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.display_name": {
+          "source": "Decompress Data",
+          "message": "Descomprimir datos"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to data or archive_path).",
+          "message": "Una URL de ubicación de FileLocationHandler para el archivo (alternativa a data o archive_path)."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "Ubicación del archivo"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL de ubicación del archivo"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to decompress (alternative to data).",
+          "message": "Ruta del sistema de archivos al archivo ZIP que se va a descomprimir (alternativa a data)."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Ruta del archivo"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive to decompress.",
+          "message": "Datos binarios que contienen el archivo ZIP que se va a descomprimir."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.display_name": {
+          "source": "Compressed Data",
+          "message": "Datos comprimidos"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.short_desc": {
+          "source": "Compressed archive data",
+          "message": "Datos del archivo comprimido"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.desc": {
+          "source": "Optional list of specific entry names to extract. If not specified, all entries are extracted.",
+          "message": "Lista opcional de nombres de entradas específicas a extraer. Si no se especifica, se extraen todas las entradas."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.display_name": {
+          "source": "Entry Names",
+          "message": "Nombres de entrada"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.short_desc": {
+          "source": "Specific entries to extract",
+          "message": "Entradas específicas a extraer"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Lista de patrones glob a excluir (lista negra). Se omitirán las entradas que coincidan con cualquier patrón. La exclusión se aplica después de la inclusión (la lista negra anula la lista blanca)."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Patrones de exclusión"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Patrones glob de lista negra"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Patrón de expresión regular para excluir entradas (lista negra). Se omitirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Expresión regular de exclusión"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Patrón regex de lista negra"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Lista de patrones glob a incluir (lista blanca). Solo se incluirán las entradas que coincidan con al menos un patrón. Utilice `*` para coincidir con cualquier carácter y `?` para coincidir con un solo carácter."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Patrones de inclusión"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Patrones glob de lista blanca"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Patrón de expresión regular para incluir entradas (lista blanca). Solo se incluirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Expresión regular de inclusión"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Patrón regex de lista blanca"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "Contraseña para descifrar entradas cifradas."
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Contraseña de descifrado"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.short_desc": {
+          "source": "Decompress zip data",
+          "message": "Descomprimir datos zip"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.desc": {
+          "source": "Extract contents of a zip archive to a destination directory with optional filtering (glob/regex whitelist/blacklist) and path remapping",
+          "message": "Extraer el contenido de un archivo zip a un directorio de destino con filtrado opcional (lista blanca/lista negra de glob/regex) y reasignación de rutas"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.display_name": {
+          "source": "Extract Archive",
+          "message": "Extraer archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.desc": {
+          "source": "If set, this prefix is prepended to all entry names during extraction. For example, with `add_prefix` = `output/`, the entry `main.cpp` becomes `output/main.cpp`.",
+          "message": "Si se establece, este prefijo se antepone a todos los nombres de entrada durante la extracción. Por ejemplo, con `add_prefix` = `output/`, la entrada `main.cpp` se convierte en `output/main.cpp`."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.display_name": {
+          "source": "Add Prefix",
+          "message": "Añadir prefijo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.short_desc": {
+          "source": "Add prefix to entry paths",
+          "message": "Añadir prefijo a las rutas de entrada"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.desc": {
+          "source": "If `True`, allow symlink entries to be extracted. Symlinks are a security risk as they can point outside the destination directory. Default is `False` (symlinks are silently skipped). When enabled, symlink targets are still validated to stay within the destination directory.",
+          "message": "Si es `True`, permite extraer entradas de enlaces simbólicos. Los enlaces simbólicos son un riesgo de seguridad, ya que pueden apuntar fuera del directorio de destino. El valor predeterminado es `False` (los enlaces simbólicos se omiten silenciosamente). Cuando está habilitado, los destinos de los enlaces simbólicos se siguen validando para que permanezcan dentro del directorio de destino."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.display_name": {
+          "source": "Allow Symlinks",
+          "message": "Permitir enlaces simbólicos"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.short_desc": {
+          "source": "Allow symlink extraction",
+          "message": "Permitir extracción de enlaces simbólicos"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Datos binarios que contienen el archivo ZIP."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Datos del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Datos binarios del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.desc": {
+          "source": "Filesystem path to the destination directory where files will be extracted.",
+          "message": "Ruta del sistema de archivos al directorio de destino donde se extraerán los archivos."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.display_name": {
+          "source": "Destination Directory",
+          "message": "Directorio de destino"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.short_desc": {
+          "source": "Directory to extract files to",
+          "message": "Directorio donde extraer los archivos"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Lista de patrones glob a excluir (lista negra). Se omitirán las entradas que coincidan con cualquier patrón. La exclusión se aplica después de la inclusión (la lista negra anula la lista blanca)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Patrones de exclusión"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Patrones glob de lista negra"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Patrón de expresión regular para excluir entradas (lista negra). Se omitirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Expresión regular de exclusión"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Patrón regex de lista negra"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Lista de patrones glob a incluir (lista blanca). Solo se incluirán las entradas que coincidan con al menos un patrón. Utilice `*` para coincidir con cualquier carácter y `?` para coincidir con un solo carácter."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Patrones de inclusión"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Patrones glob de lista blanca"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Patrón de expresión regular para incluir entradas (lista blanca). Solo se incluirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Expresión regular de inclusión"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Patrón regex de lista blanca"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to extract.",
+          "message": "Ruta del sistema de archivos al archivo ZIP que se va a extraer."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Ruta de entrada"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.desc": {
+          "source": "If `True`, overwrite existing files during extraction. Default is `False` (skip existing files).",
+          "message": "Si es `True`, sobrescribe los archivos existentes durante la extracción. El valor predeterminado es `False` (omitir archivos existentes)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.display_name": {
+          "source": "Overwrite",
+          "message": "Sobrescribir"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.short_desc": {
+          "source": "Overwrite existing files",
+          "message": "Sobrescribir archivos existentes"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "Una URL de ubicación de FileLocationHandler para el archivo (alternativa a input_path o data)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Ubicación"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL de ubicación del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.desc": {
+          "source": "If set, entries whose names start with this prefix will have it removed. For example, with `strip_prefix` = `src/`, the entry `src/main.cpp` becomes `main.cpp`.",
+          "message": "Si se establece, a las entradas cuyos nombres comiencen con este prefijo se les eliminará dicho prefijo. Por ejemplo, con `strip_prefix` = `src/`, la entrada `src/main.cpp` se convierte en `main.cpp`."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.display_name": {
+          "source": "Strip Prefix",
+          "message": "Eliminar prefijo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.short_desc": {
+          "source": "Strip prefix from entry paths",
+          "message": "Eliminar prefijo de las rutas de entrada"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "Contraseña para descifrar entradas cifradas."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Contraseña de descifrado"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.desc": {
+          "source": "If `True` (default), preserve directory paths during extraction. If `False`, all entries are extracted as flat files in the destination directory.",
+          "message": "Si es `True` (predeterminado), conserva las rutas de directorios durante la extracción. Si es `False`, todas las entradas se extraen como archivos planos en el directorio de destino."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.display_name": {
+          "source": "Preserve Paths",
+          "message": "Conservar rutas"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.short_desc": {
+          "source": "Preserve directory structure",
+          "message": "Conservar estructura de directorios"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.short_desc": {
+          "source": "Extract a zip archive",
+          "message": "Extraer un archivo zip"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.desc": {
+          "source": "Extract a single file from a zip archive to memory or disk",
+          "message": "Extraer un único archivo de un archivo zip a la memoria o al disco"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.display_name": {
+          "source": "Extract Single File",
+          "message": "Extraer un solo archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Datos binarios que contienen el archivo ZIP."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.display_name": {
+          "source": "Archive Data",
+          "message": "Datos del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.short_desc": {
+          "source": "Binary archive data",
+          "message": "Datos binarios del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to archive_path or archive_data).",
+          "message": "Una URL de ubicación de FileLocationHandler para el archivo (alternativa a archive_path o archive_data)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "Ubicación del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL de ubicación del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive.",
+          "message": "Ruta del sistema de archivos al archivo ZIP."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Ruta del archivo"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.desc": {
+          "source": "The name/path of the entry within the archive to extract.",
+          "message": "El nombre/ruta de la entrada dentro del archivo a extraer."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.display_name": {
+          "source": "Entry Name",
+          "message": "Nombre de entrada"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.short_desc": {
+          "source": "Name of the entry to extract",
+          "message": "Nombre de la entrada a extraer"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the extracted file should be written (alternative to output_path).",
+          "message": "Una URL de ubicación de FileLocationHandler donde se debe escribir el archivo extraído (alternativa a output_path)."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "Ubicación de salida"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "URL de ubicación de salida"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Filesystem path where the extracted file should be written. If not specified, the file data is returned in the response.",
+          "message": "Ruta del sistema de archivos donde se debe escribir el archivo extraído. Si no se especifica, los datos del archivo se devuelven en la respuesta."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "Ruta de salida"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Path to write the extracted file",
+          "message": "Ruta para escribir el archivo extraído"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting the entry if it is encrypted.",
+          "message": "Contraseña para descifrar la entrada si está cifrada."
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Contraseña de descifrado"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.short_desc": {
+          "source": "Extract one file from archive",
+          "message": "Extraer un archivo del archivo tar"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.desc": {
+          "source": "Get a list of all entries in a zip archive with metadata",
+          "message": "Obtener una lista de todas las entradas en un archivo zip con metadatos"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.display_name": {
+          "source": "List Archive Contents",
+          "message": "Listar contenido del archivo"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Datos binarios que contienen el archivo ZIP."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Datos del archivo"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Datos binarios del archivo"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "Lista de patrones glob a excluir (lista negra). Se omitirán las entradas que coincidan con cualquier patrón. La exclusión se aplica después de la inclusión (la lista negra anula la lista blanca)."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Patrones de exclusión"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Patrones glob de lista negra"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "Patrón de expresión regular para excluir entradas (lista negra). Se omitirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Expresión regular de exclusión"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Patrón regex de lista negra"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "Lista de patrones glob a incluir (lista blanca). Solo se incluirán las entradas que coincidan con al menos un patrón. Utilice `*` para coincidir con cualquier carácter y `?` para coincidir con un solo carácter."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Patrones de inclusión"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Patrones glob de lista blanca"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "Patrón de expresión regular para incluir entradas (lista blanca). Solo se incluirán las entradas cuyos nombres coincidan con la expresión regular."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Expresión regular de inclusión"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Patrón regex de lista blanca"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to list.",
+          "message": "Ruta del sistema de archivos al archivo ZIP a listar."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Ruta de entrada"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "Una URL de ubicación de FileLocationHandler para el archivo (alternativa a input_path o data)."
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Ubicación"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL de ubicación del archivo"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.short_desc": {
+          "source": "List files in a zip archive",
+          "message": "Listar archivos en un archivo zip"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.desc": {
+          "source": "Replace or delete entries in a ZIP archive. Unchanged entries are copied efficiently without re-compression",
+          "message": "Reemplazar o eliminar entradas en un archivo ZIP. Las entradas sin cambios se copian de manera eficiente sin volver a comprimir"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.display_name": {
+          "source": "Replace/Delete Entries",
+          "message": "Reemplazar/Eliminar entradas"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to modify.",
+          "message": "Ruta del sistema de archivos al archivo ZIP a modificar."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "Ruta del archivo"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.desc": {
+          "source": "List of entry names to remove from the archive.",
+          "message": "Lista de nombres de entrada a eliminar del archivo."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.display_name": {
+          "source": "Delete Entries",
+          "message": "Eliminar entradas"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.short_desc": {
+          "source": "Entry names to delete",
+          "message": "Nombres de entrada a eliminar"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for encrypted entries.",
+          "message": "Contraseña para entradas cifradas."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "Contraseña de cifrado"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.desc": {
+          "source": "Hash mapping entry names to replacement data. Values can be binary data or a hash with a `data` key containing binary data.",
+          "message": "Hash que asigna nombres de entrada a datos de reemplazo. Los valores pueden ser datos binarios o un hash con una clave `data` que contenga datos binarios."
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.display_name": {
+          "source": "Replacements",
+          "message": "Reemplazos"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.short_desc": {
+          "source": "Entries to replace",
+          "message": "Entradas a reemplazar"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.short_desc": {
+          "source": "Replace or delete archive entries",
+          "message": "Reemplazar o eliminar entradas del archivo"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.desc": {
+          "source": "Verify the integrity of a ZIP archive by checking CRC checksums for all entries without extracting",
+          "message": "Verificar la integridad de un archivo ZIP comprobando las sumas de verificación CRC de todas las entradas sin extraer"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.display_name": {
+          "source": "Verify Archive",
+          "message": "Verificar archivo"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "Datos binarios que contienen el archivo ZIP."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "Datos del archivo"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "Datos binarios del archivo"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist).",
+          "message": "Lista de patrones glob a excluir (lista negra)."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "Patrones de exclusión"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Patrones glob de lista negra"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries.",
+          "message": "Patrón de expresión regular para excluir entradas."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "Expresión regular de exclusión"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "Patrón regex de lista negra"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist).",
+          "message": "Lista de patrones glob a incluir (lista blanca)."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "Patrones de inclusión"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Patrones glob de lista blanca"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries.",
+          "message": "Patrón de expresión regular para incluir entradas."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "Expresión regular de inclusión"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "Patrón regex de lista blanca"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to verify.",
+          "message": "Ruta del sistema de archivos al archivo ZIP a verificar."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "Ruta de entrada"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "Ruta al archivo comprimido"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive.",
+          "message": "Una URL de ubicación de FileLocationHandler para el archivo."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "Ubicación"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "URL de ubicación del archivo"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "Contraseña para descifrar entradas cifradas."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "Contraseña"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "Contraseña de descifrado"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.desc": {
+          "source": "If `True`, enable recovery mode to read archives with corrupted central directories by reading local file headers.",
+          "message": "Si es `True`, habilita el modo de recuperación para leer archivos con directorios centrales dañados mediante la lectura de cabeceras de archivos locales."
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.display_name": {
+          "source": "Recovery Mode",
+          "message": "Modo de recuperación"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.short_desc": {
+          "source": "Enable recovery for corrupted archives",
+          "message": "Habilitar la recuperación para archivos dañados"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.short_desc": {
+          "source": "Verify archive integrity",
+          "message": "Verificar la integridad del archivo"
+        },
+        "app.Wmlw.desc": {
+          "source": "Create, extract, and manage Zip archives with compression support",
+          "message": "Crear, extraer y gestionar archivos Zip con soporte de compresión"
+        },
+        "app.Wmlw.display_name": {
+          "source": "Zip Archive",
+          "message": "Archivo Zip"
+        },
+        "app.Wmlw.short_desc": {
+          "source": "Zip archive operations",
+          "message": "Operaciones con archivos Zip"
+        }
+      }
+    }
+  }
+}

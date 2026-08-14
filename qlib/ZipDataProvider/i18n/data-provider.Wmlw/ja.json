@@ -1,0 +1,1405 @@
+{
+  "schema_version": 1,
+  "locales": {
+    "ja": {
+      "messages": {
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.desc": {
+          "source": "Compress binary data or files into an in-memory zip archive",
+          "message": "バイナリデータまたはファイルをインメモリ zip アーカイブに圧縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.display_name": {
+          "source": "Compress Data",
+          "message": "データを圧縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "圧縮なし (無圧縮/格納のみ)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Store"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "LZMA 圧縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "BZip2 圧縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Deflate 圧縮 (標準、最も高い互換性)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "XZ/LZMA2 圧縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Zstandard圧縮 (高速、高圧縮率)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method to use for all entries.",
+          "message": "すべてのエントリに使用する圧縮方式。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "圧縮方法"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "圧縮アルゴリズム"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.desc": {
+          "source": "List of entries to compress. Each entry should have 'name' and 'data' (binary data).",
+          "message": "圧縮するエントリのリスト。各エントリには 'name' と 'data' (バイナリデータ) が必要です。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "エントリ"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to compress",
+          "message": "圧縮するエントリのリスト"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "暗号化なし"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "なし"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "従来のPKWARE暗号化 (強度が低いため非推奨)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "従来のPKWARE"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128暗号化"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192暗号化"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256暗号化 (推奨)"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "パスワードが指定されている場合に使用する暗号化方式。デフォルトはAES-256です。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "暗号化方式"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "暗号化アルゴリズム"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the compressed archive will be written. If not specified, the archive data is returned in the response.",
+          "message": "圧縮されたアーカイブが書き込まれるFileLocationHandlerのロケーションURL。指定しない場合、アーカイブデータがレスポンスで返されます。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "出力ロケーション"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "出力ロケーション URL"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "AES-256暗号化用のパスワード。指定した場合、すべてのエントリが暗号化されます。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "暗号化パスワード"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.short_desc": {
+          "source": "Compress data to zip format",
+          "message": "データをzip形式に圧縮"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.desc": {
+          "source": "Create a new zip archive from files, directories, or binary data",
+          "message": "ファイル、ディレクトリ、またはバイナリデータから新しいzipアーカイブを作成"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.display_name": {
+          "source": "Create Archive",
+          "message": "アーカイブを作成"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.desc": {
+          "source": "Optional comment to embed in the archive metadata.",
+          "message": "アーカイブメタデータに埋め込むオプションのコメント。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.display_name": {
+          "source": "Archive Comment",
+          "message": "アーカイブコメント"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.short_desc": {
+          "source": "Optional archive comment",
+          "message": "オプションのアーカイブコメント"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "圧縮なし (無圧縮/格納のみ)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Store"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "LZMA 圧縮"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "BZip2 圧縮"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Deflate 圧縮 (標準、最も高い互換性)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "XZ/LZMA2 圧縮"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Zstandard圧縮 (高速、高圧縮率)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Default compression method for all entries. Can be overridden per entry.",
+          "message": "すべてのエントリに対するデフォルトの圧縮方式。エントリごとにオーバーライドできます。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "圧縮方法"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Default compression algorithm",
+          "message": "デフォルトの圧縮アルゴリズム"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from). Optional 'compression_method' per entry overrides the default.",
+          "message": "追加するエントリのリスト。各エントリには 'name' と、'data' (バイナリデータ) または 'path' (読み取り元のファイルシステムパス) のいずれかが必要です。エントリごとのオプションの 'compression_method' はデフォルトをオーバーライドします。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "エントリ"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add to the archive",
+          "message": "アーカイブに追加するエントリのリスト"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "暗号化なし"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "なし"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "従来のPKWARE暗号化 (強度が低いため非推奨)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "従来のPKWARE"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128暗号化"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192暗号化"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256暗号化 (推奨)"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "パスワードが指定されている場合に使用する暗号化方式。デフォルトはAES-256です。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "暗号化方式"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "暗号化アルゴリズム"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the archive will be written (alternative to output_path).",
+          "message": "アーカイブが書き込まれるFileLocationHandlerのロケーションURL (output_path の代替)。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "出力ロケーション"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "出力ロケーション URL"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Output file path where the archive will be written. If not specified, the archive data is returned as binary data in the response.",
+          "message": "アーカイブが書き込まれる出力ファイルパス。指定しない場合、アーカイブデータはレスポンス内にバイナリデータとして返されます。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "出力パス"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Output file path for the archive",
+          "message": "アーカイブの出力ファイルパス"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "AES-256暗号化用のパスワード。指定した場合、すべてのエントリが暗号化されます。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "暗号化パスワード"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.short_desc": {
+          "source": "Create a new zip archive",
+          "message": "新しいzipアーカイブを作成"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.desc": {
+          "source": "Add new files or update existing files in a zip archive",
+          "message": "zipアーカイブ内の新規ファイルの追加または既存ファイルの更新"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.display_name": {
+          "source": "Add Files to Archive",
+          "message": "アーカイブにファイルを追加"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "ファイルを追加するZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "アーカイブ パス"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from).",
+          "message": "追加するエントリのリスト。各エントリには 'name' と、'data' (バイナリデータ) または 'path' (読み取り元のファイルシステムパス) のいずれかが必要です。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "エントリ"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add",
+          "message": "追加するエントリのリスト"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "暗号化なし"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "なし"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "従来のPKWARE暗号化 (強度が低いため非推奨)"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "従来のPKWARE"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128暗号化"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192暗号化"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256暗号化 (推奨)"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "パスワードが指定されている場合に使用する暗号化方式。デフォルトはAES-256です。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "暗号化方式"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "暗号化アルゴリズム"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "新規エントリのAES-256暗号化用パスワード。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password for new entries",
+          "message": "新規エントリの暗号化パスワード"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.short_desc": {
+          "source": "Add files to an existing archive",
+          "message": "既存のアーカイブにファイルを追加"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.desc": {
+          "source": "Recursively add a file or directory from the filesystem to an existing zip archive",
+          "message": "ファイルシステムから既存のzipアーカイブへファイルまたはディレクトリを再帰的に追加"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.display_name": {
+          "source": "Add Path to Archive",
+          "message": "アーカイブにパスを追加"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "圧縮なし (無圧縮/格納のみ)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "Store"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "LZMA 圧縮"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "BZip2 圧縮"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Deflate 圧縮 (標準、最も高い互換性)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "XZ/LZMA2 圧縮"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Zstandard圧縮 (高速、高圧縮率)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method for all entries.",
+          "message": "すべてのエントリの圧縮方式。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "圧縮方法"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "圧縮アルゴリズム"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "ファイルを追加するZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "アーカイブ パス"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "暗号化なし"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "なし"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "従来のPKWARE暗号化 (強度が低いため非推奨)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "従来のPKWARE"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128暗号化"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192暗号化"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256暗号化 (推奨)"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "パスワードが指定されている場合に使用する暗号化方式。デフォルトはAES-256です。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "暗号化方式"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "暗号化アルゴリズム"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.desc": {
+          "source": "Filesystem path to a file or directory to add recursively to the archive.",
+          "message": "アーカイブに再帰的に追加するファイルまたはディレクトリへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.display_name": {
+          "source": "Source Path",
+          "message": "ソースパス"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.short_desc": {
+          "source": "File or directory to add",
+          "message": "追加するファイルまたはディレクトリ"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "新規エントリのAES-256暗号化用パスワード。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "暗号化パスワード"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.desc": {
+          "source": "Base path for computing relative entry names in the archive. For example, if source_path='/a/b/c' and root_path='/a', entries will be stored as 'b/c/...'.",
+          "message": "アーカイブ内の相対エントリ名を計算するためのベースパス。たとえば source_path='/a/b/c' かつ root_path='/a' の場合、エントリは 'b/c/...' として格納されます。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.display_name": {
+          "source": "Root Path",
+          "message": "ルートパス"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.short_desc": {
+          "source": "Base path for relative entry names",
+          "message": "相対エントリ名のベースパス"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.short_desc": {
+          "source": "Recursively add a file or directory",
+          "message": "ファイルまたはディレクトリを再帰的に追加"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.desc": {
+          "source": "Get metadata and statistics about a zip archive",
+          "message": "zipアーカイブに関するメタデータと統計情報を取得"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.display_name": {
+          "source": "Get Archive Info",
+          "message": "アーカイブ情報を取得"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "ZIPアーカイブを含むバイナリデータ。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "アーカイブ データ"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "バイナリ アーカイブ データ"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "除外するglobパターンのリスト (ブラックリスト)。いずれかのパターンに一致するエントリはスキップされます。除外は包含の後に適用されます (ブラックリストがホワイトリストをオーバーライド)。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "除外パターン"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Globブラックリストパターン"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "エントリを除外するための正規表現パターン (ブラックリスト)。名前に正規表現が一致するエントリはスキップされます。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "除外正規表現"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表現ブラックリストパターン"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "包含するglobパターンのリスト (ホワイトリスト)。少なくとも1つのパターンに一致するエントリのみが含まれます。任意の文字に一致させるには `*` を、単一の文字に一致させるには `?` を使用してください。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含パターン"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Globホワイトリストパターン"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "エントリを包含するための正規表現パターン (ホワイトリスト)。名前に正規表現が一致するエントリのみが含まれます。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表現"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表現ホワイトリストパターン"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to get information about.",
+          "message": "情報を取得するZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "入力パス"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "アーカイブのFileLocationHandlerロケーションURL (input_path または data の代替)。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置情報"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "アーカイブ ロケーション URL"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.short_desc": {
+          "source": "Get zip archive metadata",
+          "message": "zipアーカイブのメタデータを取得"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.desc": {
+          "source": "Decompress an in-memory zip archive and return file contents",
+          "message": "メモリ上のzipアーカイブを展開してファイルコンテンツを返す"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.display_name": {
+          "source": "Decompress Data",
+          "message": "データを解凍"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to data or archive_path).",
+          "message": "アーカイブ用のFileLocationHandlerロケーションURL（dataまたはarchive_pathの代替）。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "アーカイブ ロケーション"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "アーカイブ ロケーション URL"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to decompress (alternative to data).",
+          "message": "展開するZIPアーカイブへのファイルシステムパス（dataの代替）。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "アーカイブ パス"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive to decompress.",
+          "message": "展開するZIPアーカイブを含むバイナリデータ。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.display_name": {
+          "source": "Compressed Data",
+          "message": "圧縮データ"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.short_desc": {
+          "source": "Compressed archive data",
+          "message": "圧縮アーカイブデータ"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.desc": {
+          "source": "Optional list of specific entry names to extract. If not specified, all entries are extracted.",
+          "message": "抽出する特定のエントリ名のオプションのリスト。指定しない場合、すべてのエントリが抽出されます。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.display_name": {
+          "source": "Entry Names",
+          "message": "エントリ名"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.short_desc": {
+          "source": "Specific entries to extract",
+          "message": "抽出する特定のエントリ"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "除外するglobパターンのリスト (ブラックリスト)。いずれかのパターンに一致するエントリはスキップされます。除外は包含の後に適用されます (ブラックリストがホワイトリストをオーバーライド)。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "除外パターン"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Globブラックリストパターン"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "エントリを除外するための正規表現パターン (ブラックリスト)。名前に正規表現が一致するエントリはスキップされます。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "除外正規表現"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表現ブラックリストパターン"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "包含するglobパターンのリスト (ホワイトリスト)。少なくとも1つのパターンに一致するエントリのみが含まれます。任意の文字に一致させるには `*` を、単一の文字に一致させるには `?` を使用してください。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含パターン"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Globホワイトリストパターン"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "エントリを包含するための正規表現パターン (ホワイトリスト)。名前に正規表現が一致するエントリのみが含まれます。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表現"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表現ホワイトリストパターン"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "暗号化されたエントリを復号するためのパスワード。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "復号パスワード"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.short_desc": {
+          "source": "Decompress zip data",
+          "message": "zipデータを展開"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.desc": {
+          "source": "Extract contents of a zip archive to a destination directory with optional filtering (glob/regex whitelist/blacklist) and path remapping",
+          "message": "オプションのフィルタリング（glob/正規表現のホワイトリスト/ブラックリスト）およびパス再マッピングを使用して、zipアーカイブのコンテンツを宛先ディレクトリに抽出"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.display_name": {
+          "source": "Extract Archive",
+          "message": "アーカイブを展開"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.desc": {
+          "source": "If set, this prefix is prepended to all entry names during extraction. For example, with `add_prefix` = `output/`, the entry `main.cpp` becomes `output/main.cpp`.",
+          "message": "設定されている場合、抽出時にこのプレフィックスがすべてのエントリ名の先頭に追加されます。例えば、`add_prefix` = `output/` の場合、エントリ `main.cpp` は `output/main.cpp` になります。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.display_name": {
+          "source": "Add Prefix",
+          "message": "プレフィックスを追加"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.short_desc": {
+          "source": "Add prefix to entry paths",
+          "message": "エントリパスにプレフィックスを追加"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.desc": {
+          "source": "If `True`, allow symlink entries to be extracted. Symlinks are a security risk as they can point outside the destination directory. Default is `False` (symlinks are silently skipped). When enabled, symlink targets are still validated to stay within the destination directory.",
+          "message": "`True` の場合、シンボリックリンクエントリの抽出を許可します。シンボリックリンクは宛先ディレクトリ外を指す可能性があるため、セキュリティ上のリスクがあります。デフォルトは `False` です（シンボリックリンクは警告なしでスキップされます）。有効にした場合でも、シンボリックリンクのターゲットが宛先ディレクトリ内に留まっていることが検証されます。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.display_name": {
+          "source": "Allow Symlinks",
+          "message": "シンボリックリンクを許可"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.short_desc": {
+          "source": "Allow symlink extraction",
+          "message": "シンボリックリンクの抽出を許可"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "ZIPアーカイブを含むバイナリデータ。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "アーカイブ データ"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "バイナリ アーカイブ データ"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.desc": {
+          "source": "Filesystem path to the destination directory where files will be extracted.",
+          "message": "ファイルが抽出される宛先ディレクトリへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.display_name": {
+          "source": "Destination Directory",
+          "message": "宛先ディレクトリ"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.short_desc": {
+          "source": "Directory to extract files to",
+          "message": "ファイルを抽出するディレクトリ"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "除外するglobパターンのリスト (ブラックリスト)。いずれかのパターンに一致するエントリはスキップされます。除外は包含の後に適用されます (ブラックリストがホワイトリストをオーバーライド)。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "除外パターン"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Globブラックリストパターン"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "エントリを除外するための正規表現パターン (ブラックリスト)。名前に正規表現が一致するエントリはスキップされます。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "除外正規表現"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表現ブラックリストパターン"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "包含するglobパターンのリスト (ホワイトリスト)。少なくとも1つのパターンに一致するエントリのみが含まれます。任意の文字に一致させるには `*` を、単一の文字に一致させるには `?` を使用してください。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含パターン"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Globホワイトリストパターン"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "エントリを包含するための正規表現パターン (ホワイトリスト)。名前に正規表現が一致するエントリのみが含まれます。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表現"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表現ホワイトリストパターン"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to extract.",
+          "message": "抽出するZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "入力パス"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.desc": {
+          "source": "If `True`, overwrite existing files during extraction. Default is `False` (skip existing files).",
+          "message": "`True` の場合、抽出中に既存のファイルを上書きします。デフォルトは `False` です（既存のファイルをスキップ）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.display_name": {
+          "source": "Overwrite",
+          "message": "上書き"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.short_desc": {
+          "source": "Overwrite existing files",
+          "message": "既存のファイルを上書き"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "アーカイブのFileLocationHandlerロケーションURL (input_path または data の代替)。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置情報"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "アーカイブ ロケーション URL"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.desc": {
+          "source": "If set, entries whose names start with this prefix will have it removed. For example, with `strip_prefix` = `src/`, the entry `src/main.cpp` becomes `main.cpp`.",
+          "message": "設定されている場合、名前がこのプレフィックスで始まるエントリからプレフィックスが削除されます。例えば、`strip_prefix` = `src/` の場合、エントリ `src/main.cpp` は `main.cpp` になります。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.display_name": {
+          "source": "Strip Prefix",
+          "message": "プレフィックスを削除"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.short_desc": {
+          "source": "Strip prefix from entry paths",
+          "message": "エントリパスからプレフィックスを削除"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "暗号化されたエントリを復号するためのパスワード。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "復号パスワード"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.desc": {
+          "source": "If `True` (default), preserve directory paths during extraction. If `False`, all entries are extracted as flat files in the destination directory.",
+          "message": "`True`（デフォルト）の場合、抽出時にディレクトリパスを保持します。`False` の場合、すべてのエントリが宛先ディレクトリにフラットファイルとして抽出されます。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.display_name": {
+          "source": "Preserve Paths",
+          "message": "パスを保持"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.short_desc": {
+          "source": "Preserve directory structure",
+          "message": "ディレクトリ構造を保持"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.short_desc": {
+          "source": "Extract a zip archive",
+          "message": "zipアーカイブを抽出"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.desc": {
+          "source": "Extract a single file from a zip archive to memory or disk",
+          "message": "zipアーカイブから単一ファイルをメモリまたはディスクに抽出"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.display_name": {
+          "source": "Extract Single File",
+          "message": "単一ファイルを展開"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "ZIPアーカイブを含むバイナリデータ。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.display_name": {
+          "source": "Archive Data",
+          "message": "アーカイブ データ"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.short_desc": {
+          "source": "Binary archive data",
+          "message": "バイナリ アーカイブ データ"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to archive_path or archive_data).",
+          "message": "アーカイブ用のFileLocationHandlerロケーションURL（archive_pathまたはarchive_dataの代替）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "アーカイブ ロケーション"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "アーカイブ ロケーション URL"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive.",
+          "message": "ZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "アーカイブ パス"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.desc": {
+          "source": "The name/path of the entry within the archive to extract.",
+          "message": "抽出するアーカイブ内のエントリの名前/パス。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.display_name": {
+          "source": "Entry Name",
+          "message": "エントリ名"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.short_desc": {
+          "source": "Name of the entry to extract",
+          "message": "抽出するエントリの名前"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the extracted file should be written (alternative to output_path).",
+          "message": "抽出されたファイルを書き込むFileLocationHandlerロケーションURL（output_pathの代替）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "出力ロケーション"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "出力ロケーション URL"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Filesystem path where the extracted file should be written. If not specified, the file data is returned in the response.",
+          "message": "抽出されたファイルを書き込むファイルシステムパス。指定しない場合、ファイルデータがレスポンスで返されます。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "出力パス"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Path to write the extracted file",
+          "message": "抽出されたファイルを書き込むパス"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting the entry if it is encrypted.",
+          "message": "エントリが暗号化されている場合に復号するためのパスワード。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "復号パスワード"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.short_desc": {
+          "source": "Extract one file from archive",
+          "message": "アーカイブからファイルを1つ展開"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.desc": {
+          "source": "Get a list of all entries in a zip archive with metadata",
+          "message": "メタデータを含むzipアーカイブ内のすべてのエントリのリストを取得"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.display_name": {
+          "source": "List Archive Contents",
+          "message": "アーカイブコンテンツの一覧表示"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "ZIPアーカイブを含むバイナリデータ。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "アーカイブ データ"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "バイナリ アーカイブ データ"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "除外するglobパターンのリスト (ブラックリスト)。いずれかのパターンに一致するエントリはスキップされます。除外は包含の後に適用されます (ブラックリストがホワイトリストをオーバーライド)。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "除外パターン"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Globブラックリストパターン"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "エントリを除外するための正規表現パターン (ブラックリスト)。名前に正規表現が一致するエントリはスキップされます。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "除外正規表現"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表現ブラックリストパターン"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "包含するglobパターンのリスト (ホワイトリスト)。少なくとも1つのパターンに一致するエントリのみが含まれます。任意の文字に一致させるには `*` を、単一の文字に一致させるには `?` を使用してください。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含パターン"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Globホワイトリストパターン"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "エントリを包含するための正規表現パターン (ホワイトリスト)。名前に正規表現が一致するエントリのみが含まれます。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表現"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表現ホワイトリストパターン"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to list.",
+          "message": "リストを取得するZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "入力パス"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "アーカイブのFileLocationHandlerロケーションURL (input_path または data の代替)。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置情報"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "アーカイブ ロケーション URL"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.short_desc": {
+          "source": "List files in a zip archive",
+          "message": "zipアーカイブ内のファイルを一覧表示"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.desc": {
+          "source": "Replace or delete entries in a ZIP archive. Unchanged entries are copied efficiently without re-compression",
+          "message": "ZIPアーカイブ内のエントリを置換または削除します。変更されていないエントリは再圧縮なしで効率的にコピーされます"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.display_name": {
+          "source": "Replace/Delete Entries",
+          "message": "エントリの置換/削除"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to modify.",
+          "message": "変更するZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "アーカイブ パス"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.desc": {
+          "source": "List of entry names to remove from the archive.",
+          "message": "アーカイブから削除するエントリ名のリスト。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.display_name": {
+          "source": "Delete Entries",
+          "message": "エントリを削除"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.short_desc": {
+          "source": "Entry names to delete",
+          "message": "削除するエントリ名"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for encrypted entries.",
+          "message": "暗号化されたエントリのパスワード。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "暗号化パスワード"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.desc": {
+          "source": "Hash mapping entry names to replacement data. Values can be binary data or a hash with a `data` key containing binary data.",
+          "message": "エントリ名を置換データにマッピングするハッシュ。値にはバイナリデータ、またはバイナリデータを含む `data` キーを持つハッシュを指定できます。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.display_name": {
+          "source": "Replacements",
+          "message": "置換"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.short_desc": {
+          "source": "Entries to replace",
+          "message": "置換するエントリ"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.short_desc": {
+          "source": "Replace or delete archive entries",
+          "message": "アーカイブエントリを置換または削除"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.desc": {
+          "source": "Verify the integrity of a ZIP archive by checking CRC checksums for all entries without extracting",
+          "message": "抽出せずにすべてのエントリのCRCチェックサムをチェックしてZIPアーカイブの整合性を検証"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.display_name": {
+          "source": "Verify Archive",
+          "message": "アーカイブの検証"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "ZIPアーカイブを含むバイナリデータ。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "アーカイブ データ"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "バイナリ アーカイブ データ"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist).",
+          "message": "除外するglobパターンのリスト（ブラックリスト）。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "除外パターン"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Globブラックリストパターン"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries.",
+          "message": "エントリを除外するための正規表現パターン。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "除外正規表現"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表現ブラックリストパターン"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist).",
+          "message": "含めるglobパターンのリスト（ホワイトリスト）。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含パターン"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Globホワイトリストパターン"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries.",
+          "message": "エントリを含めるための正規表現パターン。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表現"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表現ホワイトリストパターン"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to verify.",
+          "message": "検証するZIPアーカイブへのファイルシステムパス。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "入力パス"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "アーカイブファイルへのパス"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive.",
+          "message": "アーカイブ用のFileLocationHandlerロケーションURL。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置情報"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "アーカイブ ロケーション URL"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "暗号化されたエントリを復号するためのパスワード。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "パスワード"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "復号パスワード"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.desc": {
+          "source": "If `True`, enable recovery mode to read archives with corrupted central directories by reading local file headers.",
+          "message": "`True` の場合、ローカルファイルヘッダーを読み取ることで、破損したセントラルディレクトリを持つアーカイブを読み取るリカバリモードを有効にします。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.display_name": {
+          "source": "Recovery Mode",
+          "message": "リカバリモード"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.short_desc": {
+          "source": "Enable recovery for corrupted archives",
+          "message": "破損したアーカイブのリカバリを有効化"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.short_desc": {
+          "source": "Verify archive integrity",
+          "message": "アーカイブの整合性を検証"
+        },
+        "app.Wmlw.desc": {
+          "source": "Create, extract, and manage Zip archives with compression support",
+          "message": "圧縮サポートを備えたZipアーカイブの作成、抽出、および管理"
+        },
+        "app.Wmlw.display_name": {
+          "source": "Zip Archive",
+          "message": "Zipアーカイブ"
+        },
+        "app.Wmlw.short_desc": {
+          "source": "Zip archive operations",
+          "message": "Zipアーカイブ操作"
+        }
+      }
+    }
+  }
+}

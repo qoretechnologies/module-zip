@@ -1,0 +1,1405 @@
+{
+  "schema_version": 1,
+  "locales": {
+    "zh-Hant": {
+      "messages": {
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.desc": {
+          "source": "Compress binary data or files into an in-memory zip archive",
+          "message": "將二進位資料或檔案壓縮至記憶體內的 zip 封存檔中"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.display_name": {
+          "source": "Compress Data",
+          "message": "壓縮資料"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "不壓縮（僅儲存）"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "儲存"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "LZMA 壓縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "BZip2 壓縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Deflate 壓縮（標準，相容性最佳）"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "XZ/LZMA2 壓縮"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Zstandard 壓縮（快速、高壓縮比）"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method to use for all entries.",
+          "message": "用於所有項目的壓縮方法。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "壓縮方法"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "壓縮演算法"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.desc": {
+          "source": "List of entries to compress. Each entry should have 'name' and 'data' (binary data).",
+          "message": "要壓縮的項目清單。每個項目都應包含 'name' 和 'data'（二進位資料）。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "項目"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to compress",
+          "message": "要壓縮的項目清單"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "不加密"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "無"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "傳統 PKWARE 加密（強度弱，不建議使用）"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "傳統 PKWARE"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128 加密"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192 加密"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256 加密（建議）"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "提供密碼時使用的加密方法。預設為 AES-256。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "加密方法"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "加密演算法"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the compressed archive will be written. If not specified, the archive data is returned in the response.",
+          "message": "寫入已壓縮封存檔的 FileLocationHandler 位置 URL。若未指定，則會在回應中傳回封存資料。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "輸出位置"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "輸出位置 URL"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "用於 AES-256 加密的密碼。若提供，所有項目都將進行加密。"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "加密密碼"
+        },
+        "app.Wmlw.action.Y29tcHJlc3MtZGF0YQ.short_desc": {
+          "source": "Compress data to zip format",
+          "message": "將資料壓縮為 zip 格式"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.desc": {
+          "source": "Create a new zip archive from files, directories, or binary data",
+          "message": "從檔案、目錄或二進位資料建立新的 zip 封存檔"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.display_name": {
+          "source": "Create Archive",
+          "message": "建立封存檔"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.desc": {
+          "source": "Optional comment to embed in the archive metadata.",
+          "message": "要嵌入封存檔中繼資料的選用註解。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.display_name": {
+          "source": "Archive Comment",
+          "message": "封存檔註解"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tbWVudA.short_desc": {
+          "source": "Optional archive comment",
+          "message": "選用封存檔註解"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "不壓縮（僅儲存）"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "儲存"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "LZMA 壓縮"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "BZip2 壓縮"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Deflate 壓縮（標準，相容性最佳）"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "XZ/LZMA2 壓縮"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Zstandard 壓縮（快速、高壓縮比）"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Default compression method for all entries. Can be overridden per entry.",
+          "message": "所有項目的預設壓縮方法。可針對個別項目進行覆寫。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "壓縮方法"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Default compression algorithm",
+          "message": "預設壓縮演算法"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from). Optional 'compression_method' per entry overrides the default.",
+          "message": "要新增的項目清單。每個項目都應包含 'name'，以及 'data'（二進位資料）或 'path'（要讀取的檔案系統路徑）其中之一。每個項目選用的 'compression_method' 會覆寫預設值。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "項目"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add to the archive",
+          "message": "要新增至封存檔的項目清單"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "不加密"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "無"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "傳統 PKWARE 加密（強度弱，不建議使用）"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "傳統 PKWARE"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128 加密"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192 加密"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256 加密（建議）"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "提供密碼時使用的加密方法。預設為 AES-256。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "加密方法"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "加密演算法"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the archive will be written (alternative to output_path).",
+          "message": "寫入封存檔的 FileLocationHandler 位置 URL（output_path 的替代選項）。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "輸出位置"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "輸出位置 URL"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Output file path where the archive will be written. If not specified, the archive data is returned as binary data in the response.",
+          "message": "寫入封存檔的輸出檔案路徑。若未指定，封存資料將作為二進位資料在回應中傳回。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "輸出路徑"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Output file path for the archive",
+          "message": "封存檔的輸出檔案路徑"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption. If provided, all entries will be encrypted.",
+          "message": "用於 AES-256 加密的密碼。若提供，所有項目都將進行加密。"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "加密密碼"
+        },
+        "app.Wmlw.action.Y3JlYXRlLWFyY2hpdmU.short_desc": {
+          "source": "Create a new zip archive",
+          "message": "建立新的 zip 封存檔"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.desc": {
+          "source": "Add new files or update existing files in a zip archive",
+          "message": "在 zip 封存檔中新增檔案或更新現有檔案"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.display_name": {
+          "source": "Add Files to Archive",
+          "message": "新增檔案至封存檔"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "要新增檔案的 ZIP 封存檔檔案系統路徑。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "封存檔路徑"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.desc": {
+          "source": "List of entries to add. Each entry should have 'name' and either 'data' (binary data) or 'path' (filesystem path to read from).",
+          "message": "要新增的項目清單。每個項目都應包含 'name'，以及 'data'（二進位資料）或 'path'（要讀取的檔案系統路徑）其中之一。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.display_name": {
+          "source": "Entries",
+          "message": "項目"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW50cmllcw.short_desc": {
+          "source": "List of entries to add",
+          "message": "要新增的項目清單"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "不加密"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "無"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "傳統 PKWARE 加密（強度弱，不建議使用）"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "傳統 PKWARE"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128 加密"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192 加密"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256 加密（建議）"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "提供密碼時使用的加密方法。預設為 AES-256。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "加密方法"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "加密演算法"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "新項目 AES-256 加密的密碼。"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password for new entries",
+          "message": "新項目的加密密碼"
+        },
+        "app.Wmlw.action.YWRkLWZpbGVz.short_desc": {
+          "source": "Add files to an existing archive",
+          "message": "新增檔案至現有封存檔"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.desc": {
+          "source": "Recursively add a file or directory from the filesystem to an existing zip archive",
+          "message": "從檔案系統遞迴新增檔案或目錄至現有的 zip 封存檔"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.display_name": {
+          "source": "Add Path to Archive",
+          "message": "新增路徑至封存檔"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.desc": {
+          "source": "No compression (store only)",
+          "message": "不壓縮（僅儲存）"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjA.display_name": {
+          "source": "Store",
+          "message": "儲存"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.desc": {
+          "source": "LZMA compression",
+          "message": "LZMA 壓縮"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjE0.display_name": {
+          "source": "LZMA",
+          "message": "LZMA"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.desc": {
+          "source": "BZip2 compression",
+          "message": "BZip2 壓縮"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50OjEy.display_name": {
+          "source": "BZip2",
+          "message": "BZip2"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.desc": {
+          "source": "Deflate compression (standard, most compatible)",
+          "message": "Deflate 壓縮（標準，相容性最佳）"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojg.display_name": {
+          "source": "Deflate",
+          "message": "Deflate"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.desc": {
+          "source": "XZ/LZMA2 compression",
+          "message": "XZ/LZMA2 壓縮"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojk1.display_name": {
+          "source": "XZ",
+          "message": "XZ"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.desc": {
+          "source": "Zstandard compression (fast, high ratio)",
+          "message": "Zstandard 壓縮（快速、高壓縮比）"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.allowed-value.aW50Ojkz.display_name": {
+          "source": "Zstandard",
+          "message": "Zstandard"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.desc": {
+          "source": "Compression method for all entries.",
+          "message": "所有項目的壓縮方法。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.display_name": {
+          "source": "Compression Method",
+          "message": "壓縮方法"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.Y29tcHJlc3Npb25fbWV0aG9k.short_desc": {
+          "source": "Compression algorithm",
+          "message": "壓縮演算法"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to add files to.",
+          "message": "要新增檔案的 ZIP 封存檔檔案系統路徑。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "封存檔路徑"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.desc": {
+          "source": "No encryption",
+          "message": "不加密"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjA.display_name": {
+          "source": "None",
+          "message": "無"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.desc": {
+          "source": "Traditional PKWARE encryption (weak, not recommended)",
+          "message": "傳統 PKWARE 加密（強度弱，不建議使用）"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjE.display_name": {
+          "source": "Traditional PKWARE",
+          "message": "傳統 PKWARE"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.desc": {
+          "source": "AES-128 encryption",
+          "message": "AES-128 加密"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1Nw.display_name": {
+          "source": "AES-128",
+          "message": "AES-128"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.desc": {
+          "source": "AES-192 encryption",
+          "message": "AES-192 加密"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OA.display_name": {
+          "source": "AES-192",
+          "message": "AES-192"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.desc": {
+          "source": "AES-256 encryption (recommended)",
+          "message": "AES-256 加密（建議）"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.allowed-value.aW50OjI1OQ.display_name": {
+          "source": "AES-256",
+          "message": "AES-256"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.desc": {
+          "source": "Encryption method to use when a password is provided. Defaults to AES-256.",
+          "message": "提供密碼時使用的加密方法。預設為 AES-256。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.display_name": {
+          "source": "Encryption Method",
+          "message": "加密方法"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.ZW5jcnlwdGlvbl9tZXRob2Q.short_desc": {
+          "source": "Encryption algorithm",
+          "message": "加密演算法"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.desc": {
+          "source": "Filesystem path to a file or directory to add recursively to the archive.",
+          "message": "要遞迴新增至封存檔的檔案或目錄檔案系統路徑。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.display_name": {
+          "source": "Source Path",
+          "message": "來源路徑"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.c291cmNlX3BhdGg.short_desc": {
+          "source": "File or directory to add",
+          "message": "要新增的檔案或目錄"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for AES-256 encryption of new entries.",
+          "message": "新項目 AES-256 加密的密碼。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "加密密碼"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.desc": {
+          "source": "Base path for computing relative entry names in the archive. For example, if source_path='/a/b/c' and root_path='/a', entries will be stored as 'b/c/...'.",
+          "message": "用於計算封存檔中相對項目名稱的基底路徑。例如，若 source_path='/a/b/c' 且 root_path='/a'，項目將儲存為 'b/c/...'。"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.display_name": {
+          "source": "Root Path",
+          "message": "根路徑"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.option.cm9vdF9wYXRo.short_desc": {
+          "source": "Base path for relative entry names",
+          "message": "相對項目名稱的基底路徑"
+        },
+        "app.Wmlw.action.YWRkLXBhdGg.short_desc": {
+          "source": "Recursively add a file or directory",
+          "message": "遞迴新增檔案或目錄"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.desc": {
+          "source": "Get metadata and statistics about a zip archive",
+          "message": "取得 zip 封存檔的中繼資料與統計資訊"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.display_name": {
+          "source": "Get Archive Info",
+          "message": "取得封存檔資訊"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "包含 ZIP 封存檔的二進位資料。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "封存檔資料"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "二進位封存檔資料"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "要排除的 glob 模式清單（黑名單）。將略過符合任一模式的項目。排除會在包含之後套用（黑名單優先於白名單）。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "排除模式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob 黑名單模式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "用於排除項目的正規表示式模式（黑名單）。將略過名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "排除正規表示式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表示式黑名單模式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "要包含的 glob 模式清單（白名單）。只會包含符合至少一個模式的項目。使用 `*` 比對任意字元，使用 `?` 比對單一字元。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含模式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob 白名單模式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "用於包含項目的正規表示式模式（白名單）。只會包含名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表示式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表示式白名單模式"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to get information about.",
+          "message": "要取得資訊的 ZIP 封存檔檔案系統路徑。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "輸入路徑"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "封存檔的 FileLocationHandler 位置 URL（input_path 或 data 的替代選項）。"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "封存檔位置 URL"
+        },
+        "app.Wmlw.action.Z2V0LWFyY2hpdmUtaW5mbw.short_desc": {
+          "source": "Get zip archive metadata",
+          "message": "取得 zip 封存檔中繼資料"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.desc": {
+          "source": "Decompress an in-memory zip archive and return file contents",
+          "message": "解壓縮記憶體中的 zip 封存檔並傳回檔案內容"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.display_name": {
+          "source": "Decompress Data",
+          "message": "解壓縮資料"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to data or archive_path).",
+          "message": "封存檔的 FileLocationHandler 位置 URL（data 或 archive_path 的替代選項）。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "封存檔位置"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "封存檔位置 URL"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to decompress (alternative to data).",
+          "message": "要解壓縮的 ZIP 封存檔案系統路徑（data 的替代方案）。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "封存檔路徑"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive to decompress.",
+          "message": "包含要解壓縮之 ZIP 封存的二進位資料。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.display_name": {
+          "source": "Compressed Data",
+          "message": "壓縮資料"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZGF0YQ.short_desc": {
+          "source": "Compressed archive data",
+          "message": "已壓縮的封存資料"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.desc": {
+          "source": "Optional list of specific entry names to extract. If not specified, all entries are extracted.",
+          "message": "要解壓縮的特定項目名稱選用清單。若未指定，將解壓縮所有項目。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.display_name": {
+          "source": "Entry Names",
+          "message": "項目名稱"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZW50cnlfbmFtZXM.short_desc": {
+          "source": "Specific entries to extract",
+          "message": "要解壓縮的特定項目"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "要排除的 glob 模式清單（黑名單）。將略過符合任一模式的項目。排除會在包含之後套用（黑名單優先於白名單）。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "排除模式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob 黑名單模式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "用於排除項目的正規表示式模式（黑名單）。將略過名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "排除正規表示式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表示式黑名單模式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "要包含的 glob 模式清單（白名單）。只會包含符合至少一個模式的項目。使用 `*` 比對任意字元，使用 `?` 比對單一字元。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含模式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob 白名單模式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "用於包含項目的正規表示式模式（白名單）。只會包含名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表示式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表示式白名單模式"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "用於解密已加密項目的密碼。"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "解密密碼"
+        },
+        "app.Wmlw.action.ZGVjb21wcmVzcy1kYXRh.short_desc": {
+          "source": "Decompress zip data",
+          "message": "解壓縮 ZIP 資料"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.desc": {
+          "source": "Extract contents of a zip archive to a destination directory with optional filtering (glob/regex whitelist/blacklist) and path remapping",
+          "message": "將 ZIP 封存的內容解壓縮到目的地目錄，並支援選用篩選條件（glob/regex 白名單/黑名單）與路徑重新對應"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.display_name": {
+          "source": "Extract Archive",
+          "message": "解壓縮歸檔"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.desc": {
+          "source": "If set, this prefix is prepended to all entry names during extraction. For example, with `add_prefix` = `output/`, the entry `main.cpp` becomes `output/main.cpp`.",
+          "message": "若設定，在解壓縮期間會將此前綴加到所有項目名稱前。例如，當 `add_prefix` = `output/` 時，項目 `main.cpp` 將變為 `output/main.cpp`。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.display_name": {
+          "source": "Add Prefix",
+          "message": "新增前綴"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWRkX3ByZWZpeA.short_desc": {
+          "source": "Add prefix to entry paths",
+          "message": "在項目路徑新增前綴"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.desc": {
+          "source": "If `True`, allow symlink entries to be extracted. Symlinks are a security risk as they can point outside the destination directory. Default is `False` (symlinks are silently skipped). When enabled, symlink targets are still validated to stay within the destination directory.",
+          "message": "若為 `True`，允許解壓縮符號連結（symlink）項目。符號連結可能指向目的地目錄外部，具有安全性風險。預設為 `False`（靜默略過符號連結）。啟用時，仍會驗證符號連結目標是否位於目的地目錄內。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.display_name": {
+          "source": "Allow Symlinks",
+          "message": "允許符號連結"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.YWxsb3dfc3ltbGlua3M.short_desc": {
+          "source": "Allow symlink extraction",
+          "message": "允許符號連結解壓縮"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "包含 ZIP 封存檔的二進位資料。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "封存檔資料"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "二進位封存檔資料"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.desc": {
+          "source": "Filesystem path to the destination directory where files will be extracted.",
+          "message": "將解壓縮檔案的目的地目錄之檔案系統路徑。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.display_name": {
+          "source": "Destination Directory",
+          "message": "目的地目錄"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZGVzdGluYXRpb24.short_desc": {
+          "source": "Directory to extract files to",
+          "message": "要解壓縮檔案的目的地目錄"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "要排除的 glob 模式清單（黑名單）。將略過符合任一模式的項目。排除會在包含之後套用（黑名單優先於白名單）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "排除模式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob 黑名單模式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "用於排除項目的正規表示式模式（黑名單）。將略過名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "排除正規表示式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表示式黑名單模式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "要包含的 glob 模式清單（白名單）。只會包含符合至少一個模式的項目。使用 `*` 比對任意字元，使用 `?` 比對單一字元。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含模式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob 白名單模式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "用於包含項目的正規表示式模式（白名單）。只會包含名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表示式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表示式白名單模式"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to extract.",
+          "message": "要解壓縮的 ZIP 封存之檔案系統路徑。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "輸入路徑"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.desc": {
+          "source": "If `True`, overwrite existing files during extraction. Default is `False` (skip existing files).",
+          "message": "若為 `True`，則在解壓縮期間覆寫現有檔案。預設為 `False`（略過現有檔案）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.display_name": {
+          "source": "Overwrite",
+          "message": "覆寫"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.b3ZlcndyaXRl.short_desc": {
+          "source": "Overwrite existing files",
+          "message": "覆蓋現有檔案"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "封存檔的 FileLocationHandler 位置 URL（input_path 或 data 的替代選項）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "封存檔位置 URL"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.desc": {
+          "source": "If set, entries whose names start with this prefix will have it removed. For example, with `strip_prefix` = `src/`, the entry `src/main.cpp` becomes `main.cpp`.",
+          "message": "若設定，名稱以此前綴開頭的項目將會移除該前綴。例如，當 `strip_prefix` = `src/` 時，項目 `src/main.cpp` 將變為 `main.cpp`。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.display_name": {
+          "source": "Strip Prefix",
+          "message": "移除前綴"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.c3RyaXBfcHJlZml4.short_desc": {
+          "source": "Strip prefix from entry paths",
+          "message": "從項目路徑移除前綴"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "用於解密已加密項目的密碼。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "解密密碼"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.desc": {
+          "source": "If `True` (default), preserve directory paths during extraction. If `False`, all entries are extracted as flat files in the destination directory.",
+          "message": "若為 `True`（預設），則在解壓縮期間保留目錄路徑。若為 `False`，則所有項目皆解壓縮為目的地目錄中的平坦檔案。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.display_name": {
+          "source": "Preserve Paths",
+          "message": "保留路徑"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.option.cHJlc2VydmVfcGF0aHM.short_desc": {
+          "source": "Preserve directory structure",
+          "message": "保留目錄結構"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1hcmNoaXZl.short_desc": {
+          "source": "Extract a zip archive",
+          "message": "解壓縮 ZIP 封存"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.desc": {
+          "source": "Extract a single file from a zip archive to memory or disk",
+          "message": "從 ZIP 封存中解壓縮單一檔案至記憶體或磁碟"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.display_name": {
+          "source": "Extract Single File",
+          "message": "解壓縮單一檔案"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "包含 ZIP 封存檔的二進位資料。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.display_name": {
+          "source": "Archive Data",
+          "message": "封存檔資料"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9kYXRh.short_desc": {
+          "source": "Binary archive data",
+          "message": "二進位封存檔資料"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to archive_path or archive_data).",
+          "message": "封存的 FileLocationHandler 位置 URL（archive_path 或 archive_data 的替代方案）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.display_name": {
+          "source": "Archive Location",
+          "message": "封存檔位置"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9sb2NhdGlvbg.short_desc": {
+          "source": "Archive location URL",
+          "message": "封存檔位置 URL"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive.",
+          "message": "ZIP 封存的檔案系統路徑。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "封存檔路徑"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.desc": {
+          "source": "The name/path of the entry within the archive to extract.",
+          "message": "封存中要解壓縮的項目名稱/路徑。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.display_name": {
+          "source": "Entry Name",
+          "message": "條目名稱"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.ZW50cnlfbmFtZQ.short_desc": {
+          "source": "Name of the entry to extract",
+          "message": "要解壓縮的項目名稱"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.desc": {
+          "source": "A FileLocationHandler location URL where the extracted file should be written (alternative to output_path).",
+          "message": "解壓縮檔案應寫入的 FileLocationHandler 位置 URL（output_path 的替代方案）。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.display_name": {
+          "source": "Output Location",
+          "message": "輸出位置"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X2xvY2F0aW9u.short_desc": {
+          "source": "Output location URL",
+          "message": "輸出位置 URL"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.desc": {
+          "source": "Filesystem path where the extracted file should be written. If not specified, the file data is returned in the response.",
+          "message": "解壓縮檔案應寫入的檔案系統路徑。若未指定，檔案資料將在回應中傳回。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.display_name": {
+          "source": "Output Path",
+          "message": "輸出路徑"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.b3V0cHV0X3BhdGg.short_desc": {
+          "source": "Path to write the extracted file",
+          "message": "寫入已解壓縮檔案的路徑"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting the entry if it is encrypted.",
+          "message": "項目若已加密時用於解密的密碼。"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "解密密碼"
+        },
+        "app.Wmlw.action.ZXh0cmFjdC1maWxl.short_desc": {
+          "source": "Extract one file from archive",
+          "message": "從封存檔解壓縮單一檔案"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.desc": {
+          "source": "Get a list of all entries in a zip archive with metadata",
+          "message": "取得 ZIP 封存中包含中繼資料的所有項目清單"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.display_name": {
+          "source": "List Archive Contents",
+          "message": "列出封存檔內容"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "包含 ZIP 封存檔的二進位資料。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "封存檔資料"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "二進位封存檔資料"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist). Entries matching any pattern will be skipped. Exclude is applied after include (blacklist overrides whitelist).",
+          "message": "要排除的 glob 模式清單（黑名單）。將略過符合任一模式的項目。排除會在包含之後套用（黑名單優先於白名單）。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "排除模式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob 黑名單模式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries (blacklist). Entries whose names match the regex will be skipped.",
+          "message": "用於排除項目的正規表示式模式（黑名單）。將略過名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "排除正規表示式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表示式黑名單模式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist). Only entries matching at least one pattern will be included. Use `*` to match any characters and `?` to match a single character.",
+          "message": "要包含的 glob 模式清單（白名單）。只會包含符合至少一個模式的項目。使用 `*` 比對任意字元，使用 `?` 比對單一字元。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含模式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob 白名單模式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries (whitelist). Only entries whose names match the regex will be included.",
+          "message": "用於包含項目的正規表示式模式（白名單）。只會包含名稱符合正規表示式的項目。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表示式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表示式白名單模式"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to list.",
+          "message": "要列出項目的 ZIP 封存之檔案系統路徑。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "輸入路徑"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive (alternative to input_path or data).",
+          "message": "封存檔的 FileLocationHandler 位置 URL（input_path 或 data 的替代選項）。"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "封存檔位置 URL"
+        },
+        "app.Wmlw.action.bGlzdC1hcmNoaXZl.short_desc": {
+          "source": "List files in a zip archive",
+          "message": "列出 ZIP 封存中的檔案"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.desc": {
+          "source": "Replace or delete entries in a ZIP archive. Unchanged entries are copied efficiently without re-compression",
+          "message": "取代或刪除 ZIP 封存中的項目。未變更的項目將有效率地複製而無需重新壓縮"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.display_name": {
+          "source": "Replace/Delete Entries",
+          "message": "取代/刪除項目"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.desc": {
+          "source": "Filesystem path to the ZIP archive to modify.",
+          "message": "要修改的 ZIP 封存之檔案系統路徑。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.display_name": {
+          "source": "Archive Path",
+          "message": "封存檔路徑"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.YXJjaGl2ZV9wYXRo.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.desc": {
+          "source": "List of entry names to remove from the archive.",
+          "message": "要從封存中移除的項目名稱清單。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.display_name": {
+          "source": "Delete Entries",
+          "message": "刪除項目"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.ZGVsZXRlX25hbWVz.short_desc": {
+          "source": "Entry names to delete",
+          "message": "要刪除的項目名稱"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for encrypted entries.",
+          "message": "加密項目的密碼。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Encryption password",
+          "message": "加密密碼"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.desc": {
+          "source": "Hash mapping entry names to replacement data. Values can be binary data or a hash with a `data` key containing binary data.",
+          "message": "將項目名稱對應至取代資料的雜湊（Hash）。值可以是二進位資料，或是包含帶有二進位資料之 `data` 鍵的雜湊。"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.display_name": {
+          "source": "Replacements",
+          "message": "替換項目"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.option.cmVwbGFjZW1lbnRz.short_desc": {
+          "source": "Entries to replace",
+          "message": "要取代的項目"
+        },
+        "app.Wmlw.action.cmVwbGFjZS1lbnRyaWVz.short_desc": {
+          "source": "Replace or delete archive entries",
+          "message": "取代或刪除封存項目"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.desc": {
+          "source": "Verify the integrity of a ZIP archive by checking CRC checksums for all entries without extracting",
+          "message": "在不解壓縮的情況下，透過檢查所有項目的 CRC 校驗和來驗證 ZIP 封存的完整性"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.display_name": {
+          "source": "Verify Archive",
+          "message": "驗證封存檔"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.desc": {
+          "source": "Binary data containing the ZIP archive.",
+          "message": "包含 ZIP 封存檔的二進位資料。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.display_name": {
+          "source": "Archive Data",
+          "message": "封存檔資料"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZGF0YQ.short_desc": {
+          "source": "Binary archive data",
+          "message": "二進位封存檔資料"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to exclude (blacklist).",
+          "message": "要排除的 glob 模式清單（黑名單）。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Exclude Patterns",
+          "message": "排除模式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob blacklist patterns",
+          "message": "Glob 黑名單模式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for excluding entries.",
+          "message": "用於排除項目的正規表示式模式。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.display_name": {
+          "source": "Exclude Regex",
+          "message": "排除正規表示式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.ZXhjbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex blacklist pattern",
+          "message": "正規表示式黑名單模式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.desc": {
+          "source": "List of glob patterns to include (whitelist).",
+          "message": "要包含的 glob 模式清單（白名單）。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.display_name": {
+          "source": "Include Patterns",
+          "message": "包含模式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9wYXR0ZXJucw.short_desc": {
+          "source": "Glob whitelist patterns",
+          "message": "Glob 白名單模式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.desc": {
+          "source": "Regular expression pattern for including entries.",
+          "message": "用於包含項目的正規表示式模式。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.display_name": {
+          "source": "Include Regex",
+          "message": "包含正規表示式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5jbHVkZV9yZWdleA.short_desc": {
+          "source": "Regex whitelist pattern",
+          "message": "正規表示式白名單模式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.desc": {
+          "source": "Filesystem path to the ZIP archive to verify.",
+          "message": "要驗證的 ZIP 封存之檔案系統路徑。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.display_name": {
+          "source": "Input Path",
+          "message": "輸入路徑"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.aW5wdXRfcGF0aA.short_desc": {
+          "source": "Path to the archive file",
+          "message": "封存檔案的路徑"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.desc": {
+          "source": "A FileLocationHandler location URL for the archive.",
+          "message": "封存的 FileLocationHandler 位置 URL。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.display_name": {
+          "source": "Location",
+          "message": "位置"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.bG9jYXRpb24.short_desc": {
+          "source": "Archive location URL",
+          "message": "封存檔位置 URL"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.desc": {
+          "source": "Password for decrypting encrypted entries.",
+          "message": "用於解密已加密項目的密碼。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.display_name": {
+          "source": "Password",
+          "message": "密碼"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cGFzc3dvcmQ.short_desc": {
+          "source": "Decryption password",
+          "message": "解密密碼"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.desc": {
+          "source": "If `True`, enable recovery mode to read archives with corrupted central directories by reading local file headers.",
+          "message": "若為 `True`，則啟用復原模式，透過讀取本機檔案標頭來讀取中央目錄損毀的封存。"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.display_name": {
+          "source": "Recovery Mode",
+          "message": "復原模式"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.option.cmVjb3Zlcg.short_desc": {
+          "source": "Enable recovery for corrupted archives",
+          "message": "啟用損毀封存的復原功能"
+        },
+        "app.Wmlw.action.dmVyaWZ5LWFyY2hpdmU.short_desc": {
+          "source": "Verify archive integrity",
+          "message": "驗證封存檔完整性"
+        },
+        "app.Wmlw.desc": {
+          "source": "Create, extract, and manage Zip archives with compression support",
+          "message": "建立、解壓縮並管理支援壓縮的 Zip 封存"
+        },
+        "app.Wmlw.display_name": {
+          "source": "Zip Archive",
+          "message": "Zip 封存"
+        },
+        "app.Wmlw.short_desc": {
+          "source": "Zip archive operations",
+          "message": "Zip 封存操作"
+        }
+      }
+    }
+  }
+}
