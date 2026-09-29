@@ -54,7 +54,7 @@ QoreZipFile::QoreZipFile(const char* path, ZipMode m, ExceptionSink* xsink, bool
 QoreZipFile::QoreZipFile(const BinaryNode* data, ExceptionSink* xsink, bool recover)
     : mode(ZIP_MODE_READ), reader(nullptr), writer(nullptr), mem_stream(nullptr),
       in_memory(true), closed(false), recover(recover), active_streams(0),
-      max_alloc_size(ZIP_DEFAULT_MAX_ALLOC_SIZE) {
+      max_alloc_size(ZIP_DEFAULT_MAX_ALLOC_SIZE), source_data(static_cast<BinaryNode*>(data->refSelf())) {
     // Create memory stream from binary data
     mem_stream = mz_stream_mem_create();
     if (!mem_stream) {
@@ -222,6 +222,7 @@ void QoreZipFile::close(ExceptionSink* xsink) {
         mem_stream = nullptr;
     }
 
+    source_data = nullptr;
     closed = true;
 }
 

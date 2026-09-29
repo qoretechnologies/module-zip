@@ -1,0 +1,35 @@
+.\" Copyright (C) 2026 David Nichols; SPDX-License-Identifier: MIT
+.TH QZIP 1 "September 2026" "Qore ZIP module" "User Commands"
+.SH NAME
+qzip \- create, inspect, extract and modify ZIP archives
+.SH SYNOPSIS
+.B qzip
+.I command
+.RI [ options ]
+.RI [ arguments ]
+.SH DESCRIPTION
+Qore ZIP archive utility. Commands include create, extract, list, add, info,
+verify, diff, recompress, add-path, delete and replace.
+Use qzip COMMAND --help for command-specific arguments and options.
+.SH OPTIONS
+.TP
+.BR -h , " --help"
+Display usage.
+.TP
+.BR -C , " --no-color"
+Disable colored output.
+.TP
+.BR -p , " --password=" value
+Password for encryption or decryption. Command-line arguments can be visible
+in process listings; use the Qore API when a protected secret input is required.
+.TP
+.BR -e , " --encryption=" method
+For creation or recompression, select pkware, aes-128, aes-192 or aes-256.
+PKWARE is the compatibility default; AES-256 provides stronger encryption.
+.SH EXAMPLES
+.nf
+qzip create output.zip report.txt
+qzip list output.zip
+qzip extract --dest output output.zip
+qzip verify output.zip
+.fi

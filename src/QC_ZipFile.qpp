@@ -374,6 +374,9 @@ ZipFile::constructor(string path, string mode = "r", *bool recover) [dom=FILESYS
 /** @param data binary data containing a ZIP archive
     @param recover if True, enable recovery mode to read archives with corrupted central directories
 
+    @note The reader retains the input until closed. Temporary binary values are supported;
+    later changes to the caller's binary do not alter the reader's archive.
+
     @throw ZIP-ERROR error parsing the archive data
 */
 ZipFile::constructor(binary data, *bool recover) [flags=NAMED_ARGS] {

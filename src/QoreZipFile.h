@@ -200,6 +200,9 @@ private:
     bool recover;                    //!< Recovery mode for corrupted archives
     std::atomic<int> active_streams;     //!< Count of active stream objects
     int64 max_alloc_size;                //!< Maximum size for memory allocations
+    // minizip's zero-copy reader borrows the buffer until it is closed. Holding a
+    // reference also makes Qore copy-on-write protect it from caller mutations.
+    SimpleRefHolder<BinaryNode> source_data;
 
     //! Create ZipEntryInfo hash from minizip file info
     DLLLOCAL QoreHashNode* createEntryInfo(mz_zip_file* file_info, ExceptionSink* xsink);

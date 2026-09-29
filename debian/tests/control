@@ -1,0 +1,7 @@
+Tests: runtime
+Depends: qore-zip-module, unzip
+# QUnit reports progress to stderr even on success.
+Restrictions: allow-stderr
+
+Tests: compiler
+Depends: qore-zip-module, libqore-dev

@@ -1,0 +1,23 @@
+#!/bin/sh
+# Copyright (C) 2026 David Nichols
+# SPDX-License-Identifier: MIT
+set -eu
+unset QORE_MODULE_DIR QORE_MODULE_DIR_ONLY QORE_INCLUDE_DIR LD_LIBRARY_PATH LD_PRELOAD
+cd "$AUTOPKGTEST_TMP"
+cat > zip-smoke.q <<'EOF'
+%modern
+%requires zip
+%requires DataProvider
+%requires ZipDataProvider
+ZipFile archive();
+archive.addText("data.txt", "Package test");
+ZipFile reader(archive.toData());
+if (reader.readText(name: "data.txt") != "Package test") {
+    throw "PACKAGE-TEST-ERROR", "Installed ZIP round trip failed";
+}
+if (DataProvider::getFactory("zip").getInfo().name != "zip") {
+    throw "PACKAGE-TEST-ERROR", "Installed ZIP factory is unavailable";
+}
+EOF
+/usr/bin/qcc -o zip-smoke zip-smoke.q
+./zip-smoke

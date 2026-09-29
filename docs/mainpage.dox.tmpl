@@ -182,6 +182,10 @@ try {
     @section zipreleasenotes Release Notes
 
     @subsection zip_1_0 zip Module Version 1.0
+    - In-memory readers retain their input until closed, including temporary binary expressions
+    - Debian/Ubuntu packages with offline minizip-ng 4.2.2, all compression and encryption features,
+      source/AOT providers, compiler metadata, translations, API documentation, and debug symbols
+    - Configurable private minizip-ng source directory; OpenSSL patch failures stop configuration
     - Initial release
     - Full ZIP64 support
     - Multiple compression methods (deflate, bzip2, lzma, zstd, xz)
@@ -201,7 +205,8 @@ try {
 
     @section ziplicense License
 
-    The zip module is released under the MIT license.
+    The zip module is released under the MIT license. Its private minizip-ng implementation
+    is distributed under the zlib license; the source component retains its license notice.
 
     Copyright (C) 2026 Qore Technologies, s.r.o.
 */

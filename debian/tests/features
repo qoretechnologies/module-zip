@@ -1,0 +1,30 @@
+#!/usr/bin/qore
+# Copyright (C) 2026 David Nichols
+# SPDX-License-Identifier: MIT
+%modern
+%requires zip
+%requires QUnit
+%exec-class PackageFeatures
+class PackageFeatures inherits QUnit::Test {
+    constructor() : Test("ZIP package features", "1.0", \ARGV) {
+        addTestCase("all advertised compression and encryption combinations", \roundTrips());
+        set_return_value(main());
+    }
+    roundTrips() {
+        string text = strmul("Archive feature qualification\n", 100);
+        foreach int method in (ZIP_CM_STORE, ZIP_CM_DEFLATE, ZIP_CM_BZIP2, ZIP_CM_LZMA, ZIP_CM_XZ, ZIP_CM_ZSTD) {
+            foreach int encryption in (ZIP_EM_NONE, ZIP_EM_TRAD_PKWARE, ZIP_EM_AES_128, ZIP_EM_AES_192, ZIP_EM_AES_256) {
+                ZipFile archive();
+                archive.addText("payload.txt", text, NOTHING, <ZipAddOptions>{
+                    "compression_method": method, "encryption_method": encryption, "password": "package-test",
+                });
+                ZipFile reader(archive.toData());
+                reader.setPassword("package-test");
+                hash<ZipEntryInfo> info = reader.getEntry("payload.txt");
+                assertEq(method, info.compression_method);
+                assertEq(encryption, info.encryption_method);
+                assertEq(text, reader.readText("payload.txt"));
+            }
+        }
+    }
+}

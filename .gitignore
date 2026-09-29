@@ -6,3 +6,15 @@ build*
 *.pyc
 __pycache__
 .DS_Store
+
+# Debian package builds
+obj-*/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.debhelper.log
+debian/*.substvars
+debian/qore-zip-module/
+debian/qore-zip-module-doc/
+debian/tmp/
+minizipng/

@@ -1,0 +1,52 @@
+Qore ZIP module packages
+========================
+
+This development snapshot targets qore-testing, not general release. Runtime
+includes native bindings, source/AOT ZipDataProvider, qzip, metadata, resources
+and all translations; the doc package contains both references and test examples.
+Debug symbols cover the native library, private minizip and AOT provider.
+
+Ubuntu 26.04 minizip-ng 4.0.10 is built without AES, BZip2, LZMA/XZ or Zstandard.
+The source package therefore contains a private minizip-ng 4.2.2 component with
+all advertised features, including the upstream symlink-extraction correction.
+It links system zlib, BZip2, liblzma, Zstandard and OpenSSL. minizip symbols are
+hidden; no minizip headers, static libraries, CMake files or shared ABI are installed.
+The existing ENGINE compatibility patch is applied to a build copy and failures
+are fatal. The checked-out submodule is never modified. PPMd is not exposed by
+this module and is disabled. No build-time downloads are permitted.
+
+Source preparation
+------------------
+
+Export tracked module files except debian/ and src/minizip-ng to
+qore-zip-module_1.0.0~git20260928.1+ds.orig.tar.xz with the matching top-level
+directory, then copy debian into the extracted tree. Download the archive from
+vendor-sources.json outside the build and run:
+
+    python3 debian/repack-minizipng.py /path/to/minizip-ng-4.2.2.tar.gz ..
+
+The helper verifies its SHA256 and deterministically creates the minizipng orig
+component, omitting unused documentation, test fixtures and CI files. Extract
+that component under minizipng/ (remove its top-level upstream directory), then
+run dpkg-buildpackage -S -sa -us -uc. dpkg-source -x restores both components.
+
+Qualification
+-------------
+
+Build native unprivileged and offline with the packaged Qore 3 SDK and declared
+Build-Depends. QORE_MINIZIP_SOURCE_DIR selects the offline component. Cross builds
+are rejected because Qore tools execute during compilation. Fixed AOT partitions,
+prefix maps, timezone and preserved metadata trailers support reproducibility.
+Full, -B, -A, nocheck and nodoc profiles are supported.
+
+Run both upstream suites, all compression/encryption feature round trips,
+strict provider ownership/locale checks, fresh qcc compilation and qzip/unzip
+interoperability. Installed tests copy no source modules. Also qualify source
+mode, debug symbols, exact source/resource/catalog parity, minimal runtime
+install/purge/reinstall and byte reproducibility across paths and job counts.
+No network service is required.
+
+Only Ubuntu 26.04 amd64 with Qore SDK .12 is initially qualified. Other targets,
+upgrades from future released packages and the Qore ABI freeze remain release
+requirements. Testing PPA publication requires the matching published SDK,
+source signing and upload; this is not approval for general release.

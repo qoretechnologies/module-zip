@@ -1,0 +1,46 @@
+Source: qore-zip-module
+Section: interpreters
+Priority: optional
+Maintainer: David Nichols <david@qore.org>
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.21),
+               zlib1g-dev,
+               libbz2-dev,
+               liblzma-dev,
+               libzstd-dev,
+               libssl-dev,
+               patch,
+               unzip <!nocheck>,
+               libqore-dev (>= 3.0.0~),
+               qore (>= 3.0.0~),
+               qore-misc-tools (>= 3.0.0~) <!nocheck>,
+               python3
+Build-Depends-Indep: doxygen <!nodoc>
+Standards-Version: 4.7.4
+Rules-Requires-Root: no
+Homepage: https://qore.org
+Vcs-Git: https://github.com/qoretechnologies/module-zip.git
+Vcs-Browser: https://github.com/qoretechnologies/module-zip
+
+Package: qore-zip-module
+Architecture: any
+Depends: ${qore:Depends},
+         ${shlibs:Depends},
+         ${misc:Depends}
+Suggests: qore-zip-module-doc
+Description: ZIP archives and data providers for Qore
+ This package provides native ZIP bindings, the ZipDataProvider source and
+ compiled module, qzip, compiler metadata, provider resources and translations.
+ It supports ZIP64, streams, deflate, BZip2, LZMA, XZ and Zstandard compression,
+ and traditional PKWARE or AES encryption.
+
+Package: qore-zip-module-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Build-Profiles: <!nodoc>
+Depends: ${misc:Depends}
+Suggests: qore-zip-module
+Description: documentation and examples for Qore's ZIP modules
+ This package contains HTML API references and test examples for the zip
+ native module and ZipDataProvider.

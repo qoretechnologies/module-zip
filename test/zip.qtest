@@ -26,6 +26,7 @@
 */
 
 %modern
+%prepend-module-path "${SCRIPT_DIR}/../qlib"
 
 %requires QUnit
 %requires Util
@@ -46,6 +47,7 @@ public class ZipTest inherits QUnit::Test {
         addTestCase("Archive creation tests", \archiveCreationTest());
         addTestCase("Archive reading tests", \archiveReadingTest());
         addTestCase("In-memory archive tests", \inMemoryArchiveTest());
+        addTestCase("In-memory input lifetime", \inputLifetimeTest());
         addTestCase("Compression tests", \compressionTest());
         addTestCase("Extraction tests", \extractionTest());
         addTestCase("Encryption tests", \encryptionTest());
@@ -232,6 +234,30 @@ public class ZipTest inherits QUnit::Test {
             assertEq("In-memory content", content, "in-memory content matches");
             zip.close();
         }
+    }
+
+    inputLifetimeTest() {
+        ZipFile writer();
+        writer.addText("payload.txt", "Retained archive input");
+        # The binary expression is released as soon as the constructor returns.
+        ZipFile temporary(writer.toData());
+        assertEq("Retained archive input", temporary.readText("payload.txt"));
+        {
+            ZipInputStream stream = temporary.openRead("payload.txt");
+            assertEq("Retained archive input", stream.read(100).toString("UTF-8"));
+        }
+        temporary.close();
+
+        ZipFile second_writer();
+        second_writer.addText("payload.txt", "Retained archive input");
+        binary archive_data = second_writer.toData();
+        ZipFile retained(archive_data);
+        # Both caller mutation and replacement must leave the reader's input intact.
+        archive_data += <00010203>;
+        assertEq("Retained archive input", retained.readText("payload.txt"));
+        archive_data = <ff>;
+        assertEq("Retained archive input", retained.readText("payload.txt"));
+        retained.close();
     }
 
     # Test compression methods and levels

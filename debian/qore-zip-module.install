@@ -1,0 +1,6 @@
+usr/bin/qzip
+usr/lib/*/qore-modules/*.qmod
+usr/lib/*/qore-modules/ZipDataProvider/
+usr/share/qore-modules/ZipDataProvider/
+usr/share/qore/metadata/zip/*.meta.json
+usr/share/qore/i18n/

@@ -1,0 +1,10 @@
+qore-zip-module (1.0.0~git20260928.1+ds-0qore1~ubuntu26.04) resolute; urgency=medium
+
+  * Package native and source/AOT ZIP modules, metadata and translations.
+  * Include qzip with a manual, API references, examples and debug symbols.
+  * Pin private minizip-ng 4.2.2; retain the OpenSSL compatibility patch.
+  * Retain in-memory reader input through close, including temporary values.
+  * Require all advertised compression/encryption features and test offline.
+  * Add reproducible profiles, installed tests and preserve AOT metadata.
+
+ -- David Nichols <david@qore.org>  Tue, 29 Sep 2026 04:41:39 +0000

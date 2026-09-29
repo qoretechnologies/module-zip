@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.21)
 
 project(qore-zip-module)
 
@@ -58,6 +58,8 @@ set(MZ_DECOMPRESS_ONLY OFF CACHE BOOL "Build both compression and decompression"
 set(MZ_BUILD_TESTS OFF CACHE BOOL "Disable minizip-ng tests" FORCE)
 set(MZ_BUILD_UNIT_TESTS OFF CACHE BOOL "Disable minizip-ng unit tests" FORCE)
 set(MZ_BUILD_FUZZ_TESTS OFF CACHE BOOL "Disable minizip-ng fuzz tests" FORCE)
+# PPMd is not exposed by this module and would download an additional source tree.
+set(MZ_PPMD OFF CACHE BOOL "Disable unexposed PPMd compression" FORCE)
 # Pin sanitizer to OFF: minizip-ng v4.2 only accepts OFF/memory/address/undefined/thread
 # (the earlier "AUTO" value was removed), and we don't want submodule sanitizer state to
 # leak into the module build.
@@ -71,20 +73,23 @@ set(MZ_SANITIZER OFF CACHE STRING "Disable minizip-ng sanitizers" FORCE)
 # which breaks `git pull --rebase` and `git submodule update` in persistent
 # checkouts. Instead, copy the submodule into the build tree and patch the COPY,
 # leaving the checked-out submodule pristine.
+set(QORE_MINIZIP_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/minizip-ng" CACHE PATH
+    "minizip-ng source directory (submodule or offline source component)")
+if(NOT EXISTS "${QORE_MINIZIP_SOURCE_DIR}/CMakeLists.txt")
+    message(FATAL_ERROR "minizip-ng sources not found: ${QORE_MINIZIP_SOURCE_DIR}")
+endif()
 set(MINIZIP_SRC_DIR "${CMAKE_BINARY_DIR}/minizip-ng")
-file(COPY "${CMAKE_SOURCE_DIR}/src/minizip-ng" DESTINATION "${CMAKE_BINARY_DIR}"
+file(COPY "${QORE_MINIZIP_SOURCE_DIR}/" DESTINATION "${MINIZIP_SRC_DIR}"
      PATTERN ".git" EXCLUDE)
 
 # Apply patches to the build-tree copy of minizip-ng before building.
-# OpenSSL 3.2+ removed the ENGINE API - apply compatibility patch.
+# Some OpenSSL 3.x builds disable the deprecated ENGINE API.
 if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
-    # Dry-run first: patch --dry-run returns 0 when the patch would apply, 1 when
-    # already applied, >1 on error. Only invoke the real apply on a 0, otherwise
-    # patch writes a .rej alongside the source on every configure. (file(COPY)
-    # refreshes the copy each configure, so "already applied" is normally only
-    # seen when the destination file was not re-copied.)
+    find_program(QORE_PATCH_EXECUTABLE patch REQUIRED)
+    # A failed forward dry-run can mean either already applied or incompatible.
+    # Verify the reverse patch before accepting an already patched source copy.
     execute_process(
-        COMMAND patch -p1 --dry-run --forward --silent -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+        COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --dry-run --forward --silent -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
         WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
         RESULT_VARIABLE PATCH_DRY_RESULT
         OUTPUT_QUIET
@@ -92,22 +97,37 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
     )
     if(PATCH_DRY_RESULT EQUAL 0)
         execute_process(
-            COMMAND patch -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+            COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
             WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
             RESULT_VARIABLE PATCH_RESULT
             OUTPUT_QUIET
             ERROR_QUIET
         )
         if(NOT PATCH_RESULT EQUAL 0)
-            message(WARNING "Failed to apply OpenSSL 3.2 compatibility patch (patch exit code: ${PATCH_RESULT})")
+            message(FATAL_ERROR "Failed to apply OpenSSL compatibility patch (patch exit code: ${PATCH_RESULT})")
         endif()
-    elseif(PATCH_DRY_RESULT GREATER 1)
-        message(WARNING "OpenSSL 3.2 compatibility patch dry-run failed (exit code: ${PATCH_DRY_RESULT})")
+    else()
+        execute_process(
+            COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --dry-run --reverse --silent -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+            WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
+            RESULT_VARIABLE PATCH_REVERSE_RESULT
+            OUTPUT_QUIET ERROR_QUIET
+        )
+        if(NOT PATCH_REVERSE_RESULT EQUAL 0)
+            message(FATAL_ERROR "OpenSSL compatibility patch does not match the minizip-ng sources")
+        endif()
     endif()
 endif()
 
-# Add minizip-ng subdirectory (the patched build-tree copy, never the submodule)
-add_subdirectory("${MINIZIP_SRC_DIR}" "${CMAKE_BINARY_DIR}/minizip-ng-build")
+# The implementation is private to the module: do not install or export a second
+# minizip library into the system prefix. Function scope preserves caller options.
+function(qore_add_private_minizip)
+    set(BUILD_SHARED_LIBS OFF)
+    set(SKIP_INSTALL_ALL ON)
+    add_subdirectory("${MINIZIP_SRC_DIR}" "${CMAKE_BINARY_DIR}/minizip-ng-build" EXCLUDE_FROM_ALL)
+endfunction()
+qore_add_private_minizip()
+set_target_properties(minizip-ng PROPERTIES C_VISIBILITY_PRESET hidden)
 
 # Some distros (e.g. Debian/Ubuntu aarch64) ship libzstd.a without -fPIC, but
 # minizip-ng links zstd::libzstd_static when built as a static archive. Linking
@@ -223,4 +243,8 @@ if (DOXYGEN_FOUND)
     qore_wrap_dox(QORE_DOX_SRC ${QORE_DOX_TMPL_SRC})
     add_custom_target(QORE_MOD_DOX_FILES DEPENDS ${QORE_DOX_SRC})
     add_dependencies(docs-module QORE_MOD_DOX_FILES)
+endif()
+
+if (COMMAND qore_binary_module_two_phase_docs)
+    qore_binary_module_two_phase_docs(zip "ZipDataProvider")
 endif()
