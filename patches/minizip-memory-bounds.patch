@@ -1,0 +1,157 @@
+Fix bounded memory-stream resizing and atomic archive comment replacement.
+
+Copyright (C) 2026 Qore Technologies, s.r.o.
+SPDX-License-Identifier: Zlib
+
+The comment ownership ordering follows upstream develop 72d3b398c420f01f1351b1fc9ddb8fc53eb7faf4;
+copy the terminator explicitly instead of relying on strncpy plus zero fill.
+Memory streams retain the 4.2.x 32-bit ABI, validate growth before narrowing,
+and copy only the destination capacity when reopening with a smaller buffer.
+
+--- a/mz_strm_mem.c
++++ b/mz_strm_mem.c
+@@ -54,12 +54,17 @@
+     int32_t new_size = size;
+     uint8_t *new_buf = NULL;
+ 
+-    new_buf = (uint8_t *)malloc((uint32_t)new_size);
++    if (new_size <= 0 || mem->size < 0) {
++        return MZ_PARAM_ERROR;
++    }
++
++    new_buf = (uint8_t *)malloc((size_t)new_size);
+     if (!new_buf)
+         return MZ_BUF_ERROR;
+ 
+     if (mem->buffer) {
+-        memcpy(new_buf, mem->buffer, mem->size);
++        size_t copy_size = (size_t)(mem->size < new_size ? mem->size : new_size);
++        memcpy(new_buf, mem->buffer, copy_size);
+         free(mem->buffer);
+     }
+ 
+@@ -112,11 +117,15 @@
+ 
+ int32_t mz_stream_mem_write(void *stream, const void *buf, int32_t size) {
+     mz_stream_mem *mem = (mz_stream_mem *)stream;
+-    int32_t new_size = 0;
++    int64_t new_size = 0;
+     int32_t err = MZ_OK;
+ 
+-    if (!size)
+-        return size;
++    if (size < 0 || (size > 0 && !buf)) {
++        return MZ_PARAM_ERROR;
++    }
++    if (!size) {
++        return 0;
++    }
+ 
+     if (size > mem->size - mem->position) {
+         if (mem->mode & MZ_OPEN_MODE_CREATE) {
+@@ -126,7 +135,10 @@
+             else
+                 new_size += size;
+ 
+-            err = mz_stream_mem_set_size(stream, new_size);
++            if (new_size > INT32_MAX) {
++                return MZ_BUF_ERROR;
++            }
++            err = mz_stream_mem_set_size(stream, (int32_t)new_size);
+             if (err != MZ_OK)
+                 return err;
+         } else {
+@@ -134,7 +146,9 @@
+         }
+     }
+ 
+-    memcpy(mem->buffer + mem->position, buf, size);
++    if (size > 0) {
++        memcpy(mem->buffer + mem->position, buf, (size_t)size);
++    }
+ 
+     mem->position += size;
+     if (mem->position > mem->limit)
+@@ -155,9 +169,15 @@
+ 
+     switch (origin) {
+     case MZ_SEEK_CUR:
++        if (offset < -(int64_t)mem->position || offset > INT32_MAX - (int64_t)mem->position) {
++            return MZ_SEEK_ERROR;
++        }
+         new_pos = mem->position + offset;
+         break;
+     case MZ_SEEK_END:
++        if (offset < -(int64_t)mem->limit || offset > INT32_MAX - (int64_t)mem->limit) {
++            return MZ_SEEK_ERROR;
++        }
+         new_pos = mem->limit + offset;
+         break;
+     case MZ_SEEK_SET:
+@@ -201,8 +221,12 @@
+ 
+ void mz_stream_mem_set_buffer(void *stream, void *buf, int32_t size) {
+     mz_stream_mem *mem = (mz_stream_mem *)stream;
++    if (size < 0 || (size > 0 && !buf)) {
++        return;
++    }
+     mem->buffer = (uint8_t *)buf;
+     mem->size = size;
++    mem->position = 0;
+     mem->limit = size;
+ }
+ 
+@@ -230,12 +254,16 @@
+ 
+ void mz_stream_mem_set_buffer_limit(void *stream, int32_t limit) {
+     mz_stream_mem *mem = (mz_stream_mem *)stream;
+-    mem->limit = limit;
++    if (limit >= 0 && limit <= mem->size) {
++        mem->limit = limit;
++    }
+ }
+ 
+ void mz_stream_mem_set_grow_size(void *stream, int32_t grow_size) {
+     mz_stream_mem *mem = (mz_stream_mem *)stream;
+-    mem->grow_size = grow_size;
++    if (grow_size > 0) {
++        mem->grow_size = grow_size;
++    }
+ }
+ 
+ void *mz_stream_mem_create(void) {
+--- a/mz_zip.c
++++ b/mz_zip.c
+@@ -1561,17 +1561,22 @@
+ 
+ int32_t mz_zip_set_comment(void *handle, const char *comment) {
+     mz_zip *zip = (mz_zip *)handle;
+-    int32_t comment_size = 0;
+-    if (!zip || !comment)
+-        return MZ_PARAM_ERROR;
++    size_t comment_size = 0;
++    char *new_comment = NULL;
++    if (!zip || !comment) {
++        return MZ_PARAM_ERROR;
++    }
++    comment_size = strlen(comment);
++    if (comment_size > UINT16_MAX) {
++        return MZ_PARAM_ERROR;
++    }
++    new_comment = (char *)malloc(comment_size + 1);
++    if (!new_comment) {
++        return MZ_MEM_ERROR;
++    }
++    memcpy(new_comment, comment, comment_size + 1);
+     free(zip->comment);
+-    comment_size = (int32_t)strlen(comment);
+-    if (comment_size > UINT16_MAX)
+-        return MZ_PARAM_ERROR;
+-    zip->comment = (char *)calloc(comment_size + 1, sizeof(char));
+-    if (!zip->comment)
+-        return MZ_MEM_ERROR;
+-    strncpy(zip->comment, comment, comment_size);
++    zip->comment = new_comment;
+     return MZ_OK;
+ }
+ 

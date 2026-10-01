@@ -84,12 +84,12 @@ file(COPY "${QORE_MINIZIP_SOURCE_DIR}/" DESTINATION "${MINIZIP_SRC_DIR}"
 
 # Apply patches to the build-tree copy of minizip-ng before building.
 # Some OpenSSL 3.x builds disable the deprecated ENGINE API.
-if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
+foreach(QORE_MINIZIP_PATCH openssl-3.2-fix.patch minizip-memory-bounds.patch)
     find_program(QORE_PATCH_EXECUTABLE patch REQUIRED)
     # A failed forward dry-run can mean either already applied or incompatible.
     # Verify the reverse patch before accepting an already patched source copy.
     execute_process(
-        COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --dry-run --forward --silent -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+        COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --dry-run --forward --silent -i "${CMAKE_SOURCE_DIR}/patches/${QORE_MINIZIP_PATCH}"
         WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
         RESULT_VARIABLE PATCH_DRY_RESULT
         OUTPUT_QUIET
@@ -97,27 +97,27 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch")
     )
     if(PATCH_DRY_RESULT EQUAL 0)
         execute_process(
-            COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+            COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --forward -i "${CMAKE_SOURCE_DIR}/patches/${QORE_MINIZIP_PATCH}"
             WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
             RESULT_VARIABLE PATCH_RESULT
             OUTPUT_QUIET
             ERROR_QUIET
         )
         if(NOT PATCH_RESULT EQUAL 0)
-            message(FATAL_ERROR "Failed to apply OpenSSL compatibility patch (patch exit code: ${PATCH_RESULT})")
+            message(FATAL_ERROR "Failed to apply minizip patch ${QORE_MINIZIP_PATCH} (patch exit code: ${PATCH_RESULT})")
         endif()
     else()
         execute_process(
-            COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --dry-run --reverse --silent -i "${CMAKE_SOURCE_DIR}/patches/openssl-3.2-fix.patch"
+            COMMAND "${QORE_PATCH_EXECUTABLE}" -p1 --dry-run --reverse --silent -i "${CMAKE_SOURCE_DIR}/patches/${QORE_MINIZIP_PATCH}"
             WORKING_DIRECTORY "${MINIZIP_SRC_DIR}"
             RESULT_VARIABLE PATCH_REVERSE_RESULT
             OUTPUT_QUIET ERROR_QUIET
         )
         if(NOT PATCH_REVERSE_RESULT EQUAL 0)
-            message(FATAL_ERROR "OpenSSL compatibility patch does not match the minizip-ng sources")
+            message(FATAL_ERROR "minizip patch ${QORE_MINIZIP_PATCH} does not match the minizip-ng sources")
         endif()
     endif()
-endif()
+endforeach()
 
 # The implementation is private to the module: do not install or export a second
 # minizip library into the system prefix. Function scope preserves caller options.
