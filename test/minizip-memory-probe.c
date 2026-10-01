@@ -9,8 +9,10 @@
 #include <assert.h>
 #include <stdio.h>
 
-/* Single-threaded, deterministic allocation-failure injection. */
-static int fail_malloc;
+/* Single-threaded allocation injection. --wrap rewrites malloc calls after
+ * LTO optimization, so accesses must observe the wrapper's hidden mutation.
+ */
+static volatile int fail_malloc;
 void *__real_malloc(size_t size);
 void *__wrap_malloc(size_t size) {
     if (fail_malloc) {

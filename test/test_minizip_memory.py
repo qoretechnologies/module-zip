@@ -58,7 +58,8 @@ target_link_libraries(probe PRIVATE minizip-ng)
             command = ["valgrind", "--quiet", "--leak-check=full",
                        "--show-leak-kinds=all", "--errors-for-leak-kinds=all",
                        "--error-exitcode=99", *command]
-        result = subprocess.run(command, capture_output=True, text=True, check=True, timeout=60)
+        result = subprocess.run(command, capture_output=True, text=True, timeout=60)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
         self.assertEqual("", result.stderr)
         self.assertEqual("PASS\n", result.stdout)
 

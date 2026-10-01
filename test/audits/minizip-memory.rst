@@ -27,6 +27,10 @@ empty and maximum-length comments, oversize rejection, aliased comments,
 injected allocation failures, shrinking reopen, normal growth, fixed buffers,
 negative sizes and extreme positive/negative seek offsets. Allocation injection
 is confined to the single-threaded test executable via the GNU linker.
+The injection flag is volatile because GNU --wrap rewrites malloc references
+after LTO; without volatile, GCC can reuse its pre-call value when checking
+that the wrapper consumed the flag. The same five groups also pass under the
+full Fedora RPM compiler/linker flags, including LTO, with Valgrind.
 
 The full module's Debug build, API documentation, 61 Qore test cases (493
 assertions), 90 feature assertions and ZIP CLI interoperability checks also pass.
