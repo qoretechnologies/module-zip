@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.21...3.31)
 
 project(qore-zip-module)
 
@@ -30,7 +30,7 @@ find_package(ZLIB REQUIRED)
 # Find optional compression libraries
 find_package(BZip2)
 find_package(LibLZMA)
-find_package(zstd)
+include(cmake/QoreFindZstd.cmake)
 find_package(OpenSSL)
 
 # Check for C++11.
@@ -84,7 +84,7 @@ file(COPY "${QORE_MINIZIP_SOURCE_DIR}/" DESTINATION "${MINIZIP_SRC_DIR}"
 
 # Apply patches to the build-tree copy of minizip-ng before building.
 # Some OpenSSL 3.x builds disable the deprecated ENGINE API.
-foreach(QORE_MINIZIP_PATCH openssl-3.2-fix.patch minizip-memory-bounds.patch)
+foreach(QORE_MINIZIP_PATCH openssl-3.2-fix.patch minizip-memory-bounds.patch minizip-zstd-discovery.patch)
     find_program(QORE_PATCH_EXECUTABLE patch REQUIRED)
     # A failed forward dry-run can mean either already applied or incompatible.
     # Verify the reverse patch before accepting an already patched source copy.

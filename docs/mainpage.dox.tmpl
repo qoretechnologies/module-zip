@@ -181,6 +181,10 @@ try {
 
     @section zipreleasenotes Release Notes
 
+    - Provide manifest-based uninstall and support CMake install-path normalization.
+    - Detect the system Zstandard library through pkg-config when a distribution
+      does not provide its CMake configuration. Preserve shared-library linking.
+
     @subsection zip_1_0 zip Module Version 1.0
     - Bundled minizip rejects overflowing memory-stream growth, safely resizes on reopen,
       and preserves archive comments when replacement validation or allocation fails

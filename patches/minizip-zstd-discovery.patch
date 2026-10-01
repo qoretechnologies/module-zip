@@ -1,0 +1,19 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -398,14 +398,14 @@
+ 
+ if(MZ_ZSTD)
+     # Check if zstd is present
+-    if(NOT MZ_FORCE_FETCH_LIBS)
++    if(NOT MZ_FORCE_FETCH_LIBS AND NOT zstd_FOUND)
+         find_package(zstd QUIET CONFIG)
+     endif()
+ 
+     if(zstd_FOUND AND NOT MZ_FORCE_FETCH_LIBS)
+         message(STATUS "Using ZSTD ${zstd_VERSION}")
+ 
+-        if(BUILD_SHARED_LIBS)
++        if(BUILD_SHARED_LIBS OR NOT TARGET zstd::libzstd_static)
+             list(APPEND MINIZIP_LIB zstd::libzstd_shared)
+         else()
+             list(APPEND MINIZIP_LIB zstd::libzstd_static)
