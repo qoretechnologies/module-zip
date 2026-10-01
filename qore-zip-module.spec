@@ -77,7 +77,6 @@ cmake -S . -B build -G 'Unix Makefiles' \
   -DQORE_QPP_EXECUTABLE=/usr/bin/qpp -DQORE_QCC_EXECUTABLE=/usr/bin/qcc \
   -DQORE_MINIZIP_SOURCE_DIR:PATH=$PWD/minizip-ng-4.2.2 \
   -DMZ_FETCH_LIBS=OFF -DMZ_FORCE_FETCH_LIBS=OFF -DMZ_ZLIB_FLAVOR=zlib \
-  -DFETCHCONTENT_FULLY_DISCONNECTED=ON \
   -DQORE_BUILD_AOT_MODULES=ON -DQORE_AOT_LINK_SOURCE_MODULES=OFF \
   -DQORE_QM_METADATA_ENV:STRING="QORE_MODULE_DIR=$QORE_MODULE_DIR:$PWD/qlib;QORE_MODULE_DIR_ONLY=1;QORE_INCLUDE_DIR=;LD_LIBRARY_PATH=" \
   -DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=%{!?with_docs:ON}%{?with_docs:OFF}
@@ -101,6 +100,8 @@ hardlink -t -O %{buildroot}%{_docdir}/%{name}-doc
 . %{_rpmconfigdir}/qore/module-env.sh
 QORE_MINIZIP_SOURCE_DIR="$PWD/minizip-ng-4.2.2" \
   python3 -B -W error -m unittest discover -s test -p test_minizip_memory.py -v
+python3 -B -W error test/test_zstd_discovery.py -v
+python3 -B -W error test/test_uninstall.py -v
 for test in test/*.qtest; do
   timeout 180 /usr/bin/qore -b --enable-debug \
     -l "$PWD/build/zip-api-$(/usr/bin/qore --latest-module-api).qmod" \
