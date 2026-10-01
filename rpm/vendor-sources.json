@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "components": [
+    {
+      "name": "minizip-ng",
+      "archive": "minizip-ng-4.2.2.tar.xz",
+      "top": "minizip-ng-4.2.2",
+      "licenses": [
+        "LICENSE"
+      ],
+      "version": "4.2.2",
+      "url": "https://codeload.github.com/zlib-ng/minizip-ng/tar.gz/refs/tags/4.2.2",
+      "sha256": "71af7b9799856d8b03619df3949e9c1be9703f8de0795af71399ba283cb27aac",
+      "excluded": [
+        "doc",
+        "test",
+        ".github"
+      ]
+    }
+  ]
+}
