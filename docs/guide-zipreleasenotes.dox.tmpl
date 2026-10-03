@@ -4,31 +4,6 @@
 
     @tableofcontents
 
-    - Provide manifest-based uninstall and support CMake install-path normalization.
-    - Detect the system Zstandard library through pkg-config when a distribution
-      does not provide its CMake configuration. Preserve shared-library linking.
-
     @section zip_1_0 zip Module Version 1.0
-    - Bundled minizip rejects overflowing memory-stream growth, safely resizes on reopen,
-      and preserves archive comments when replacement validation or allocation fails
-    - In-memory readers retain their input until closed, including temporary binary expressions
-    - Debian/Ubuntu packages with offline minizip-ng 4.2.2, all compression and encryption features,
-      source/AOT providers, compiler metadata, translations, API documentation, and debug symbols
-    - Configurable private minizip-ng source directory; OpenSSL patch failures stop configuration
-    - Initial release
-    - Full ZIP64 support
-    - Multiple compression methods (deflate, bzip2, lzma, zstd, xz)
-    - Encryption: traditional PKWARE (ZipCrypto) by default for maximum interoperability with
-      Windows Explorer, macOS Finder, and other common ZIP tools; optional AES-128/192/256 for
-      strong encryption
-    - \c ZIP-PASSWORD-ERROR raised cleanly when a password is required or incorrect, with no
-      0-byte garbage left on disk
-    - @ref Qore::Zip::ZipFile::extractAll() returns a @ref Qore::Zip::ZipExtractResult hash
-      describing which entries were written and which were skipped because the destination
-      already existed
-    - @ref Qore::Zip::ZipFile::recompress() accepts an optional \c encryption_method
-    - In-memory archive operations
-    - Streaming API (@ref Qore::Zip::ZipInputStream / @ref Qore::Zip::ZipOutputStream)
-    - Data provider module
-    - @c qzip CLI with 11 commands and an \c -e / \c --encryption flag
+    - initial release
 */

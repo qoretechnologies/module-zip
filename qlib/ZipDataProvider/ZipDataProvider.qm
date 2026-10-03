@@ -260,6 +260,8 @@ module ZipDataProvider {
 
     @section zipdataproviderintro ZipDataProvider Module Introduction
 
+    <img src="zip-logo.svg" width="96" alt="ZipDataProvider module logo"/>
+
     @anchor zipdpintro
 
     The ZipDataProvider module exposes ZIP archive operations through the Qore DataProvider API,
