@@ -175,6 +175,13 @@ set(QMOD
 
 set(QORE_DOX_TMPL_SRC
   docs/mainpage.dox.tmpl
+    docs/guide-zipcompression.dox.tmpl
+    docs/guide-zipdataprovider.dox.tmpl
+    docs/guide-zipencryption.dox.tmpl
+    docs/guide-ziperrors.dox.tmpl
+    docs/guide-ziplicense.dox.tmpl
+    docs/guide-zipquickstart.dox.tmpl
+    docs/guide-zipreleasenotes.dox.tmpl
 )
 
 add_library(${module_name} MODULE ${CPP_SRC} ${QPP_SOURCES})
@@ -203,7 +210,18 @@ file(WRITE
     "${CMAKE_BINARY_DIR}/doxygen/qlib/ZipDataProvider/zip-logo.svg.dox.h"
     "/** @file zip-logo.svg.dox.h\n    @brief ZIP DataProvider logo file.\n*/\n"
 )
-set(MODULE_DOX_INPUT ${CMAKE_BINARY_DIR})
+list(APPEND MODULE_DOX_INPUT
+    ${CMAKE_CURRENT_BINARY_DIR}/guide-zipcompression.dox
+    ${CMAKE_CURRENT_BINARY_DIR}/guide-zipdataprovider.dox
+    ${CMAKE_CURRENT_BINARY_DIR}/guide-zipencryption.dox
+    ${CMAKE_CURRENT_BINARY_DIR}/guide-ziperrors.dox
+    ${CMAKE_CURRENT_BINARY_DIR}/guide-ziplicense.dox
+    ${CMAKE_CURRENT_BINARY_DIR}/guide-zipquickstart.dox
+    ${CMAKE_CURRENT_BINARY_DIR}/guide-zipreleasenotes.dox
+)
+set(QORE_DOXYGEN_IMAGES
+    "${CMAKE_SOURCE_DIR}/qlib/ZipDataProvider/zip-logo.svg"
+)
 qore_external_binary_module(${module_name} ${PROJECT_VERSION})
 
 qore_dist(${PROJECT_VERSION})

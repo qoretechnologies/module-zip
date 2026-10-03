@@ -18,201 +18,41 @@
 
     @section zipquickstart Quick Start
 
-    @subsection zipcreate Creating a ZIP Archive
+    @subpage zipquickstartguide
 
-    @code{.py}
-#!/usr/bin/qore
-
-%requires zip
-
-# Create a new archive
-ZipFile zip("archive.zip", "w");
-zip.addText("readme.txt", "Hello, World!");
-zip.addFile("document.pdf", "/path/to/document.pdf");
-zip.addDirectory("images/");
-zip.addFile("images/logo.png", "/path/to/logo.png", {"compression_level": ZIP_COMPRESSION_BEST});
-zip.close();
-    @endcode
-
-    @subsection zipread Reading a ZIP Archive
-
-    @code{.py}
-ZipFile zip("archive.zip", "r");
-foreach hash<Qore::Zip::ZipEntryInfo> entry in (zip.entries()) {
-    printf("Entry: %s, Size: %d bytes\n", entry.name, entry.size);
-}
-binary data = zip.read("readme.txt");
-zip.close();
-    @endcode
-
-    @subsection zipextract Extracting a ZIP Archive
-
-    @code{.py}
-ZipFile zip("archive.zip", "r");
-zip.extractAll("/destination/path", {"overwrite": True});
-zip.close();
-    @endcode
-
-    @subsection zipmemory In-Memory Archives
-
-    @code{.py}
-# Create an in-memory archive
-ZipFile zip();
-zip.addText("data.json", make_json({"key": "value"}));
-binary archive_data = zip.toData();
-# archive_data can be sent over network, stored in DB, etc.
-
-# Read from binary data
-ZipFile readZip(archive_data);
-string content = readZip.readText("data.json");
-    @endcode
-
-    @subsection zipencrypt Password-Protected Archives
-
-    @code{.py}
-# Create an encrypted archive. The default encryption method when a password is supplied is
-# traditional PKWARE (ZipCrypto), which every common ZIP tool can open out of the box. Use
-# ZIP_EM_AES_256 when the data is sensitive and you control which tool the recipient will use.
-ZipFile zip("secure.zip", "w");
-zip.addText("secret.txt", "Confidential data", NOTHING, {"password": "secret123"});  # PKWARE
-zip.addText("topsecret.txt", "Very sensitive", NOTHING,
-    {"password": "secret123", "encryption_method": ZIP_EM_AES_256});                   # AES-256
-zip.close();
-    @endcode
 
     @section zipcompression Compression Methods
 
-    The module supports multiple compression methods:
+    @subpage zipcompressionguide
 
-    |!Constant|!Description
-    |@ref Qore::Zip::ZIP_CM_STORE|No compression (store only)
-    |@ref Qore::Zip::ZIP_CM_DEFLATE|Standard deflate compression (most compatible)
-    |@ref Qore::Zip::ZIP_CM_BZIP2|BZip2 compression
-    |@ref Qore::Zip::ZIP_CM_LZMA|LZMA compression
-    |@ref Qore::Zip::ZIP_CM_ZSTD|Zstandard compression (fast, high ratio)
-    |@ref Qore::Zip::ZIP_CM_XZ|XZ/LZMA2 compression
-
-    Compression levels range from 0 (store) to 9 (maximum):
-
-    |!Constant|!Description
-    |@ref Qore::Zip::ZIP_COMPRESSION_DEFAULT|Default compression level
-    |@ref Qore::Zip::ZIP_COMPRESSION_STORE|No compression (level 0)
-    |@ref Qore::Zip::ZIP_COMPRESSION_FASTEST|Fastest compression (level 1)
-    |@ref Qore::Zip::ZIP_COMPRESSION_BEST|Best compression (level 9)
 
     @section zipencryption Encryption
 
-    The module supports multiple encryption methods:
+    @subpage zipencryptionguide
 
-    |!Constant|!Description
-    |@ref Qore::Zip::ZIP_EM_NONE|No encryption (disables encryption even when a password is set)
-    |@ref Qore::Zip::ZIP_EM_TRAD_PKWARE|Traditional PKWARE (ZipCrypto) — default; readable by every common ZIP tool
-    |@ref Qore::Zip::ZIP_EM_AES_128|AES-128 encryption
-    |@ref Qore::Zip::ZIP_EM_AES_192|AES-192 encryption
-    |@ref Qore::Zip::ZIP_EM_AES_256|AES-256 encryption (strongest)
-
-    When a password is provided in @ref Qore::Zip::ZipAddOptions without an explicit
-    \c encryption_method, the module uses traditional PKWARE (ZipCrypto) encryption. This is the
-    format Windows Explorer's built-in ZIP handler, macOS Finder, and most common tools open
-    without any extra software. PKWARE is cryptographically weak and vulnerable to known-plaintext
-    attacks; choose one of the AES methods explicitly when the data is sensitive and the recipient
-    has a modern ZIP tool (7-Zip, WinRAR, Info-ZIP 6.1+, etc.).
-
-    Extracting an encrypted entry without supplying a password raises \c ZIP-PASSWORD-ERROR
-    before any destination file is created, and extracting with an incorrect password raises
-    \c ZIP-PASSWORD-ERROR with a "wrong password" message; no 0-byte garbage is left on disk.
 
     @section zipdataprovider Data Provider API
 
-    The \c ZipDataProvider module provides integration with Qore's data provider framework:
-    @htmlonly <a href="../../ZipDataProvider/html/index.html">ZipDataProvider module documentation</a> @endhtmlonly
+    @subpage zipdataproviderguide
 
-    @code{.py}
-%requires ZipDataProvider
-
-# Get the data provider factory
-AbstractDataProviderFactory factory = DataProvider::getFactoryEx("zip");
-AbstractDataProvider provider = factory.create();
-
-# Navigate to the create-archive action
-AbstractDataProvider createAction = provider.getChildProviderEx("archive").getChildProviderEx("create");
-
-# Execute the action
-hash<auto> result = createAction.doRequest({
-    "path": "output.zip",
-    "files": (
-        {"name": "file.txt", "data": "Hello, World!"},
-    ),
-});
-
-# Or use the shorthand path navigation
-AbstractDataProvider dp = DataProvider::getFactoryObjectFromStringEx("zip{}/archive/create");
-result = dp.doRequest({
-    "path": "output.zip",
-    "files": (
-        {"name": "file.txt", "data": "Hello, World!"},
-    ),
-});
-    @endcode
 
     @section ziperrors Error Handling
 
-    ZIP operations throw exceptions of type \c "ZIP-ERROR" for generic failures,
-    \c "ZIP-PASSWORD-ERROR" when an encrypted entry needs a password or a supplied password is
-    wrong, and \c "ZIP-SECURITY-ERROR" for path-traversal attempts or unsafe symlink targets:
+    @subpage ziperrorsguide
 
-    @code{.py}
-try {
-    ZipFile zip("archive.zip", "r");
-    zip.extractAll("/dest", {"password": "maybe-wrong"});
-} catch (hash<ExceptionInfo> ex) {
-    switch (ex.err) {
-        case "ZIP-PASSWORD-ERROR":
-            printf("Password problem: %s\n", ex.desc);
-            break;
-        case "ZIP-SECURITY-ERROR":
-            printf("Archive is unsafe: %s\n", ex.desc);
-            break;
-        default:
-            printf("ZIP error: %s\n", ex.desc);
-    }
-}
-    @endcode
 
     @section zipreleasenotes Release Notes
 
-    - Provide manifest-based uninstall and support CMake install-path normalization.
-    - Detect the system Zstandard library through pkg-config when a distribution
-      does not provide its CMake configuration. Preserve shared-library linking.
+    @subpage zipreleasenotesguide
 
-    @subsection zip_1_0 zip Module Version 1.0
-    - Bundled minizip rejects overflowing memory-stream growth, safely resizes on reopen,
-      and preserves archive comments when replacement validation or allocation fails
-    - In-memory readers retain their input until closed, including temporary binary expressions
-    - Debian/Ubuntu packages with offline minizip-ng 4.2.2, all compression and encryption features,
-      source/AOT providers, compiler metadata, translations, API documentation, and debug symbols
-    - Configurable private minizip-ng source directory; OpenSSL patch failures stop configuration
-    - Initial release
-    - Full ZIP64 support
-    - Multiple compression methods (deflate, bzip2, lzma, zstd, xz)
-    - Encryption: traditional PKWARE (ZipCrypto) by default for maximum interoperability with
-      Windows Explorer, macOS Finder, and other common ZIP tools; optional AES-128/192/256 for
-      strong encryption
-    - \c ZIP-PASSWORD-ERROR raised cleanly when a password is required or incorrect, with no
-      0-byte garbage left on disk
-    - @ref Qore::Zip::ZipFile::extractAll() returns a @ref Qore::Zip::ZipExtractResult hash
-      describing which entries were written and which were skipped because the destination
-      already existed
-    - @ref Qore::Zip::ZipFile::recompress() accepts an optional \c encryption_method
-    - In-memory archive operations
-    - Streaming API (@ref Qore::Zip::ZipInputStream / @ref Qore::Zip::ZipOutputStream)
-    - Data provider module
-    - @c qzip CLI with 11 commands and an \c -e / \c --encryption flag
 
     @section ziplicense License
 
-    The zip module is released under the MIT license. Its private minizip-ng implementation
-    is distributed under the zlib license; the source component retains its license notice.
+    @subpage ziplicenseguide
 
-    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    @section zipqlibmodules Qore User Modules
+
+    - <img src="zip-logo.svg" width="28" height="28" alt="ZipDataProvider app icon"/> @ref zipdataproviderintro "ZipDataProvider" — a data provider API for ZIP archives
+
 */

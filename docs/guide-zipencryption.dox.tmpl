@@ -1,0 +1,26 @@
+/* Copyright (C) 2026 Qore Technologies, s.r.o. */
+
+/** @page zipencryptionguide Encryption
+
+    @tableofcontents
+
+    The module supports multiple encryption methods:
+
+    |!Constant|!Description
+    |@ref Qore::Zip::ZIP_EM_NONE|No encryption (disables encryption even when a password is set)
+    |@ref Qore::Zip::ZIP_EM_TRAD_PKWARE|Traditional PKWARE (ZipCrypto) — default; readable by every common ZIP tool
+    |@ref Qore::Zip::ZIP_EM_AES_128|AES-128 encryption
+    |@ref Qore::Zip::ZIP_EM_AES_192|AES-192 encryption
+    |@ref Qore::Zip::ZIP_EM_AES_256|AES-256 encryption (strongest)
+
+    When a password is provided in @ref Qore::Zip::ZipAddOptions without an explicit
+    \c encryption_method, the module uses traditional PKWARE (ZipCrypto) encryption. This is the
+    format Windows Explorer's built-in ZIP handler, macOS Finder, and most common tools open
+    without any extra software. PKWARE is cryptographically weak and vulnerable to known-plaintext
+    attacks; choose one of the AES methods explicitly when the data is sensitive and the recipient
+    has a modern ZIP tool (7-Zip, WinRAR, Info-ZIP 6.1+, etc.).
+
+    Extracting an encrypted entry without supplying a password raises \c ZIP-PASSWORD-ERROR
+    before any destination file is created, and extracting with an incorrect password raises
+    \c ZIP-PASSWORD-ERROR with a "wrong password" message; no 0-byte garbage is left on disk.
+*/

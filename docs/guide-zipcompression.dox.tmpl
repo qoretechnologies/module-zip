@@ -1,0 +1,24 @@
+/* Copyright (C) 2026 Qore Technologies, s.r.o. */
+
+/** @page zipcompressionguide Compression Methods
+
+    @tableofcontents
+
+    The module supports multiple compression methods:
+
+    |!Constant|!Description
+    |@ref Qore::Zip::ZIP_CM_STORE|No compression (store only)
+    |@ref Qore::Zip::ZIP_CM_DEFLATE|Standard deflate compression (most compatible)
+    |@ref Qore::Zip::ZIP_CM_BZIP2|BZip2 compression
+    |@ref Qore::Zip::ZIP_CM_LZMA|LZMA compression
+    |@ref Qore::Zip::ZIP_CM_ZSTD|Zstandard compression (fast, high ratio)
+    |@ref Qore::Zip::ZIP_CM_XZ|XZ/LZMA2 compression
+
+    Compression levels range from 0 (store) to 9 (maximum):
+
+    |!Constant|!Description
+    |@ref Qore::Zip::ZIP_COMPRESSION_DEFAULT|Default compression level
+    |@ref Qore::Zip::ZIP_COMPRESSION_STORE|No compression (level 0)
+    |@ref Qore::Zip::ZIP_COMPRESSION_FASTEST|Fastest compression (level 1)
+    |@ref Qore::Zip::ZIP_COMPRESSION_BEST|Best compression (level 9)
+*/

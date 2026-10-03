@@ -1,0 +1,68 @@
+/* Copyright (C) 2026 Qore Technologies, s.r.o. */
+
+/** @page zipquickstartguide Quick Start
+
+    @tableofcontents
+
+    @section zipcreate Creating a ZIP Archive
+
+    @code{.py}
+#!/usr/bin/qore
+
+%requires zip
+
+# Create a new archive
+ZipFile zip("archive.zip", "w");
+zip.addText("readme.txt", "Hello, World!");
+zip.addFile("document.pdf", "/path/to/document.pdf");
+zip.addDirectory("images/");
+zip.addFile("images/logo.png", "/path/to/logo.png", {"compression_level": ZIP_COMPRESSION_BEST});
+zip.close();
+    @endcode
+
+    @section zipread Reading a ZIP Archive
+
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+foreach hash<Qore::Zip::ZipEntryInfo> entry in (zip.entries()) {
+    printf("Entry: %s, Size: %d bytes\n", entry.name, entry.size);
+}
+binary data = zip.read("readme.txt");
+zip.close();
+    @endcode
+
+    @section zipextract Extracting a ZIP Archive
+
+    @code{.py}
+ZipFile zip("archive.zip", "r");
+zip.extractAll("/destination/path", {"overwrite": True});
+zip.close();
+    @endcode
+
+    @section zipmemory In-Memory Archives
+
+    @code{.py}
+# Create an in-memory archive
+ZipFile zip();
+zip.addText("data.json", make_json({"key": "value"}));
+binary archive_data = zip.toData();
+# archive_data can be sent over network, stored in DB, etc.
+
+# Read from binary data
+ZipFile readZip(archive_data);
+string content = readZip.readText("data.json");
+    @endcode
+
+    @section zipencrypt Password-Protected Archives
+
+    @code{.py}
+# Create an encrypted archive. The default encryption method when a password is supplied is
+# traditional PKWARE (ZipCrypto), which every common ZIP tool can open out of the box. Use
+# ZIP_EM_AES_256 when the data is sensitive and you control which tool the recipient will use.
+ZipFile zip("secure.zip", "w");
+zip.addText("secret.txt", "Confidential data", NOTHING, {"password": "secret123"});  # PKWARE
+zip.addText("topsecret.txt", "Very sensitive", NOTHING,
+    {"password": "secret123", "encryption_method": ZIP_EM_AES_256});                   # AES-256
+zip.close();
+    @endcode
+*/

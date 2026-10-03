@@ -258,7 +258,9 @@ module ZipDataProvider {
 
     @tableofcontents
 
-    @section zipdpintro Zip DataProvider Introduction
+    @section zipdataproviderintro ZipDataProvider Module Introduction
+
+    @anchor zipdpintro
 
     The ZipDataProvider module exposes ZIP archive operations through the Qore DataProvider API,
     providing a provider tree for archive, file, and data actions along with the corresponding

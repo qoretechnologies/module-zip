@@ -1,0 +1,37 @@
+/* Copyright (C) 2026 Qore Technologies, s.r.o. */
+
+/** @page zipdataproviderguide Data Provider API
+
+    @tableofcontents
+
+    The \c ZipDataProvider module provides integration with Qore's data provider framework:
+    @htmlonly @ref zipdataproviderintro "ZipDataProvider module documentation" @endhtmlonly
+
+    @code{.py}
+%requires ZipDataProvider
+
+# Get the data provider factory
+AbstractDataProviderFactory factory = DataProvider::getFactoryEx("zip");
+AbstractDataProvider provider = factory.create();
+
+# Navigate to the create-archive action
+AbstractDataProvider createAction = provider.getChildProviderEx("archive").getChildProviderEx("create");
+
+# Execute the action
+hash<auto> result = createAction.doRequest({
+    "path": "output.zip",
+    "files": (
+        {"name": "file.txt", "data": "Hello, World!"},
+    ),
+});
+
+# Or use the shorthand path navigation
+AbstractDataProvider dp = DataProvider::getFactoryObjectFromStringEx("zip{}/archive/create");
+result = dp.doRequest({
+    "path": "output.zip",
+    "files": (
+        {"name": "file.txt", "data": "Hello, World!"},
+    ),
+});
+    @endcode
+*/

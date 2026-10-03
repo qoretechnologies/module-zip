@@ -1,0 +1,28 @@
+/* Copyright (C) 2026 Qore Technologies, s.r.o. */
+
+/** @page ziperrorsguide Error Handling
+
+    @tableofcontents
+
+    ZIP operations throw exceptions of type \c "ZIP-ERROR" for generic failures,
+    \c "ZIP-PASSWORD-ERROR" when an encrypted entry needs a password or a supplied password is
+    wrong, and \c "ZIP-SECURITY-ERROR" for path-traversal attempts or unsafe symlink targets:
+
+    @code{.py}
+try {
+    ZipFile zip("archive.zip", "r");
+    zip.extractAll("/dest", {"password": "maybe-wrong"});
+} catch (hash<ExceptionInfo> ex) {
+    switch (ex.err) {
+        case "ZIP-PASSWORD-ERROR":
+            printf("Password problem: %s\n", ex.desc);
+            break;
+        case "ZIP-SECURITY-ERROR":
+            printf("Archive is unsafe: %s\n", ex.desc);
+            break;
+        default:
+            printf("ZIP error: %s\n", ex.desc);
+    }
+}
+    @endcode
+*/
