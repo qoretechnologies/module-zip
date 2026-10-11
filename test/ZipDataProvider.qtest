@@ -44,6 +44,7 @@ public class ZipDataProviderTest inherits QUnit::Test {
     constructor() : Test("ZipDataProviderTest", "1.0") {
         testDir = tmp_location() + "/zip_dp_test_" + string(getpid());
 
+        addTestCase("Action provider classes", \actionProviderClassTest());
         addTestCase("Enum tests", \enumTest());
         addTestCase("Type metadata tests", \typeMetadataTest());
         addTestCase("Field descriptions tests", \fieldDescriptionsTest());
@@ -72,6 +73,33 @@ public class ZipDataProviderTest inherits QUnit::Test {
         addTestCase("Replace action tests", \replaceActionTest());
 
         set_return_value(main());
+    }
+
+    #! Every action names the class that provides it, so it can be used without a connection or a context
+    /** An application without a connection scheme is used through its actions' classes: the provider is created
+        from the class (loaded from its module) and the action's path is followed from it, as Qorus does for a
+        tool call or a Qog action.
+    */
+    actionProviderClassTest() {
+        list<hash<DataProviderActionInfo>> actions = DataProviderActionCatalog::getActions(ZipDataProvider::AppName);
+        assertEq(11, actions.size(), "every action is registered");
+        foreach hash<DataProviderActionInfo> action in (actions) {
+            string label = action.action;
+            assertEq("ZipDataProvider::ZipDataProvider", action.cls,
+                label + ": the action names its data provider class");
+            assertEq("ZipDataProvider", action.cls_mod, label + ": the action names the module of its class");
+            if (!action.cls.val()) {
+                continue;
+            }
+            hash<auto> options = {};
+            AbstractDataProvider prov = DataProviderActionCatalog::getDataProviderForAction(action, \options);
+            foreach string seg in (action.path[1..].split("/")) {
+                prov = prov.getChildProviderEx(seg);
+            }
+            if (action.action_code == DPAT_API) {
+                assertTrue(prov.supportsRequest(), label + ": the provider at the action's path executes it");
+            }
+        }
     }
 
     setUp() {

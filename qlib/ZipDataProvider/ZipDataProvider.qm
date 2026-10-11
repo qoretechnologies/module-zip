@@ -58,6 +58,7 @@ module ZipDataProvider {
         # Register actions
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/create",
             "action": "create-archive",
             "display_name": "Create Archive",
@@ -77,6 +78,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/extract",
             "action": "extract-archive",
             "display_name": "Extract Archive",
@@ -101,6 +103,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/list",
             "action": "list-archive",
             "display_name": "List Archive Contents",
@@ -115,6 +118,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/info",
             "action": "get-archive-info",
             "display_name": "Get Archive Info",
@@ -129,6 +133,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/add",
             "action": "add-files",
             "display_name": "Add Files to Archive",
@@ -148,6 +153,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/verify",
             "action": "verify-archive",
             "display_name": "Verify Archive",
@@ -163,6 +169,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/replace",
             "action": "replace-entries",
             "display_name": "Replace/Delete Entries",
@@ -183,6 +190,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/archive/add-path",
             "action": "add-path",
             "display_name": "Add Path to Archive",
@@ -202,6 +210,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/file/extract",
             "action": "extract-file",
             "display_name": "Extract Single File",
@@ -221,6 +230,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/data/compress",
             "action": "compress-data",
             "display_name": "Compress Data",
@@ -240,6 +250,7 @@ module ZipDataProvider {
 
         DataProviderActionCatalog::registerAction(<DataProviderActionInfo>{
             "app": ZipDataProvider::AppName,
+            "cls": "ZipDataProvider::ZipDataProvider",
             "path": "/data/decompress",
             "action": "decompress-data",
             "display_name": "Decompress Data",
