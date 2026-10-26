@@ -134,7 +134,7 @@ QoreZipFile::~QoreZipFile() {
 
 void QoreZipFile::openRead(ExceptionSink* xsink) {
     // Check filesystem sandbox access
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(filepath.c_str(), QSEC_READ, xsink)) {
         return;
     }
@@ -165,7 +165,7 @@ void QoreZipFile::openRead(ExceptionSink* xsink) {
 
 void QoreZipFile::openWrite(ExceptionSink* xsink) {
     // Check filesystem sandbox access (need write and create for new files)
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(filepath.c_str(), QSEC_WRITE | QSEC_CREATE, xsink)) {
         return;
     }
@@ -971,7 +971,7 @@ void QoreZipFile::addFile(const char* name, const char* filepath, const QoreHash
     }
 
     // Check filesystem sandbox access before reading source file
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(filepath, QSEC_READ, xsink)) {
         return;
     }
@@ -1347,7 +1347,7 @@ QoreHashNode* QoreZipFile::extractAll(const char* destPath, const QoreHashNode* 
     }
 
     // Check filesystem sandbox access before writing to destination
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
         return nullptr;
     }
@@ -1635,7 +1635,7 @@ QoreListNode* QoreZipFile::extractEntries(const char* destPath, const QoreListNo
     }
 
     // Check filesystem sandbox access before writing to destination
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
         return nullptr;
     }
@@ -1779,7 +1779,7 @@ void QoreZipFile::addPath(const char* path, const char* root_path, const QoreHas
     }
 
     // Check filesystem sandbox access before reading source
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(path, QSEC_READ, xsink)) {
         return;
     }
@@ -1816,7 +1816,7 @@ void QoreZipFile::extractEntry(const char* name, const char* destPath, Exception
     }
 
     // Check filesystem sandbox access before writing to destination
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(destPath, QSEC_WRITE | QSEC_CREATE, xsink)) {
         return;
     }
@@ -1869,7 +1869,7 @@ void QoreZipFile::deleteEntry(const char* name, ExceptionSink* xsink) {
 QoreHashNode* QoreZipFile::replaceEntries(const char* archive_path, const QoreHashNode* replacements,
                                            const QoreListNode* delete_names, ExceptionSink* xsink) {
     // Check filesystem sandbox
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(archive_path, QSEC_READ | QSEC_WRITE, xsink)) {
         return nullptr;
     }
@@ -2042,7 +2042,7 @@ QoreHashNode* QoreZipFile::replaceEntries(const char* archive_path, const QoreHa
 
 QoreHashNode* QoreZipFile::diff(const char* archive1, const char* archive2, ExceptionSink* xsink) {
     // Check filesystem sandbox
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh) {
         if (!smh->checkFilesystemAccess(archive1, QSEC_READ, xsink)) {
             return nullptr;
@@ -2151,7 +2151,7 @@ QoreHashNode* QoreZipFile::diff(const char* archive1, const char* archive2, Exce
 QoreHashNode* QoreZipFile::recompress(const char* archive_path, int16_t compression_method,
                                        int16_t compression_level, const char* pwd,
                                        int encryption_method, ExceptionSink* xsink) {
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(archive_path, QSEC_READ | QSEC_WRITE, xsink)) {
         return nullptr;
     }

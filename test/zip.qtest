@@ -977,6 +977,9 @@ public class ZipTest inherits QUnit::Test {
             sub test_open_zip_write() {
                 ZipFile zip('%s_new', 'w');
             }
+            auto sub through(code c) {
+                return c();
+            }
         ", testZipOutside, testZipOutside), "sandbox_zip_test");
 
         SandboxManager sm();
@@ -1002,6 +1005,29 @@ public class ZipTest inherits QUnit::Test {
             assertEq("FILESYSTEM-ACCESS-DENIED", ex.err, "ZIP write access blocked with correct error");
         }
         assertTrue(caught, "ZIP write access outside sandbox was blocked");
+
+        # a system-policy capability called from the sandbox is subject to the system policy, not the sandbox's
+        code read_zip = string sub () {
+            ZipFile zip(testZipOutside, 'r');
+            on_exit zip.close();
+            return zip.readText('test.txt');
+        };
+        string written = testZipOutside + "_capability";
+        on_exit if (is_file(written)) { unlink(written); }
+        code write_zip = sub () {
+            ZipFile zip(written, 'w');
+            zip.addText('test.txt', 'written in a capability');
+            zip.close();
+        };
+        assertThrows("FILESYSTEM-ACCESS-DENIED", \p.callFunction(), ("through", read_zip),
+            "reading a ZIP file called directly from the sandbox is denied");
+        assertThrows("FILESYSTEM-ACCESS-DENIED", \p.callFunction(), ("through", write_zip),
+            "writing a ZIP file called directly from the sandbox is denied");
+        assertFalse(is_file(written), "the denied write creates nothing");
+        assertEq("Hello, World!", p.callFunction("through", SandboxManager::createSystemPolicyCall(read_zip)),
+            "a ZIP file is read in a system-policy capability");
+        p.callFunction("through", SandboxManager::createSystemPolicyCall(write_zip));
+        assertTrue(is_file(written), "a ZIP file is written in a system-policy capability");
 
         # Test that in-memory archives work with any sandbox
         Program p2(PO_NEW_STYLE | PO_STRICT_ARGS | PO_REQUIRE_TYPES);
