@@ -308,6 +308,14 @@ module ZipDataProvider {
     @par API Example: Extract an Archive
     @verbatim qdp 'zip{}/archive/extract' path=archive.zip,destination=/tmp/extract,overwrite=true
     @endverbatim
+
+    @subpage zipdataproviderreleasenotes
+*/
+
+/** @page zipdataproviderreleasenotes ZipDataProvider Release Notes
+
+    @section zipdataproviderv10 ZipDataProvider Module Version 1.0
+    - initial release
 */
 
 public namespace ZipDataProvider {
