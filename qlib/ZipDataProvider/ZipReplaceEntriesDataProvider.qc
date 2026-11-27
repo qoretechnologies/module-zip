@@ -68,6 +68,9 @@ public class ZipReplaceEntriesDataProvider inherits AbstractDataProvider {
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
         hash<auto> request = req;
+        # the paths and locations in the request are the caller's input, also for the code that a host-created
+        # provider was lent to: refused before anything is read or written if that code is restricted (issue #7)
+        zip_check_caller_path("archive_path", request.archive_path);
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: replacing/deleting entries in %y",
             request.archive_path));
 

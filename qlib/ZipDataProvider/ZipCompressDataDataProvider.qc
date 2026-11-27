@@ -68,6 +68,9 @@ public class ZipCompressDataDataProvider inherits AbstractDataProvider {
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
         hash<auto> request = req;
+        # the paths and locations in the request are the caller's input, also for the code that a host-created
+        # provider was lent to: refused before anything is read or written if that code is restricted (issue #7)
+        zip_check_caller_location("output_location", request.output_location);
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: compressing %d entries", request.entries.size()));
 
         ZipFile zip();

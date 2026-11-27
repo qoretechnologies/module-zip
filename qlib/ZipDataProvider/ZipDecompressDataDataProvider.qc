@@ -68,6 +68,10 @@ public class ZipDecompressDataDataProvider inherits AbstractDataProvider {
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
         hash<auto> request = req;
+        # the paths and locations in the request are the caller's input, also for the code that a host-created
+        # provider was lent to: refused before anything is read or written if that code is restricted (issue #7)
+        zip_check_caller_path("archive_path", request.archive_path);
+        zip_check_caller_location("archive_location", request.archive_location);
 
         *binary archive_data = request.data;
         if (!archive_data && request.archive_location) {

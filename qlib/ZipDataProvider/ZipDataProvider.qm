@@ -289,6 +289,35 @@ module ZipDataProvider {
     - @ref ZipDataProvider::ZipFileDataProvider "ZipFileDataProvider"
     - @ref ZipDataProvider::ZipDataDataProvider "ZipDataDataProvider"
 
+    @section zipdp_caller_paths Paths Given by Restricted Callers
+
+    The code of this module runs with its own %Program's options, so it decides with the restrictions of the code that
+    calls it before it uses a filesystem path or a location in a request: if that code is restricted from the
+    \c FILESYSTEM functional domain (for example with \c PO_NO_FILESYSTEM), the request is refused with
+    \c PERMISSION-DENIED before anything is read or written.  This also applies when the host created the provider
+    and gave it to restricted code (see @ref Qore::SandboxManager::isLentToRestricted()
+    "SandboxManager::isLentToRestricted()").  The file-system policy of a sandbox that governs the calling code
+    applies when a file is opened (\c FILESYSTEM-ACCESS-DENIED).  The checked fields are:
+    - \c archive/create: \c output_path, \c output_location and the \c path of each entry without \c data
+    - \c archive/extract: \c input_path, \c location and \c destination
+    - \c archive/list, \c archive/info and \c archive/verify: \c input_path and \c location
+    - \c archive/add: \c archive_path and the \c path of each entry without \c data
+    - \c archive/add-path: \c archive_path and \c source_path
+    - \c archive/replace: \c archive_path
+    - \c file/extract: \c archive_path, \c archive_location, \c output_path and \c output_location
+    - \c data/compress: \c output_location
+    - \c data/decompress: \c archive_path and \c archive_location
+
+    A location is refused if the calling code is restricted from a functional domain that the handler of its scheme
+    uses for its caller (\c FILESYSTEM for \c file:// locations; see
+    @ref FileLocationHandler::AbstractFileLocationHandler::getCallerDomains()
+    "AbstractFileLocationHandler::getCallerDomains()").  The handler of \c conn locations has no functional domains of
+    its own and gives the options of the location to the handler that it resolves the location to, which does not see
+    the code that a host-created provider was lent to: for such code, the options of \c conn locations are refused if
+    it is restricted from the file system or the network.
+    Requests that give the archive or the entries as data and
+    return the result as data work for restricted callers.
+
     @section zipdp_factory Factory Name
 
     Factory string for DataProvider::getFactoryEx(): "zip"
@@ -316,6 +345,10 @@ module ZipDataProvider {
 
     @section zipdataproviderv10 ZipDataProvider Module Version 1.0
     - initial release
+    - the paths and locations that the actions' requests give are refused with \c PERMISSION-DENIED before they are
+      used if the calling code is restricted from the file system, also when the host created the provider and gave
+      it to that code (see @ref zipdp_caller_paths,
+      <a href="https://github.com/qoretechnologies/module-zip/issues/7">issue 7</a>)
 */
 
 public namespace ZipDataProvider {

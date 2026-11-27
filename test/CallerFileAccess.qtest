@@ -1,0 +1,360 @@
+#!/usr/bin/env qore
+# -*- mode: qore; indent-tabs-mode: nil -*-
+
+/*
+    Qore ZipDataProvider caller file access test
+
+    Copyright (C) 2026 Qore Technologies, s.r.o.
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+*/
+
+%modern
+%prepend-module-path "${SCRIPT_DIR}/../qlib"
+
+%requires QUnit
+%requires Util
+%requires FsUtil
+%requires DataProvider
+%requires zip
+%requires ZipDataProvider
+
+%exec-class CallerFileAccessTest
+
+#! Tests that the paths that restricted callers give the ZIP actions are refused before they are used (module-zip#7)
+/** Library code runs with its own Program's options, so the actions refuse a path or location in a request if the
+    calling code is restricted from the file system, also if a host-created provider was lent to that code: a
+    Program with PO_NO_FILESYSTEM is refused with PERMISSION-DENIED, a Program whose sandbox denies the file system by
+    default with FILESYSTEM-ACCESS-DENIED (its file-system policy, when the file is opened), and a location is refused
+    for a Program restricted from a domain of its scheme's handler; nothing is read or written.  Requests without paths
+    still work for restricted callers, and unrestricted callers use the paths.
+*/
+class CallerFileAccessTest inherits QUnit::Test {
+    private {
+        const Modes = {"ast": EM_AST, "ir": EM_IR, "jit": EM_JIT, "tiered": EM_TIERED};
+
+        const Source = "%modern
+%requires DataProvider
+%requires ZipDataProvider
+
+# runs the given use and returns \"ok\" or the error
+string sub run(code c) {
+    try {
+        c();
+        return \"ok\";
+    } catch (hash<ExceptionInfo> ex) {
+        return ex.err;
+    }
+}
+
+# returns the provider at the given path below the given provider
+AbstractDataProvider sub get_child(AbstractDataProvider dp, string path) {
+    foreach string seg in (path.split(\"/\")) {
+        dp = dp.getChildProviderEx(seg);
+    }
+    return dp;
+}
+
+# makes a request with a provider that this Program creates
+string sub request(string path, hash<auto> req) {
+    return run(sub () { get_child(new ZipDataProvider(), path).doRequest(req); });
+}
+
+# makes a request with a provider that the host created
+string sub lent_request(AbstractDataProvider dp, hash<auto> req) {
+    return run(sub () { dp.doRequest(req); });
+}
+";
+    }
+
+    private {
+        #! the directory of the test
+        string dir;
+        #! an archive with one entry
+        string archive;
+        #! the archive's data
+        binary archive_data;
+        #! a file to add
+        string input;
+        #! the output file
+        string out;
+        #! the extraction directory
+        string dest;
+    }
+
+    constructor() : QUnit::Test("CallerFileAccess", "1.0", \ARGV) {
+        dir = make_tmp_dir("zip-caller-file-access-");
+        input = dir + "/input.txt";
+        out = dir + "/out.zip";
+        dest = dir + "/dest";
+        archive = dir + "/archive.zip";
+        # a relative path is used in the current directory
+        mkdir(dir + "/cwd");
+        chdir(dir + "/cwd");
+        File f();
+        f.open2(input, O_CREAT | O_WRONLY | O_TRUNC);
+        f.write("input data");
+        f.close();
+        ZipFile zf();
+        zf.addText("a.txt", "entry data");
+        archive_data = zf.toData();
+        resetArchive();
+
+        foreach string mode in (keys Modes) {
+            string m = mode;
+            addTestCase("restricted callers, " + m, sub () { testRestricted(m); });
+            addTestCase("lent providers, " + m, sub () { testLent(m); });
+            addTestCase("requests without paths, " + m, sub () { testNoPaths(m); });
+            addTestCase("network locations, " + m, sub () { testNetworkLocations(m); });
+            addTestCase("location options, " + m, sub () { testLocationOptions(m); });
+        }
+        set_return_value(main());
+    }
+
+    destructor() {
+        if (dir) {
+            remove_tree(dir);
+        }
+    }
+
+    #! returns the requests with paths: action path, description, request
+    private list<list<auto>> getPathRequests() {
+        list<hash<auto>> entries = ({"name": "b.txt", "data": <0102>},);
+        return (
+            ("archive/create", "output_path", {"entries": entries, "output_path": out}),
+            ("archive/create", "output_location", {"entries": entries, "output_location": "file://" + out}),
+            ("archive/create", "entry path", {"entries": ({"name": "b.txt", "path": input},)}),
+            ("archive/extract", "input_path", {"input_path": archive, "destination": dest}),
+            ("archive/extract", "destination", {"data": archive_data, "destination": dest}),
+            ("archive/extract", "location", {"location": "file://" + archive, "destination": dest}),
+            ("archive/list", "input_path", {"input_path": archive}),
+            ("archive/list", "location", {"location": "file://" + archive}),
+            ("archive/list", "plain location", {"location": archive}),
+            ("archive/info", "input_path", {"input_path": archive}),
+            ("archive/info", "location", {"location": "file://" + archive}),
+            ("archive/verify", "input_path", {"input_path": archive}),
+            ("archive/verify", "location", {"location": "file://" + archive}),
+            ("archive/add", "archive_path", {"archive_path": archive, "entries": entries}),
+            # a path that evaluates to False is a path too
+            ("archive/add", "archive_path \"0\"", {"archive_path": "0", "entries": entries}),
+            ("archive/extract", "destination \"0\"", {"data": archive_data, "destination": "0"}),
+            ("archive/add-path", "archive_path", {"archive_path": archive, "source_path": input}),
+            ("archive/replace", "archive_path", {"archive_path": archive, "replacements": {"a.txt": <03>}}),
+            ("file/extract", "archive_path", {"archive_path": archive, "entry_name": "a.txt"}),
+            ("file/extract", "archive_location", {"archive_location": "file://" + archive, "entry_name": "a.txt"}),
+            ("file/extract", "output_path", {"archive_data": archive_data, "entry_name": "a.txt",
+                "output_path": out}),
+            ("file/extract", "output_location", {"archive_data": archive_data, "entry_name": "a.txt",
+                "output_location": "file://" + out}),
+            ("data/compress", "output_location", {"entries": entries, "output_location": "file://" + out}),
+            ("data/decompress", "archive_path", {"archive_path": archive}),
+            ("data/decompress", "archive_location", {"archive_location": "file://" + archive}),
+        );
+    }
+
+    #! paths given by restricted callers are refused before they are used; unrestricted callers use them
+    private testRestricted(string mode) {
+        # a failed case before this one can leave outputs
+        reset();
+        foreach list<auto> r in (getPathRequests()) {
+            string desc = sprintf("%s %s %s", r[0], r[1], mode);
+            assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("request", r[0], r[2]),
+                "nofs " + desc);
+            checkUnchanged("nofs " + desc);
+            # the file-system policy of the sandbox refuses the file when it is opened
+            assertEq("FILESYSTEM-ACCESS-DENIED", getProgram("sandbox", mode).callFunction("request", r[0], r[2]),
+                "sandbox " + desc);
+            checkUnchanged("sandbox " + desc);
+            assertEq("ok", getProgram("unrestricted", mode).callFunction("request", r[0], r[2]),
+                "unrestricted " + desc);
+            reset();
+        }
+    }
+
+    #! paths given by the restricted code that a host-created provider was lent to are refused
+    /** The host creates the action's provider itself: a provider that a method of a lent provider of another module
+        (DataProvider's AbstractDataProvider::getChildProviderEx()) creates is not lent
+    */
+    private testLent(string mode) {
+        # a failed case before this one can leave outputs
+        reset();
+        foreach list<auto> r in (getPathRequests()) {
+            string desc = sprintf("%s %s %s", r[0], r[1], mode);
+            assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf(r[0]), r[2]),
+                "nofs lent " + desc);
+            checkUnchanged("nofs lent " + desc);
+            assertEq("FILESYSTEM-ACCESS-DENIED", getProgram("sandbox", mode).callFunction("lent_request",
+                getLeaf(r[0]), r[2]), "sandbox lent " + desc);
+            checkUnchanged("sandbox lent " + desc);
+            assertEq("ok", getProgram("unrestricted", mode).callFunction("lent_request", getLeaf(r[0]), r[2]),
+                "unrestricted lent " + desc);
+            reset();
+        }
+    }
+
+    #! a location is refused if the calling code is restricted from a functional domain of the handler of its scheme
+    private testNetworkLocations(string mode) {
+        # the refusal comes before any connection: nothing listens on the port
+        string url = "http://127.0.0.1:1/archive.zip";
+        foreach list<auto> r in ((
+                ("archive/list", {"location": url}),
+                ("file/extract", {"archive_location": url, "entry_name": "a.txt"}),
+                ("data/compress", {"entries": ({"name": "b.txt", "data": <0102>},), "output_location": url}),
+            )) {
+            string desc = sprintf("%s %s", r[0], mode);
+            assertEq("PERMISSION-DENIED", getProgram("nonet", mode).callFunction("request", r[0], r[1]),
+                "nonet " + desc);
+            assertEq("PERMISSION-DENIED", getProgram("nonet", mode).callFunction("lent_request", getLeaf(r[0]),
+                r[1]), "nonet lent " + desc);
+        }
+    }
+
+    #! the locations that restricted callers may use, the options of locations and the options of conn locations
+    private testLocationOptions(string mode) {
+        # a file location for code restricted only from the network
+        assertEq("ok", getProgram("nonet", mode).callFunction("request", "archive/list",
+            {"location": "file://" + archive}),
+            "nonet file location " + mode);
+        assertEq("ok", getProgram("nonet", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "file://" + archive}), "nonet lent file location " + mode);
+        # a network location for code restricted only from the file system: refused by the network, not by the module
+        string url = "http://127.0.0.1:1/x";
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("request", "archive/list",
+            {"location": url}),
+            "nofs http location " + mode);
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": url}), "nofs lent http location " + mode);
+        # an option of a network location that names a local file
+        url = "https://127.0.0.1:1/x{ssl_cert_path=/etc/hostname}";
+        assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("request", "archive/list",
+            {"location": url}),
+            "nofs https location with a file option " + mode);
+        assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": url}), "nofs lent https location with a file option " + mode);
+        # the options of a conn location are given to the handler of its connection, which does not see the code that
+        # a provider was lent to
+        url = "conn://no-such-connection/x{ssl_cert_path=/etc/hostname}";
+        assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": url}), "nofs lent conn location with options " + mode);
+        assertNeq("ok", getProgram("nofs", mode).callFunction("request", "archive/list", {"location": url}),
+            "nofs conn location with options " + mode);
+        # without options, the connection decides
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "conn://no-such-connection/x"}), "nofs lent conn location " + mode);
+        # the options of other handlers without domains of their own are not given to another handler
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "data://abc{encoding_errors=strict}"}), "nofs lent data location with options " + mode);
+        # options that cannot be parsed
+        assertEq("LOCATION-ERROR", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "file:///x{(1,2)}"}), "nofs lent location with invalid options " + mode);
+    }
+
+    #! requests without paths work for restricted callers and with lent providers
+    private testNoPaths(string mode) {
+        # a failed case before this one can leave outputs
+        reset();
+        list<list<auto>> reqs = (
+            ("archive/create", {"entries": ({"name": "b.txt", "data": <0102>},)}),
+            # the path of an entry with data is not used
+            ("archive/create", {"entries": ({"name": "b.txt", "data": <0102>, "path": "/etc/hostname"},)}),
+            ("archive/list", {"data": archive_data}),
+            ("archive/info", {"data": archive_data}),
+            ("archive/verify", {"data": archive_data}),
+            ("file/extract", {"archive_data": archive_data, "entry_name": "a.txt"}),
+            ("data/compress", {"entries": ({"name": "b.txt", "data": <0102>},)}),
+            ("data/decompress", {"data": archive_data}),
+        );
+        foreach list<auto> r in (reqs) {
+            foreach string kind in ("nofs", "sandbox") {
+                string desc = sprintf("%s %s %s", kind, r[0], mode);
+                assertEq("ok", getProgram(kind, mode).callFunction("request", r[0], r[1]), desc);
+                assertEq("ok", getProgram(kind, mode).callFunction("lent_request", getLeaf(r[0]), r[1]),
+                    "lent " + desc);
+            }
+        }
+        checkUnchanged("no paths " + mode);
+    }
+
+    #! returns the action's provider, created by the host: the provider that the host lends to the restricted code
+    private static AbstractDataProvider getLeaf(string path) {
+        AbstractDataProvider dp = new ZipDataProvider();
+        foreach string seg in (path.split("/")) {
+            dp = dp.getChildProviderEx(seg);
+        }
+        return dp;
+    }
+
+    #! checks that nothing was written
+    private checkUnchanged(string desc) {
+        assertFalse(is_file(out), "nothing written: " + desc);
+        assertFalse(is_dir(dest), "nothing extracted: " + desc);
+        assertFalse(exists hstat("0"), "nothing written to a relative path: " + desc);
+        assertEq(archive_data, ReadOnlyFile::readBinaryFile(archive), "archive unchanged: " + desc);
+    }
+
+    #! removes the outputs and restores the archive
+    private reset() {
+        if (is_file(out)) {
+            unlink(out);
+        }
+        if (is_dir(dest)) {
+            remove_tree(dest);
+        }
+        if (is_dir("0")) {
+            remove_tree("0");
+        } else if (exists hstat("0")) {
+            unlink("0");
+        }
+        resetArchive();
+    }
+
+    #! writes the archive
+    private resetArchive() {
+        File f();
+        f.open2(archive, O_CREAT | O_WRONLY | O_TRUNC);
+        f.write(archive_data);
+        f.close();
+    }
+
+    #! returns a Program of the given kind
+    private Program getProgram(string kind, string mode) {
+        Program p;
+        switch (kind) {
+            case "nofs":
+                p = new Program(PO_NEW_STYLE | PO_NO_FILESYSTEM);
+                break;
+            case "nonet":
+                p = new Program(PO_NEW_STYLE | PO_NO_NETWORK);
+                break;
+            case "sandbox": {
+                SandboxManager sm();
+                sm.setFilesystemDefaultPolicy(False);
+                p = new Program(PO_NEW_STYLE);
+                p.setSandboxManager(sm);
+                break;
+            }
+            default:
+                p = new Program(PO_NEW_STYLE);
+                break;
+        }
+        p.setExecMode(Modes{mode});
+        p.parse(Source, kind);
+        return p;
+    }
+}
