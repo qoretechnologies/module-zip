@@ -113,8 +113,11 @@ public namespace ZipDataProvider {
         # to the handler that it resolves the location to, which judges the calling code as
         # SandboxManager::isCallerRestricted() does; for the code that a host-created provider was lent to, which that
         # does not see, the options are refused here if that code is restricted from the file system or the network
-        if (!dom && opts && SandboxManager::isLentToRestricted(DOM_FILESYSTEM | DOM_NETWORK)
-                && !SandboxManager::isCallerRestricted(DOM_FILESYSTEM | DOM_NETWORK)) {
+        if (!dom && opts
+                && ((SandboxManager::isLentToRestricted(DOM_FILESYSTEM)
+                        && !SandboxManager::isCallerRestricted(DOM_FILESYSTEM))
+                    || (SandboxManager::isLentToRestricted(DOM_NETWORK)
+                        && !SandboxManager::isCallerRestricted(DOM_NETWORK)))) {
             throw "PERMISSION-DENIED", sprintf("the options of the location in the %y field of the request cannot be "
                 "used: the calling code is restricted from the FILESYSTEM or NETWORK functional domain", field);
         }

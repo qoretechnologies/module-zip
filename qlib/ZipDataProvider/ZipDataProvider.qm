@@ -311,7 +311,11 @@ module ZipDataProvider {
     A location is refused if the calling code is restricted from a functional domain that the handler of its scheme
     uses for its caller (\c FILESYSTEM for \c file:// locations; see
     @ref FileLocationHandler::AbstractFileLocationHandler::getCallerDomains()
-    "AbstractFileLocationHandler::getCallerDomains()").  Requests that give the archive or the entries as data and
+    "AbstractFileLocationHandler::getCallerDomains()").  A handler without functional domains of its own, such as that
+    of \c conn locations, gives the options of the location to the handler that it resolves the location to, which
+    does not see the code that a host-created provider was lent to: for such code, the options of these locations
+    are refused if it is restricted from the file system or the network.
+    Requests that give the archive or the entries as data and
     return the result as data work for restricted callers.
 
     @section zipdp_factory Factory Name
