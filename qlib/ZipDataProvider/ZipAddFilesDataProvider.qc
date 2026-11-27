@@ -68,6 +68,10 @@ public class ZipAddFilesDataProvider inherits AbstractDataProvider {
 
     private auto doRequestImpl(auto req, *hash<auto> request_options) {
         hash<auto> request = req;
+        # the paths and locations in the request are the caller's input, also for the code that a host-created
+        # provider was lent to: refused before anything is read or written if that code is restricted (issue #7)
+        zip_check_caller_path("archive_path", request.archive_path);
+        zip_check_caller_entry_paths("entries", request.entries);
         @debug(log(LoggerLevel::DEBUG, "doRequestImpl: adding %d entries to %y", request.entries.size(),
             request.archive_path));
 
