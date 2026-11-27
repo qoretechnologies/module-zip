@@ -257,6 +257,9 @@ string sub lent_request(AbstractDataProvider dp, hash<auto> req) {
         # without options, the connection decides
         assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
             {"location": "conn://no-such-connection/x"}), "nofs lent conn location " + mode);
+        # the options of other handlers without domains of their own are not given to another handler
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "data://abc{encoding_errors=strict}"}), "nofs lent data location with options " + mode);
         # options that cannot be parsed
         assertEq("LOCATION-ERROR", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
             {"location": "file:///x{(1,2)}"}), "nofs lent location with invalid options " + mode);
