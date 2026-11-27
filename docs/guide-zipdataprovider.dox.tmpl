@@ -7,6 +7,10 @@
     The \c ZipDataProvider module provides integration with Qore's data provider framework:
     @ref zipdataproviderintro "ZipDataProvider module documentation"
 
+    The paths and locations in a request are refused with \c PERMISSION-DENIED before they are used if the calling
+    code is restricted from the file system, also when the host created the provider and gave it to that code; see
+    @ref zipdp_caller_paths "Paths Given by Restricted Callers".
+
     @code{.py}
 %requires ZipDataProvider
 

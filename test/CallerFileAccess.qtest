@@ -122,6 +122,7 @@ string sub lent_request(AbstractDataProvider dp, hash<auto> req) {
             addTestCase("lent providers, " + m, sub () { testLent(m); });
             addTestCase("requests without paths, " + m, sub () { testNoPaths(m); });
             addTestCase("network locations, " + m, sub () { testNetworkLocations(m); });
+            addTestCase("location options, " + m, sub () { testLocationOptions(m); });
         }
         set_return_value(main());
     }
@@ -222,6 +223,43 @@ string sub lent_request(AbstractDataProvider dp, hash<auto> req) {
             assertEq("PERMISSION-DENIED", getProgram("nonet", mode).callFunction("lent_request", getLeaf(r[0]),
                 r[1]), "nonet lent " + desc);
         }
+    }
+
+    #! the locations that restricted callers may use, the options of locations and the options of conn locations
+    private testLocationOptions(string mode) {
+        # a file location for code restricted only from the network
+        assertEq("ok", getProgram("nonet", mode).callFunction("request", "archive/list",
+            {"location": "file://" + archive}),
+            "nonet file location " + mode);
+        assertEq("ok", getProgram("nonet", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "file://" + archive}), "nonet lent file location " + mode);
+        # a network location for code restricted only from the file system: refused by the network, not by the module
+        string url = "http://127.0.0.1:1/x";
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("request", "archive/list",
+            {"location": url}),
+            "nofs http location " + mode);
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": url}), "nofs lent http location " + mode);
+        # an option of a network location that names a local file
+        url = "https://127.0.0.1:1/x{ssl_cert_path=/etc/hostname}";
+        assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("request", "archive/list",
+            {"location": url}),
+            "nofs https location with a file option " + mode);
+        assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": url}), "nofs lent https location with a file option " + mode);
+        # the options of a conn location are given to the handler of its connection, which does not see the code that
+        # a provider was lent to
+        url = "conn://no-such-connection/x{ssl_cert_path=/etc/hostname}";
+        assertEq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": url}), "nofs lent conn location with options " + mode);
+        assertNeq("ok", getProgram("nofs", mode).callFunction("request", "archive/list", {"location": url}),
+            "nofs conn location with options " + mode);
+        # without options, the connection decides
+        assertNeq("PERMISSION-DENIED", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "conn://no-such-connection/x"}), "nofs lent conn location " + mode);
+        # options that cannot be parsed
+        assertEq("LOCATION-ERROR", getProgram("nofs", mode).callFunction("lent_request", getLeaf("archive/list"),
+            {"location": "file:///x{(1,2)}"}), "nofs lent location with invalid options " + mode);
     }
 
     #! requests without paths work for restricted callers and with lent providers

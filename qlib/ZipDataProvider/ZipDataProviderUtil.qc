@@ -109,6 +109,15 @@ public namespace ZipDataProvider {
             throw "PERMISSION-DENIED", sprintf("the %y field of the request cannot be used: the calling code is "
                 "restricted from a functional domain of the handler of %y locations", field, scheme);
         }
+        # a handler without domains of its own (such as that of conn locations) gives the options that the caller adds
+        # to the handler that it resolves the location to, which judges the calling code as
+        # SandboxManager::isCallerRestricted() does; for the code that a host-created provider was lent to, which that
+        # does not see, the options are refused here if that code is restricted from the file system or the network
+        if (!dom && opts && SandboxManager::isLentToRestricted(DOM_FILESYSTEM | DOM_NETWORK)
+                && !SandboxManager::isCallerRestricted(DOM_FILESYSTEM | DOM_NETWORK)) {
+            throw "PERMISSION-DENIED", sprintf("the options of the location in the %y field of the request cannot be "
+                "used: the calling code is restricted from the FILESYSTEM or NETWORK functional domain", field);
+        }
     }
 
     #! Check if a name matches a glob pattern (using Util::glob_to_regex())
